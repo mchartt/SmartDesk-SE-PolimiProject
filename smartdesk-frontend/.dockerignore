@@ -1,9 +1,0 @@
-node_modules/
-dist/
-.angular/
-.git
-.gitignore
-*.md
-.env
-.env.*
-e2e/
