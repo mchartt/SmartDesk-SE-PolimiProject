@@ -1,0 +1,35 @@
+<div class="modal-content border-0 rounded-5 shadow-lg text-center" role="document">
+  <div class="modal-body p-4 p-md-5 position-relative">
+    <button type="button" class="btn-close position-absolute top-0 end-0 m-4" aria-label="Chiudi" (click)="close()" mdbRipple></button>
+    
+    <div
+      class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4"
+      [ngClass]="headerIconClass"
+      style="width: 4rem; height: 4rem"
+      aria-hidden="true"
+    >
+      <app-sd-icon [name]="iconName" [size]="32" />
+    </div>
+
+    <h3 class="modal-title fw-bold mb-3">{{ title }}</h3>
+    <p class="text-secondary mb-0">{{ message }}</p>
+  </div>
+
+  <div class="modal-footer border-0 p-4 pt-0 d-flex justify-content-center gap-3">
+    @if (!alertMode) {
+      <button type="button" class="btn btn-light rounded-pill px-4 py-3 fw-bold border-0 shadow-0 text-dark" (click)="close()" mdbRipple>
+        {{ cancelLabel }}
+      </button>
+    }
+    <button
+      type="button"
+      class="btn rounded-pill px-5 py-3 fw-bold shadow-sm"
+      [ngClass]="confirmBtnClass"
+      (click)="confirm()"
+      mdbRipple
+      cdkFocusInitial
+    >
+      {{ confirmLabel }}
+    </button>
+  </div>
+</div>

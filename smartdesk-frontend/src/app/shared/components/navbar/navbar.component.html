@@ -1,0 +1,171 @@
+<nav
+  class="navbar navbar-expand-lg navbar-fixed-top fixed-top sd-navbar"
+  [class.sd-navbar--scrolled]="scrolled()"
+  aria-label="Barra di navigazione principale"
+>
+  <a class="sd-navbar__skip-link" href="#contenuto-principale">Vai al contenuto</a>
+  <div class="container-fluid">
+    <a
+      class="navbar-brand d-flex align-items-center gap-2 fw-bold text-decoration-none flex-shrink-0 border border-2 border-primary rounded-pill pe-3 p-1"
+      [routerLink]="brandLink()"
+      mdbRipple
+      rippleColor="dark"
+      (click)="closeMobileNav()"
+    >
+      <div
+        class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white shadow-sm"
+        style="width: 2.5rem; height: 2.5rem"
+        aria-hidden="true"
+      >
+        <app-sd-brand-mark [size]="22" />
+      </div>
+      <span class="fs-5 d-none d-sm-inline sd-navbar__brand-text">SmartDesk</span>
+    </a>
+
+    <div class="sd-navbar__context d-none d-md-flex flex-column justify-content-center flex-grow-1 px-3 min-w-0">
+      <div class="d-flex align-items-center gap-2 min-w-0">
+        <span class="badge rounded-pill text-bg-light border text-muted fw-normal">{{ roleLabel() }}</span>
+        @if (accountRestricted()) {
+          <span class="badge rounded-pill text-bg-warning">Account limitato</span>
+        }
+      </div>
+      @if (pageTitle()) {
+        <p class="sd-navbar__page-title mb-0 fw-semibold text-truncate small text-body-secondary">
+          {{ pageTitle() }}
+        </p>
+      }
+    </div>
+
+    <button
+      class="navbar-toggler border-0 shadow-none ms-auto ms-lg-0"
+      type="button"
+      (click)="toggleMobileNav()"
+      [attr.aria-expanded]="mobileNavOpen()"
+      aria-controls="navbar-mobile-menu"
+      aria-label="Apri o chiudi menu di navigazione"
+      mdbRipple
+    >
+      <app-sd-icon [name]="mobileNavOpen() ? 'circle-xmark' : 'menu'" [size]="20" />
+    </button>
+
+    <div
+      id="navbar-mobile-menu"
+      class="collapse navbar-collapse justify-content-end"
+      mdbCollapse
+      #mobileCollapse="mdbCollapse"
+    >
+      <div class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-3 mt-3 mt-lg-0 pb-3 pb-lg-0 w-100">
+        <div class="sd-navbar__mobile-nav d-lg-none">
+          <p class="small text-uppercase text-muted fw-semibold mb-2 px-1">Sezioni</p>
+          <nav class="nav nav-pills flex-column gap-1" aria-label="Menu mobile area riservata">
+            @for (item of menuItems(); track item.path) {
+              <a
+                [routerLink]="item.path"
+                routerLinkActive="active"
+                class="nav-link rounded-pill d-flex align-items-center gap-2"
+                [routerLinkActiveOptions]="{ exact: false }"
+                (click)="closeMobileNav()"
+                mdbRipple
+              >
+                <app-sd-icon [name]="item.icon" [size]="18" />
+                <span>{{ item.label }}</span>
+              </a>
+            }
+          </nav>
+        </div>
+
+        <div class="d-none d-lg-flex align-items-center gap-2 ms-lg-auto me-lg-1">
+          @for (link of quickLinks(); track link.path) {
+            <a
+              [routerLink]="link.path"
+              routerLinkActive="active"
+              class="btn btn-link btn-sm sd-navbar__quick-link text-decoration-none d-inline-flex align-items-center gap-1 px-3 rounded-pill"
+              [routerLinkActiveOptions]="{ exact: false }"
+              mdbRipple
+            >
+              <app-sd-icon [name]="link.icon" [size]="14" />
+              {{ link.label }}
+            </a>
+          }
+        </div>
+
+        <div class="d-flex align-items-center gap-3 pt-2 pt-lg-0 sd-navbar__mobile-border sd-navbar__actions">
+          <app-notification-bell />
+
+          <div #accountMenuRoot class="dropdown position-relative sd-navbar__account-dropdown">
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm dropdown-toggle sd-navbar__account-btn d-flex align-items-center gap-2"
+              mdbRipple
+              [attr.aria-expanded]="accountMenuOpen()"
+              aria-haspopup="true"
+              [attr.aria-label]="'Menu account ' + (auth.user()?.displayName ?? '')"
+              (click)="toggleAccountMenu($event)"
+            >
+              <span
+                class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center fw-semibold text-uppercase flex-shrink-0"
+                style="width: 2rem; height: 2rem; font-size: 0.7rem"
+                aria-hidden="true"
+              >
+                {{ userInitials() }}
+              </span>
+              <span class="d-none d-md-inline text-truncate" style="max-width: 8rem">
+                {{ auth.user()?.displayName ?? 'Profilo' }}
+              </span>
+            </button>
+            @if (accountMenuOpen()) {
+              <ul
+                class="dropdown-menu dropdown-menu-end show sd-navbar__account-menu shadow-lg border-0"
+                role="menu"
+              >
+                <li class="px-4 py-3" role="none">
+                  <p class="mb-1 fw-bold text-dark fs-6 text-truncate">{{ auth.user()?.displayName ?? 'Profilo' }}</p>
+                  <p class="mb-3 small text-muted text-truncate">{{ auth.user()?.email ?? '—' }}</p>
+                  <span class="custom-role-badge">{{ roleLabel() }}</span>
+                </li>
+                @if (accountRestricted()) {
+                  <li role="none">
+                    <span class="dropdown-item-text small text-warning px-4">Account limitato o non autorizzato</span>
+                  </li>
+                }
+                <li role="separator"><hr class="dropdown-divider mx-3 my-2" /></li>
+                @for (item of accountMenuItems(); track item.path) {
+                  <li role="none" class="px-2">
+                    <a
+                      class="dropdown-item custom-dropdown-item d-flex align-items-center justify-content-between"
+                      role="menuitem"
+                      [routerLink]="item.path"
+                      (click)="closeAccountMenu()"
+                      mdbRipple
+                    >
+                      <div class="d-flex align-items-center gap-3">
+                        <app-sd-icon [name]="item.icon" [size]="18" class="custom-dropdown-icon" />
+                        <span class="fw-medium">{{ item.label }}</span>
+                      </div>
+                      @if (item.showUnreadBadge && unreadNotifications() > 0) {
+                        <span class="custom-nav-badge">{{ unreadBadgeLabel(unreadNotifications()) }}</span>
+                      }
+                    </a>
+                  </li>
+                }
+                <li role="separator"><hr class="dropdown-divider mx-3 my-2" /></li>
+                <li role="none" class="px-2 pb-2">
+                  <button
+                    type="button"
+                    class="dropdown-item custom-dropdown-item logout-item d-flex align-items-center gap-3 text-danger"
+                    role="menuitem"
+                    (click)="closeAccountMenu(); logout()"
+                    mdbRipple
+                  >
+                    <app-sd-icon name="logout" [size]="18" class="custom-dropdown-icon text-danger" />
+                    <span class="fw-medium">Esci</span>
+                  </button>
+                </li>
+              </ul>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

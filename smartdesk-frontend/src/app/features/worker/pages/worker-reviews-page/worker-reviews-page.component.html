@@ -1,0 +1,411 @@
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 px-2">
+  <div>
+    <h1 class="display-6 fw-bold mb-0 tracking-tight">{{ title() }}</h1>
+  </div>
+  @if (successMsg()) {
+    <div class="alert alert-success rounded-pill shadow-sm mb-0 py-2 px-4 border-0 fw-medium d-flex align-items-center gap-2" role="status">
+      <app-sd-icon name="circle-check" [size]="16" />
+      {{ successMsg() }}
+    </div>
+  }
+</div>
+
+<h2 class="fs-6 text-uppercase text-muted fw-semibold mb-2 ms-4 tracking-wide" id="reviews-compose-heading">
+  {{ editingReviewId() ? 'Modifica recensione' : 'Lascia una recensione' }}
+</h2>
+<section class="card border-0 rounded-5 mb-5 shadow-sm overflow-hidden bg-white" aria-labelledby="reviews-compose-heading">
+  <div class="card-body p-4 p-md-5">
+    @if (editingReviewId()) {
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-light rounded-pill text-muted fw-bold px-4" type="button" mdbRipple (click)="cancelEdit()">Annulla modifica</button>
+      </div>
+    }
+
+    @if (eligibleLoadError()) {
+      <div class="alert alert-danger border-0 rounded-4 py-3 px-4 fw-medium small mb-4" role="alert">{{ eligibleLoadError() }}</div>
+    }
+    @if (submitError()) {
+      <div class="alert alert-danger border-0 rounded-4 py-3 px-4 fw-medium small mb-4" role="alert">{{ submitError() }}</div>
+    }
+
+    @if (loadingEligible() && !editingReviewId()) {
+      <p class="text-muted small mb-0 fw-medium d-flex align-items-center gap-2" role="status">
+        <span class="spinner-border spinner-border-sm text-primary" aria-hidden="true"></span>
+        Caricamento prenotazioni disponibili…
+      </p>
+    } @else if (!completedBookings().length && !editingReviewId()) {
+      <div class="p-5 text-center">
+        <div class="mb-4 text-muted">
+          <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 5rem; height: 5rem">
+            <app-sd-icon name="star" [size]="32" class="opacity-50" />
+          </div>
+        </div>
+        <h3 class="fw-bold mb-2">Tutto in regola</h3>
+        <p class="text-muted mb-0 fw-medium">Nessuna prenotazione recensibile negli ultimi giorni.</p>
+      </div>
+    } @else {
+      <div class="list-group list-group-flush" [class.opacity-50]="editingReviewId()">
+        
+        
+        <div class="list-group-item px-0 py-4 border-bottom border-light">
+          <div class="d-flex align-items-center gap-4">
+            <div class="rounded-circle bg-primary bg-opacity-25 text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3rem; height: 3rem" aria-hidden="true">
+              <span class="fw-bold fs-5">1</span>
+            </div>
+            <div class="flex-grow-1 min-w-0">
+              <label id="review-booking-label" class="form-label fw-bold mb-1 fs-5 text-dark" for="review-booking-trigger">Prenotazione</label>
+              <p id="review-booking-hint" class="text-muted small fw-medium mb-3">
+                {{ editingReviewId() ? 'La prenotazione associata non può essere cambiata.' : 'Scegli una prenotazione conclusa negli ultimi 7 giorni.' }}
+              </p>
+              <button
+                id="review-booking-trigger"
+                type="button"
+                class="btn btn-light w-100 text-start d-flex justify-content-between align-items-center rounded-4 p-3 shadow-sm border-0"
+                [disabled]="!!editingReviewId()"
+                (click)="openBookingPicker($event)"
+                mdbRipple
+                aria-haspopup="dialog"
+                aria-describedby="review-booking-hint"
+              >
+                <span class="text-truncate me-2 fw-semibold fs-6 text-dark">{{ bookingId() != null ? selectedBookingLabel() : 'Scegli dalla lista…' }}</span>
+                <div class="bg-white rounded-circle p-2 shadow-sm d-flex align-items-center justify-content-center text-primary">
+                  <app-sd-icon name="calendar-check" [size]="18" class="flex-shrink-0" aria-hidden="true" />
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="list-group-item px-0 py-4 border-bottom border-light">
+          <div class="d-flex align-items-center gap-4">
+            <div class="rounded-circle bg-primary bg-opacity-25 text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3rem; height: 3rem" aria-hidden="true">
+              <span class="fw-bold fs-5">2</span>
+            </div>
+            <div class="flex-grow-1 min-w-0">
+              <p id="review-rating-label" class="form-label fw-bold mb-1 fs-5 text-dark">Valutazione</p>
+              <p class="text-muted small fw-medium mb-3">Da 1 a 5 stelle.</p>
+              <div class="d-flex align-items-center gap-2" role="radiogroup" aria-labelledby="review-rating-label">
+                @for (s of stars; track s) {
+                  <button
+                    type="button"
+                    class="btn btn-link p-2 text-decoration-none shadow-none rounded-circle transition-hover"
+                    role="radio"
+                    [attr.aria-checked]="rating() === s"
+                    [attr.aria-pressed]="rating() === s"
+                    [attr.aria-label]="'Valuta ' + s + (s === 1 ? ' stella' : ' stelle')"
+                    (mouseenter)="hoverStar.set(s)"
+                    (mouseleave)="hoverStar.set(null)"
+                    (focus)="hoverStar.set(s)"
+                    (blur)="hoverStar.set(null)"
+                    (keydown)="onStarsKeydown($event)"
+                    (click)="setRating(s)"
+                    mdbRipple
+                  >
+                    <app-sd-icon 
+                      name="star" 
+                      [size]="36" 
+                      [class.text-warning]="s <= effectiveStars()" 
+                      [class.text-muted]="s > effectiveStars()" 
+                      [class.opacity-50]="s > effectiveStars()"
+                      [class.star-filled]="s <= effectiveStars()"
+                      [class.star-outline]="s > effectiveStars()"
+                      aria-hidden="true" 
+                    />
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="list-group-item px-0 py-4 border-0">
+          <div class="d-flex align-items-start gap-4">
+            <div class="rounded-circle bg-primary bg-opacity-25 text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3rem; height: 3rem" aria-hidden="true">
+              <span class="fw-bold fs-5">3</span>
+            </div>
+            <div class="flex-grow-1 min-w-0">
+              <label class="form-label fw-bold mb-1 fs-5 text-dark" for="reviewComment">Commento</label>
+              <p id="review-comment-hint" class="text-muted small fw-medium mb-3">
+                Obbligatorio: minimo {{ COMMENT_MIN }} caratteri.
+              </p>
+              <textarea
+                mdbInput
+                id="reviewComment"
+                name="reviewComment"
+                class="form-control bg-light border-0 rounded-4 p-3 mb-2"
+                rows="4"
+                [ngModel]="commentText()"
+                (ngModelChange)="commentText.set($event)"
+                [minlength]="COMMENT_MIN"
+                [maxlength]="COMMENT_MAX"
+                required
+                aria-describedby="review-comment-hint reviewComment-help reviewComment-count"
+                placeholder="Come ti sei trovato?"
+              ></textarea>
+              <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2">
+                <small id="reviewComment-help" class="text-muted fw-medium mb-0">
+                  {{ COMMENT_MIN }}–{{ COMMENT_MAX }} caratteri.
+                </small>
+                <small
+                  id="reviewComment-count"
+                  class="fw-bold"
+                  [class.text-danger]="commentText().trim().length > COMMENT_MAX - 25 || (commentText().trim().length > 0 && commentText().trim().length < COMMENT_MIN)"
+                  [class.text-primary]="!(commentText().trim().length > COMMENT_MAX - 25 || (commentText().trim().length > 0 && commentText().trim().length < COMMENT_MIN))"
+                >
+                  {{ commentText().trim().length }} / {{ COMMENT_MAX }}
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="d-flex justify-content-end gap-3 mt-4 pt-4 border-top border-light">
+        @if (editingReviewId()) {
+          <button class="btn btn-white rounded-pill px-5 py-3 fw-bold shadow-sm" type="button" (click)="cancelEdit()" mdbRipple>
+            Annulla
+          </button>
+        }
+        <button class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-0" type="button" [disabled]="!canSubmitNow()" (click)="submit()" mdbRipple>
+          {{ editingReviewId() ? 'Aggiorna recensione' : 'Invia recensione' }}
+        </button>
+      </div>
+    }
+  </div>
+</section>
+
+<h2 class="fs-6 text-uppercase text-muted fw-semibold mb-2 ms-4 tracking-wide" id="reviews-history-heading">
+  Storico recensioni
+</h2>
+<section class="card border-0 rounded-5 shadow-sm overflow-hidden bg-white mb-5" aria-labelledby="reviews-history-heading">
+  <div class="card-body p-4 p-md-5">
+    @if (historyLoadError()) {
+      <div class="alert alert-danger border-0 rounded-4 py-3 px-4 fw-medium small mb-4" role="alert">{{ historyLoadError() }}</div>
+    }
+
+    @if (historyLoading()) {
+      <div class="d-flex justify-content-center p-5">
+        <div class="spinner-border text-secondary" role="status">
+          <span class="visually-hidden">Caricamento storico…</span>
+        </div>
+      </div>
+    } @else {
+      <div class="bg-light rounded-4 p-4 mb-4">
+        <div class="row g-4 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label small text-uppercase text-muted fw-semibold mb-2" for="reviewOfficeFilter">Filtro ufficio</label>
+            <select
+              id="reviewOfficeFilter"
+              class="form-select form-select-lg bg-white border-0 shadow-sm rounded-4"
+              [ngModel]="officeFilterId()"
+              (ngModelChange)="officeFilterId.set($event)"
+              name="officeFilter"
+            >
+              <option [ngValue]="'all'">Tutti gli uffici</option>
+              @for (opt of officeOptions(); track opt[0]) {
+                <option [ngValue]="opt[0]">{{ opt[1] }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small text-uppercase text-muted fw-semibold mb-2" for="reviewSearch">Cerca nel testo</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-0 shadow-sm rounded-start-4 ps-4 pe-2" aria-hidden="true">
+                <app-sd-icon name="search" [size]="18" class="text-muted" />
+              </span>
+              <input
+                id="reviewSearch"
+                name="reviewSearch"
+                type="search"
+                class="form-control form-control-lg bg-white border-0 shadow-sm rounded-end-4"
+                placeholder="Parole nel commento…"
+                [ngModel]="searchQuery()"
+                (ngModelChange)="searchQuery.set($event)"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4 d-flex justify-content-center justify-content-md-end">
+            <mdb-tabs pills class="apple-tabs bg-white rounded-pill shadow-sm p-1" (activeTabChange)="onMdbTabChange($event)">
+              <mdb-tab title="Tutte"></mdb-tab>
+              <mdb-tab title="Nuove"></mdb-tab>
+              <mdb-tab title="Storico"></mdb-tab>
+            </mdb-tabs>
+          </div>
+        </div>
+      </div>
+
+      @if (displayedHistoryReviews().length > 0) {
+        <p class="text-muted small fw-medium mb-4 ms-2" aria-live="polite">
+          Trovate {{ displayedHistoryReviews().length }} {{ displayedHistoryReviews().length === 1 ? 'recensione' : 'recensioni' }}
+        </p>
+      }
+
+      @if (!displayedHistoryReviews().length) {
+        <div class="p-5 text-center">
+          <div class="mb-4 text-muted">
+            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 5rem; height: 5rem">
+              <app-sd-icon name="search" [size]="32" class="opacity-50" />
+            </div>
+          </div>
+          <p class="text-muted fw-medium mb-0">Nessun risultato con questi filtri. Prova a modificare la ricerca.</p>
+        </div>
+      } @else {
+        <div class="list-group list-group-flush border border-light rounded-4 overflow-hidden">
+          @for (r of displayedHistoryReviews(); track r.reviewID) {
+            <ng-container *ngTemplateOutlet="reviewItem; context: { $implicit: r }"></ng-container>
+          }
+        </div>
+      }
+    }
+  </div>
+</section>
+
+<ng-template #reviewItem let-r>
+  <div class="list-group-item p-4 p-md-5 border-bottom border-light" [class.opacity-50]="deletingReviewId() === r.reviewID">
+    <div class="d-flex flex-column flex-lg-row gap-4 justify-content-between align-items-lg-start">
+      <div class="d-flex gap-4 flex-grow-1 min-w-0">
+        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+          <app-sd-icon name="clipboard-list" [size]="20" class="text-secondary" />
+        </div>
+        <div class="min-w-0 flex-grow-1">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <h4 class="fw-bold text-dark fs-5 mb-0">{{ locationLine(r) }}</h4>
+            @if (r.createdAt) {
+              <time class="small text-muted fw-medium flex-shrink-0" [attr.datetime]="r.createdAt">{{ formatReviewDate(r.createdAt) }}</time>
+            }
+          </div>
+          
+          <div class="d-flex align-items-center gap-1 mb-3" [attr.aria-label]="'Valutazione ' + r.rating + ' su 5'">
+            @for (s of stars; track s) {
+              <app-sd-icon
+                name="star"
+                [size]="16"
+                [class.text-warning]="s <= r.rating"
+                [class.text-muted]="s > r.rating"
+                [class.opacity-50]="s > r.rating"
+                aria-hidden="true"
+              />
+            }
+          </div>
+          
+          <p class="mb-3 text-break fw-medium text-dark">{{ r.comment }}</p>
+
+          <div class="mt-2" mdbCollapse #reviewCollapse="mdbCollapse">
+            <div class="p-4 bg-light rounded-4 border border-light d-flex flex-wrap gap-4 mb-3 mt-3">
+              <div>
+                <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem;"><app-sd-icon name="ticket" [size]="12" /> Prenotazione</span>
+                <span class="fw-bold text-dark fs-6">{{ reviewBookingPublicRef(r) }}</span>
+              </div>
+              <div>
+                <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem;"><app-sd-icon name="building" [size]="12" /> Codice Ufficio</span>
+                <span class="badge bg-secondary text-white fw-bold px-3 py-2 rounded-pill">{{ r.spaceOfficeCode || '—' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap flex-lg-column justify-content-end gap-2 flex-shrink-0">
+        <button
+          type="button"
+          class="btn btn-light rounded-pill fw-bold shadow-sm px-4 py-2"
+          (click)="startEdit(r)"
+          mdbRipple
+        >
+          Modifica
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center justify-content-center gap-2"
+          (click)="reviewCollapse.toggle()"
+          mdbRipple
+          [attr.aria-expanded]="!reviewCollapse.collapsed"
+          [attr.aria-label]="'Mostra dettagli recensione numero ' + r.reviewID"
+        >
+          Dettagli
+          <app-sd-icon [name]="reviewCollapse.collapsed ? 'chevron-down' : 'chevron-up'" [size]="14" />
+        </button>
+        <button
+          type="button"
+          class="btn btn-white text-danger border-0 rounded-pill px-4 py-2 mt-lg-2"
+          [disabled]="deletingReviewId() === r.reviewID"
+          (click)="deleteReview(r.reviewID)"
+          mdbRipple
+        >
+          @if (deletingReviewId() === r.reviewID) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          } @else {
+            <app-sd-icon name="trash" [size]="16" aria-hidden="true" class="me-2" />
+            Elimina
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #bookingPickerModal>
+  <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
+    <app-sd-modal-header
+      title="Prenotazioni degli ultimi 7 giorni"
+      [subtitle]="completedBookings().length + ' disponibil' + (completedBookings().length === 1 ? 'e' : 'i') + ' · scegli una prenotazione'"
+      icon="calendar-check"
+      titleId="review-booking-dialog-title"
+      (close)="closeBookingPicker()"
+    />
+    <div class="modal-body p-0">
+      <ul
+        id="review-booking-listbox"
+        class="list-group list-group-flush"
+        role="listbox"
+        aria-labelledby="review-booking-dialog-title"
+      >
+        @for (b of completedBookings(); track b.bookingID) {
+          <li class="list-group-item p-0 border-bottom border-light" role="presentation">
+            <button
+              type="button"
+              class="btn btn-white w-100 text-start d-flex align-items-center gap-4 p-4 rounded-0 shadow-0 transition-hover"
+              role="option"
+              [class.bg-light]="isBookingOptionSelected(b)"
+              [attr.aria-selected]="isBookingOptionSelected(b)"
+              (click)="pickBooking(b)"
+              mdbRipple
+            >
+              <div
+                class="rounded-circle bg-primary bg-opacity-25 text-primary d-flex align-items-center justify-content-center flex-shrink-0"
+                style="width: 3rem; height: 3rem"
+                aria-hidden="true"
+              >
+                <app-sd-icon name="calendar-check" [size]="20" />
+              </div>
+              <div class="flex-grow-1 min-w-0">
+                <span class="fw-bold fs-6 text-dark d-block mb-1">Prenotazione #{{ bookingPublicRef(b) }}</span>
+                <div class="d-flex flex-wrap align-items-center gap-3 small text-muted fw-medium">
+                  <span class="d-flex align-items-center gap-1 text-truncate">
+                    <app-sd-icon name="building" [size]="14" aria-hidden="true" />
+                    {{ b.spaceName || 'Spazio' }}
+                  </span>
+                  <span class="d-flex align-items-center gap-1">
+                    <app-sd-icon name="desktop" [size]="14" aria-hidden="true" />
+                    Desk {{ b.deskCode || b.deskID }}
+                  </span>
+                  <span class="d-flex align-items-center gap-1">
+                    <app-sd-icon name="clock" [size]="14" aria-hidden="true" />
+                    {{ b.startTime | date: 'dd/MM/yyyy HH:mm' }} - {{ b.endTime | date: 'HH:mm' }}
+                  </span>
+                </div>
+              </div>
+              <app-sd-icon name="arrow-right" [size]="20" class="text-primary opacity-50 flex-shrink-0 ms-2" aria-hidden="true" />
+            </button>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</ng-template>

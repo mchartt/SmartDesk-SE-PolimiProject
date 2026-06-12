@@ -1,0 +1,141 @@
+<div class="mb-4">
+  <div class="d-flex flex-wrap gap-3 py-3 px-4 rounded-4 bg-light border-0" aria-label="Legenda disponibilità">
+    <span class="d-flex align-items-center gap-2 small fw-medium text-dark">
+      <span class="rounded-circle bg-success shadow-sm flex-shrink-0" style="width: 0.75rem; height: 0.75rem"></span>
+      Libero
+    </span>
+    <span class="d-flex align-items-center gap-2 small fw-medium text-dark">
+      <span class="rounded-circle bg-danger shadow-sm flex-shrink-0" style="width: 0.75rem; height: 0.75rem"></span>
+      Occupato
+    </span>
+    <span class="d-flex align-items-center gap-2 small fw-medium text-dark">
+      <span class="rounded-circle bg-primary shadow-sm flex-shrink-0" style="width: 0.75rem; height: 0.75rem"></span>
+      Selezionato
+    </span>
+    <span class="d-flex align-items-center gap-2 small fw-medium text-dark">
+      <span class="rounded-circle bg-warning shadow-sm flex-shrink-0" style="width: 0.75rem; height: 0.75rem"></span>
+      Conflitto
+    </span>
+    <span class="d-flex align-items-center gap-2 small fw-medium text-dark">
+      <span class="rounded-circle bg-info shadow-sm flex-shrink-0" style="width: 0.75rem; height: 0.75rem"></span>
+      Tua prenotazione
+    </span>
+    <span class="d-flex align-items-center gap-2 small fw-medium text-dark">
+      <span class="rounded-circle bg-secondary shadow-sm flex-shrink-0" style="width: 0.75rem; height: 0.75rem"></span>
+      Non disponibile
+    </span>
+  </div>
+</div>
+
+@if (!slotsLoading() && visibleSlotRows().length > 0) {
+  @let stats = availabilityDaySummary();
+  <div class="mb-4 px-4 py-3 rounded-4 bg-white border border-light shadow-sm d-flex flex-wrap align-items-center gap-2 small" role="status" aria-label="Riepilogo fascia giornaliera nella timeline">
+    <span class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">In questa giornata:</span>
+    <div class="d-flex align-items-center gap-2 fw-medium">
+      <span class="text-success">{{ stats.free }} disponibili</span>
+      <span class="text-muted opacity-50" aria-hidden="true">•</span>
+      <span class="text-danger">{{ stats.occupied }} occupati</span>
+      <span class="text-muted opacity-50" aria-hidden="true">•</span>
+      <span class="text-info">{{ stats.ownBooking }} tue pren.</span>
+      <span class="text-muted opacity-50" aria-hidden="true">•</span>
+      <span class="text-secondary">{{ stats.unavailable }} non disp.</span>
+    </div>
+  </div>
+}
+
+<div class="d-flex align-items-center gap-2 mb-3">
+  <app-sd-icon name="circle-info" [size]="16" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+  <p id="sd-timeline-hint" class="small text-muted fw-medium mb-0">
+    Primo clic: inizio fascia. Secondo clic: fine fascia. Puoi anche trascinare.
+  </p>
+</div>
+
+@if (slotsLoading()) {
+  <div class="d-flex align-items-center justify-content-center gap-3 py-5 px-3 bg-light rounded-4" role="status" aria-live="polite" aria-busy="true">
+    <span class="spinner-border text-primary" aria-hidden="true"></span>
+    <span class="fw-medium text-muted">Caricamento disponibilità…</span>
+  </div>
+} @else {
+  <div
+    class="list-group list-group-flush border-0 rounded-4 overflow-hidden shadow-sm bg-white mb-4"
+    role="listbox"
+    aria-multiselectable="true"
+    aria-label="Disponibilità postazione: scegli fascia oraria"
+    aria-describedby="sd-timeline-hint"
+    aria-busy="false"
+  >
+    @for (row of visibleSlotRows(); track row.slot.time) {
+      @let i = row.index;
+      @let status = getSlotStatus(i);
+      <div
+        class="list-group-item list-group-item-action d-flex align-items-center gap-4 py-3 px-4 border-bottom border-light transition-hover"
+        [class.bg-primary]="status === 'selected'"
+        [class.bg-opacity-25]="status === 'selected'"
+        (pointerdown)="onSlotPointerDown(i, $event)"
+        (pointerenter)="onSlotPointerEnter(i)"
+        role="option"
+        tabindex="0"
+        (keydown)="onSlotKeydown($event, i)"
+        [attr.aria-selected]="isInSelection(i)"
+        [attr.aria-disabled]="isUnavailableAtTimelineIndex(i) ? true : null"
+        [attr.aria-label]="slotRangeDisplayLabel(i) + ', ' + slotStatusBarLabel(status)"
+      >
+        <span class="fw-bold text-dark flex-shrink-0 text-nowrap" style="min-width: 5.5rem">{{ slotRangeDisplayLabel(i) }}</span>
+        <div class="desk-timeline-track flex-grow-1">
+          <div
+            class="desk-timeline-slot w-100 d-flex align-items-center justify-content-center small fw-bold rounded-pill"
+            style="min-height: 2rem"
+            [class.desk-timeline-slot--free]="status === 'free'"
+            [class.desk-timeline-slot--busy]="status === 'occupied'"
+            [class.desk-timeline-slot--selected]="status === 'selected'"
+            [class.bg-warning]="status === 'conflict'"
+            [class.bg-info]="status === 'own-booking'"
+            [class.bg-secondary]="status === 'closed'"
+            [class.text-dark]="status === 'conflict' || status === 'own-booking'"
+            [class.text-white]="status === 'closed' || status === 'selected'"
+          >
+            <span aria-hidden="true">{{ slotStatusBarLabel(status) }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<div class="bg-light rounded-4 p-4 border border-light">
+  <div class="d-flex flex-column gap-3">
+    <p
+      id="sd-timeline-summary-text"
+      class="mb-0 fw-bold fs-6 text-center"
+      [class.text-danger]="summaryIsBlocking() && !showDeskOccupancyConflictAlert() && !showOwnBookingConflictAlert()"
+      [class.text-primary]="!(summaryIsBlocking() && !showDeskOccupancyConflictAlert() && !showOwnBookingConflictAlert())"
+      aria-live="polite"
+    >
+      {{ timelineFooterIntervalText() }}
+    </p>
+    
+    @if (showOwnBookingConflictAlert()) {
+      <div id="sd-timeline-own-booking-alert" class="alert alert-warning border-0 rounded-4 py-3 px-4 mb-0 fw-medium small d-flex align-items-center gap-2" role="alert">
+        <app-sd-icon name="exclamation" [size]="18" class="flex-shrink-0" />
+        {{ ownBookingConflictMessage() }}
+      </div>
+    }
+    
+    @if (showDeskOccupancyConflictAlert()) {
+      <div id="sd-timeline-conflict-alert" class="alert alert-danger border-0 rounded-4 py-3 px-4 mb-0 fw-medium small d-flex align-items-center gap-2" role="alert">
+        <app-sd-icon name="exclamation" [size]="18" class="flex-shrink-0" />
+        {{ deskOccupancyConflictMessage() }}
+      </div>
+    }
+    
+    <button
+      class="btn btn-primary rounded-pill py-3 px-4 fw-bold shadow-sm w-100 mt-2"
+      type="button"
+      [disabled]="!bookingReady()"
+      [attr.aria-describedby]="bookButtonAriaDescribedBy()"
+      (click)="bookSelection()"
+    >
+      Prenota orari selezionati
+    </button>
+  </div>
+</div>

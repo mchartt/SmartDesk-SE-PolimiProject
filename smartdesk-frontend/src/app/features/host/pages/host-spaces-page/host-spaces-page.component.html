@@ -1,0 +1,260 @@
+<header class="mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 px-2">
+  <div class="d-flex align-items-center gap-4">
+    <div class="bg-primary bg-opacity-25 text-primary rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 4rem; height: 4rem">
+      <app-sd-icon name="building" [size]="28" />
+    </div>
+    <div>
+      <p class="text-muted text-uppercase small fw-bold mb-1 tracking-wide">Configurazione</p>
+      <h1 class="display-6 fw-bold mb-0 tracking-tight">{{ title() }}</h1>
+    </div>
+  </div>
+  <button class="btn btn-primary rounded-pill px-4 py-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2" type="button" (click)="openModal()" mdbRipple>
+    <app-sd-icon name="plus" [size]="18" aria-hidden="true" />
+    <span>Crea nuovo spazio</span>
+  </button>
+</header>
+
+@if (successMsg) {
+  <div class="alert alert-success border-0 rounded-4 shadow-sm d-flex align-items-center mb-4 fw-medium small" role="alert">
+    <app-sd-icon name="circle-check" [size]="20" class="me-3 flex-shrink-0" aria-hidden="true" />
+    {{ successMsg }}
+  </div>
+}
+@if (errorMsg) {
+  <div class="alert alert-danger border-0 rounded-4 shadow-sm d-flex align-items-center mb-4 fw-medium small" role="alert">
+    <app-sd-icon name="exclamation" [size]="20" class="me-3 flex-shrink-0" aria-hidden="true" />
+    {{ errorMsg }}
+  </div>
+}
+
+@if (isModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-space-modal-title"
+    (click)="onModalBackdropClick()"
+  >
+    <div
+      class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"
+      role="document"
+      (click)="onModalDialogClick($event)"
+    >
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <div class="modal-header border-0 px-4 px-md-5 pt-4 pt-md-5 pb-0 d-flex justify-content-between align-items-start">
+          <div class="d-flex align-items-center gap-3">
+            <div
+              class="rounded-circle bg-primary bg-opacity-25 text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+              style="width: 3.5rem; height: 3.5rem"
+              aria-hidden="true"
+            >
+              <app-sd-icon [name]="editingId === null ? 'building' : 'layers'" [size]="20" />
+            </div>
+            <div>
+              <p class="text-muted small text-uppercase fw-bold mb-1 tracking-wide">
+                {{ editingId === null ? 'Nuovo ufficio' : 'Modifica ufficio' }}
+              </p>
+              <h2 id="host-space-modal-title" class="fw-bold fs-4 mb-0 text-dark">
+                {{ editingId === null ? 'Crea uno spazio' : 'Aggiorna i dettagli dello spazio' }}
+              </h2>
+            </div>
+          </div>
+          <button type="button" class="btn-close bg-light rounded-circle p-2" aria-label="Chiudi finestra" (click)="closeModal()"></button>
+        </div>
+
+        <div class="modal-body px-4 px-md-5 py-4">
+          <section class="mb-5" aria-labelledby="host-space-section-details">
+            <h3 id="host-space-section-details" class="fs-6 text-uppercase text-muted fw-semibold mb-3 tracking-wide">Dettagli spazio</h3>
+            <div class="card border-0 bg-light rounded-4 p-4 p-md-5">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-dark" for="host-space-name">Nome spazio</label>
+                  <input
+                    id="host-space-name"
+                    class="form-control form-control-lg bg-white border-0 rounded-3 shadow-sm"
+                    [(ngModel)]="name"
+                    placeholder="es. Ufficio Milano"
+                    maxlength="50"
+                    autocomplete="organization"
+                  />
+                  <div class="form-text small fw-medium mt-2">{{ name.length }}/50 caratteri</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-dark" for="host-space-city">Città</label>
+                  <div class="position-relative" #cityCombo>
+                    <input
+                      id="host-space-city"
+                      class="form-control form-control-lg bg-white border-0 rounded-3 shadow-sm"
+                      type="text"
+                      [(ngModel)]="city"
+                      (ngModelChange)="onCityQueryChange($event)"
+                      (focus)="onCityFocus()"
+                      (blur)="onCityBlur()"
+                      (keydown)="onCityKeydown($event)"
+                      placeholder="Cerca comune (es. Milano)"
+                      autocomplete="off"
+                      role="combobox"
+                      [attr.aria-expanded]="cityPanelOpen"
+                      [attr.aria-controls]="cityListboxId"
+                      aria-autocomplete="list"
+                      [attr.aria-activedescendant]="
+                        cityHighlightIdx >= 0 && citySuggestions[cityHighlightIdx]
+                          ? 'host-space-city-opt-' + cityHighlightIdx
+                          : null
+                      "
+                    />
+                    @if (cityPanelOpen) {
+                      <div
+                        class="dropdown-menu show w-100 shadow-sm mt-2 p-2 border-0 rounded-4 overflow-hidden"
+                        role="listbox"
+                        [id]="cityListboxId"
+                        aria-label="Comuni italiani"
+                      >
+                        @if (!comuniCatalogReady()) {
+                          <div class="dropdown-item-text small text-muted px-3 py-2 fw-medium" role="status">Caricamento elenco comuni…</div>
+                        } @else {
+                          @for (row of citySuggestions; track row.label; let i = $index) {
+                            <button
+                              type="button"
+                              class="dropdown-item rounded-3 px-3 py-2 fw-medium"
+                              role="option"
+                              [id]="'host-space-city-opt-' + i"
+                              [attr.aria-selected]="i === cityHighlightIdx"
+                              [class.bg-light]="i === cityHighlightIdx"
+                              [class.text-primary]="i === cityHighlightIdx"
+                              (mousedown)="$event.preventDefault()"
+                              (click)="selectCitySuggestion(row)"
+                            >
+                              {{ row.label }}
+                            </button>
+                          } @empty {
+                            @if (city.trim().length > 0) {
+                              <div class="dropdown-item-text small text-muted px-3 py-2 fw-medium" role="status">
+                                Nessun comune corrisponde.
+                              </div>
+                            } @else {
+                              <div class="dropdown-item-text small text-muted px-3 py-2 fw-medium" role="status">
+                                Digita per cercare.
+                              </div>
+                            }
+                          }
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold text-dark" for="host-space-address">Indirizzo</label>
+                  <input
+                    id="host-space-address"
+                    class="form-control form-control-lg bg-white border-0 rounded-3 shadow-sm"
+                    [(ngModel)]="address"
+                    placeholder="es. Via Roma 1"
+                    autocomplete="street-address"
+                  />
+                </div>
+                <div class="col-12">
+                  <div class="d-flex justify-content-between align-items-baseline gap-2 mb-2">
+                    <label class="form-label small fw-bold text-dark mb-0" for="host-space-description">Descrizione (opzionale)</label>
+                    <span class="small fw-bold text-muted" aria-live="polite">{{ description.length }}/{{ descriptionMaxLen }}</span>
+                  </div>
+                  <textarea
+                    id="host-space-description"
+                    class="form-control bg-white border-0 rounded-4 p-3 shadow-sm"
+                    rows="4"
+                    [(ngModel)]="description"
+                    [maxlength]="descriptionMaxLen"
+                    spellcheck="true"
+                    placeholder="Servizi inclusi, piano, accesso, note per chi prenota…"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <app-opening-hours-editor
+            class="d-block mb-5"
+            [openingHoursRows]="openingHoursRows"
+            [hoursQuickAction]="hoursQuickAction"
+            (openingHoursRowsChange)="onOpeningHoursRowsChange($event)"
+            (hoursQuickActionChange)="hoursQuickAction = $event"
+            (hoursEdited)="onOpeningHoursEdited()"
+          />
+
+          @if (editingId !== null) {
+            <app-closure-calendar />
+          }
+        </div>
+
+        <div class="modal-footer border-0 px-4 px-md-5 pb-4 pb-md-5 pt-0 gap-3">
+          <button type="button" class="btn btn-white rounded-pill px-4 py-3 fw-bold shadow-sm" (click)="closeModal()" mdbRipple>Annulla</button>
+          <button type="button" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-sm d-inline-flex align-items-center" (click)="saveSpace()" mdbRipple>
+            <app-sd-icon [name]="editingId === null ? 'check' : 'edit'" [size]="18" class="me-2" aria-hidden="true" />
+            {{ editingId === null ? 'Crea spazio' : 'Salva spazio' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show bg-dark" style="opacity: 0.4;"></div>
+}
+
+@if (loading()) {
+  <div class="d-flex flex-column align-items-center justify-content-center py-5 gap-3" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" aria-hidden="true"></div>
+    <p class="text-muted small fw-medium mb-0">Caricamento spazi...</p>
+  </div>
+} @else if (!spaces().length && !errorMsg) {
+  <div class="p-5 text-center bg-white rounded-5 shadow-sm mb-5">
+    <div class="mb-4 text-muted">
+      <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 5rem; height: 5rem">
+        <app-sd-icon name="building" [size]="32" class="opacity-50" />
+      </div>
+    </div>
+    <h3 class="fw-bold mb-2">Nessuno spazio</h3>
+    <p class="text-muted fw-medium mb-4">Non hai ancora configurato nessuno spazio. Inizia creandone uno nuovo.</p>
+    <button class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2" type="button" (click)="openModal()" mdbRipple>
+      <app-sd-icon name="plus" [size]="18" aria-hidden="true" />
+      <span>Crea il tuo primo spazio</span>
+    </button>
+  </div>
+} @else {
+  <div class="card border-0 rounded-5 shadow-sm overflow-hidden bg-white mb-5">
+    <div class="list-group list-group-flush">
+      @for (space of spaces(); track space.spaceID) {
+        <div class="list-group-item p-4 p-md-4 border-bottom border-light d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-4 transition-hover">
+          <div class="d-flex align-items-center gap-4 min-w-0">
+            <div
+              class="rounded-circle bg-primary bg-opacity-25 text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+              style="width: 3.5rem; height: 3.5rem"
+              aria-hidden="true"
+            >
+              <app-sd-icon name="building" [size]="24" />
+            </div>
+            <div class="min-w-0">
+              <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                <h5 class="fw-bold fs-5 mb-0 text-dark text-truncate">{{ space.name }}</h5>
+                <app-status-badge [status]="space.approved ? 'APPROVED' : 'PENDING'" />
+              </div>
+              <p class="text-muted small fw-medium mb-0 text-truncate">
+                {{ space.address }}, {{ space.city }}
+                <span class="opacity-50 mx-1">•</span>
+                Codice: <span class="badge bg-secondary bg-opacity-25 text-secondary rounded-pill px-2">{{ space.officeCode || 'N/A' }}</span>
+              </p>
+            </div>
+          </div>
+          <div class="d-flex gap-2 flex-shrink-0 mt-2 mt-md-0 w-100 w-md-auto">
+            <button class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold flex-grow-1 flex-md-grow-0 d-inline-flex align-items-center justify-content-center" type="button" (click)="editSpace(space)" mdbRipple>
+              Modifica
+            </button>
+            <button class="btn btn-white text-danger border-0 rounded-pill px-4 py-2 fw-bold shadow-sm flex-grow-1 flex-md-grow-0 d-inline-flex align-items-center justify-content-center gap-2" type="button" (click)="deleteSpace(space.spaceID)" mdbRipple>
+              <app-sd-icon name="trash" [size]="16" />
+              Elimina
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

@@ -1,0 +1,268 @@
+<header class="mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 px-2">
+  <div class="d-flex align-items-center gap-3">
+    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+      <app-sd-icon name="calendar-check" [size]="24" />
+    </div>
+    <div>
+      <p class="text-muted text-uppercase small fw-bold mb-1 tracking-wide">Gestione spazi</p>
+      <h2 class="mb-0 fw-bold">Prenotazioni</h2>
+      <p class="text-muted small mb-0 mt-1 d-none d-sm-block">Monitora le prenotazioni attive e consulta lo storico con filtri avanzati.</p>
+    </div>
+  </div>
+  <button
+    type="button"
+    class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-2 shadow-sm"
+    (click)="load()"
+    [disabled]="loading()"
+    aria-label="Aggiorna elenco prenotazioni"
+    mdbRipple
+  >
+    @if (loading()) {
+      <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+    } @else {
+      <app-sd-icon name="rotate-right" [size]="16" aria-hidden="true" />
+    }
+    <span class="fw-semibold">Aggiorna</span>
+  </button>
+</header>
+
+<nav class="nav nav-pills flex-wrap gap-2 mb-4 p-1 bg-light rounded-pill d-inline-flex align-items-center" role="tablist" aria-label="Sezioni prenotazioni">
+  <button
+    type="button"
+    class="nav-link rounded-pill d-inline-flex align-items-center gap-2 px-4 fw-semibold border-0 py-2"
+    role="tab"
+    [class.active]="activeSection() === 'today'"
+    [class.bg-white]="activeSection() === 'today'"
+    [class.shadow-sm]="activeSection() === 'today'"
+    [class.text-dark]="activeSection() === 'today'"
+    [class.text-muted]="activeSection() !== 'today'"
+    [attr.aria-selected]="activeSection() === 'today'"
+    (click)="setSection('today')"
+  >
+    Oggi
+    <span class="badge rounded-pill" [class.bg-primary]="activeSection() === 'today'" [class.bg-secondary]="activeSection() !== 'today'">
+      {{ todayBookings().length }}
+    </span>
+  </button>
+  <button
+    type="button"
+    class="nav-link rounded-pill d-inline-flex align-items-center gap-2 px-4 fw-semibold border-0 py-2"
+    role="tab"
+    [class.active]="activeSection() === 'future'"
+    [class.bg-white]="activeSection() === 'future'"
+    [class.shadow-sm]="activeSection() === 'future'"
+    [class.text-dark]="activeSection() === 'future'"
+    [class.text-muted]="activeSection() !== 'future'"
+    [attr.aria-selected]="activeSection() === 'future'"
+    (click)="setSection('future')"
+  >
+    Future
+    <span class="badge rounded-pill" [class.bg-primary]="activeSection() === 'future'" [class.bg-secondary]="activeSection() !== 'future'">
+      {{ futureBookings().length }}
+    </span>
+  </button>
+  <button
+    type="button"
+    class="nav-link rounded-pill d-inline-flex align-items-center gap-2 px-4 fw-semibold border-0 py-2"
+    role="tab"
+    [class.active]="activeSection() === 'history'"
+    [class.bg-white]="activeSection() === 'history'"
+    [class.shadow-sm]="activeSection() === 'history'"
+    [class.text-dark]="activeSection() === 'history'"
+    [class.text-muted]="activeSection() !== 'history'"
+    [attr.aria-selected]="activeSection() === 'history'"
+    (click)="setSection('history')"
+  >
+    Storico
+    <span class="badge rounded-pill" [class.bg-primary]="activeSection() === 'history'" [class.bg-secondary]="activeSection() !== 'history'">
+      {{ pastBookings().length }}
+    </span>
+  </button>
+</nav>
+
+@if (activeSection() === 'history') {
+  <section class="card bg-white border-0 rounded-5 shadow-sm mb-4" aria-label="Filtri storico prenotazioni">
+    <div class="card-body p-4 p-md-5">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted text-uppercase mb-2" style="letter-spacing: 0.5px" for="host-booking-desk-filter">Postazione</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0 rounded-start-pill ps-3 pe-2 text-muted" aria-hidden="true">
+              <app-sd-icon name="desktop" [size]="16" />
+            </span>
+            <input
+              id="host-booking-desk-filter"
+              type="search"
+              class="form-control border-0 bg-light rounded-end-pill shadow-none"
+              placeholder="Codice postazione…"
+              autocomplete="off"
+              spellcheck="false"
+              [ngModel]="historyDeskCode()"
+              (ngModelChange)="historyDeskCode.set($event)"
+            />
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted text-uppercase mb-2" style="letter-spacing: 0.5px" for="host-booking-date-filter">Giorno</label>
+          <app-sd-search-calendar-field
+            inputId="host-booking-date-filter"
+            label=""
+            placeholder="Tutti i giorni"
+            [selectedIso]="historyDate()"
+            (selectedIsoChange)="historyDate.set($event)"
+            [highlightedDays]="highlightedHistoryDays()"
+          />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted text-uppercase mb-2" style="letter-spacing: 0.5px" for="host-booking-email-filter">Email lavoratore</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0 rounded-start-pill ps-3 pe-2 text-muted" aria-hidden="true">
+              <app-sd-icon name="envelope" [size]="16" />
+            </span>
+            <input
+              id="host-booking-email-filter"
+              type="search"
+              class="form-control border-0 bg-light rounded-end-pill shadow-none"
+              placeholder="nome@dominio.it"
+              autocomplete="off"
+              spellcheck="false"
+              [ngModel]="historyEmail()"
+              (ngModelChange)="historyEmail.set($event)"
+            />
+          </div>
+        </div>
+      </div>
+      @if (hasHistoryFilters()) {
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4 pt-3 border-top border-light">
+          <p class="text-muted small mb-0 fw-semibold" role="status" aria-live="polite">
+            {{ filteredPastBookings().length }}
+            {{ filteredPastBookings().length === 1 ? 'risultato' : 'risultati' }}
+            su {{ pastBookings().length }} in storico
+          </p>
+          <button type="button" class="btn btn-light rounded-pill btn-sm px-3 fw-semibold" (click)="resetHistoryFilters()" mdbRipple>
+            Azzera filtri
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+}
+
+@if (loading()) {
+  <div class="d-flex flex-column align-items-center justify-content-center py-5 gap-3" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" aria-hidden="true"></div>
+    <p class="text-muted small fw-semibold mb-0">Caricamento prenotazioni…</p>
+  </div>
+} @else if (errorMsg) {
+  <div class="alert alert-danger rounded-4 shadow-sm d-flex align-items-center gap-2 border-0" role="alert">
+    <app-sd-icon name="circle-exclamation" [size]="20" aria-hidden="true" />
+    <span class="fw-semibold">{{ errorMsg }}</span>
+  </div>
+} @else if (!visibleBookings().length) {
+  <div class="card bg-white border-0 rounded-5 shadow-sm text-center py-5" role="status">
+    <div class="mb-3" [class.text-primary]="activeSection() !== 'history'" [class.text-muted]="activeSection() === 'history'" aria-hidden="true">
+      @if (activeSection() === 'history') {
+        <app-sd-icon name="history" [size]="48" />
+      } @else if (activeSection() === 'future') {
+        <app-sd-icon name="calendar" [size]="48" />
+      } @else {
+        <app-sd-icon name="calendar-check" [size]="48" />
+      }
+    </div>
+    <app-empty-state [message]="emptyMessage()" />
+  </div>
+} @else {
+  <div class="card bg-white border-0 rounded-5 shadow-sm overflow-hidden mb-5" role="list">
+    <div class="list-group list-group-flush">
+      @for (b of visibleBookings(); track b.bookingID) {
+        <div class="list-group-item border-bottom border-light" role="listitem">
+          <div class="d-flex flex-column flex-lg-row gap-4 align-items-lg-center">
+            <div class="d-flex gap-3 min-w-0 flex-grow-1 align-items-center">
+              <div
+                class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                [class.bg-primary-subtle]="activeSection() !== 'history'"
+                [class.text-primary]="activeSection() !== 'history'"
+                [class.bg-secondary-subtle]="activeSection() === 'history'"
+                [class.text-secondary]="activeSection() === 'history'"
+                style="width: 3.5rem; height: 3.5rem"
+                aria-hidden="true"
+              >
+                <app-sd-icon name="user" [size]="24" />
+              </div>
+              <div class="min-w-0 flex-grow-1">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                  <h3 class="h6 fw-bold mb-0 text-truncate text-body">{{ workerDisplayName(b) }}</h3>
+                  <span class="badge bg-light text-muted border border-light rounded-pill px-2">#{{ bookingRef(b) }}</span>
+                </div>
+                @if (b.workerEmail) {
+                  <p class="text-muted small mb-2 text-truncate d-flex align-items-center gap-1">
+                    <app-sd-icon name="envelope" [size]="14" aria-hidden="true" />
+                    <span>{{ b.workerEmail }}</span>
+                  </p>
+                }
+                <div class="d-flex flex-wrap gap-3">
+                  <p class="text-muted small fw-semibold mb-0 text-truncate d-flex align-items-center gap-1">
+                    <app-sd-icon name="desktop" [size]="14" aria-hidden="true" class="text-primary" />
+                    <span class="text-body">{{ deskLabel(b) }}</span>
+                  </p>
+                  <p class="text-muted small fw-semibold mb-0 text-truncate d-flex align-items-center gap-1">
+                    <app-sd-icon name="building" [size]="14" aria-hidden="true" class="text-secondary" />
+                    <span>{{ b.spaceName || '—' }}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="d-flex flex-wrap gap-4 align-items-center bg-light p-3 rounded-4"
+              role="group"
+              [attr.aria-label]="'Orario prenotazione ' + formatWhen(b.startTime) + ' ' + formatTime(b.startTime, b.endTime)"
+            >
+              <div>
+                <span class="d-block text-uppercase text-muted fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px">Giorno</span>
+                <time class="d-block fw-semibold text-body" [attr.datetime]="b.startTime">{{ formatWhen(b.startTime) }}</time>
+              </div>
+              <div class="bg-secondary opacity-25" style="width: 1px; height: 24px;"></div>
+              <div>
+                <span class="d-block text-uppercase text-muted fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px">Orario</span>
+                <span class="d-block fw-semibold text-body d-flex align-items-center gap-1">
+                  <app-sd-icon name="clock" [size]="14" class="text-muted" aria-hidden="true" />
+                  {{ formatTime(b.startTime, b.endTime) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="d-flex flex-column align-items-end justify-content-center gap-2">
+              @if (isInProgress(b)) {
+                <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2 d-inline-flex align-items-center gap-2 fw-semibold border border-success border-opacity-25">
+                  <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true" style="width: 0.5rem; height: 0.5rem"></span>
+                  In corso
+                </span>
+              }
+              <span
+                class="badge rounded-pill px-3 py-2 fw-semibold"
+                [class.bg-success-subtle]="statusTone(b.status) === 'confirmed'"
+                [class.text-success]="statusTone(b.status) === 'confirmed'"
+                [class.border]="statusTone(b.status) === 'confirmed'"
+                [class.border-success]="statusTone(b.status) === 'confirmed'"
+                [class.border-opacity-25]="statusTone(b.status) === 'confirmed'"
+                [class.bg-warning-subtle]="statusTone(b.status) === 'pending'"
+                [class.text-warning]="statusTone(b.status) === 'pending'"
+                [class.border]="statusTone(b.status) === 'pending'"
+                [class.border-warning]="statusTone(b.status) === 'pending'"
+                [class.border-opacity-25]="statusTone(b.status) === 'pending'"
+                [class.bg-secondary-subtle]="statusTone(b.status) === 'other'"
+                [class.text-secondary]="statusTone(b.status) === 'other'"
+                [class.border]="statusTone(b.status) === 'other'"
+                [class.border-secondary]="statusTone(b.status) === 'other'"
+                [class.border-opacity-25]="statusTone(b.status) === 'other'"
+              >
+                {{ statusLabel(b.status) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

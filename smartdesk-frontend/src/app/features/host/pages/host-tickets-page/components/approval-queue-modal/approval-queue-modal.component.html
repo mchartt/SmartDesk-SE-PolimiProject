@@ -1,0 +1,178 @@
+@if (approvalQueueModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-tickets-approval-queue-title"
+    (click)="closeApprovalQueueModal()"
+  >
+    <div
+      class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered"
+      role="document"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden bg-light">
+        <app-sd-modal-header
+          title="In attesa di approvazione"
+          subtitle="Riparazioni completate o ispezioni in sospeso. Approvale per riaprire le postazioni."
+          icon="check"
+          iconVariant="primary"
+          titleId="host-tickets-approval-queue-title"
+          (close)="closeApprovalQueueModal()"
+        />
+
+        <div class="px-4 pb-0 pt-3 bg-white border-bottom">
+          <ul class="nav nav-pills mb-3" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link rounded-pill px-4 fw-semibold"
+                [class.active]="pendingApprovalViewMode() === 'rooms'"
+                (click)="pendingApprovalViewMode.set('rooms')"
+                type="button"
+                role="tab"
+                [attr.aria-selected]="pendingApprovalViewMode() === 'rooms'"
+              >
+                Uffici
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link rounded-pill px-4 fw-semibold"
+                [class.active]="pendingApprovalViewMode() === 'flat'"
+                (click)="pendingApprovalViewMode.set('flat')"
+                type="button"
+                role="tab"
+                [attr.aria-selected]="pendingApprovalViewMode() === 'flat'"
+              >
+                Tutte le scrivanie
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="modal-body p-4">
+          @if (pendingApprovalViewMode() === 'rooms') {
+            <div class="accordion" id="approvalRoomsAccordion">
+              @for (room of pendingApprovalSpaceModalDesksByRoom(); track room.roomId) {
+                <div class="accordion-item border-0 shadow-sm rounded-4 mb-3 overflow-hidden">
+                  <h2 class="accordion-header" [id]="'approvalRoomHeading' + room.roomId">
+                    <button
+                      class="accordion-button bg-white text-dark fw-bold px-4 py-3"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      [attr.data-bs-target]="'#approvalRoomCollapse' + room.roomId"
+                      aria-expanded="false"
+                      [attr.aria-controls]="'approvalRoomCollapse' + room.roomId"
+                    >
+                      <div class="d-flex w-100 justify-content-between align-items-center me-3">
+                        <div class="d-flex align-items-center gap-3">
+                          <span class="badge rounded-pill text-bg-warning px-3 py-2 fs-6">
+                            {{ room.desks.length }}
+                          </span>
+                          <span class="fs-5">{{ room.roomName }}</span>
+                        </div>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-success rounded-pill px-4"
+                          (click)="approveRoomInspections(room.desks); $event.stopPropagation()"
+                          [disabled]="isActionPerforming()"
+                        >
+                          Approva tutte
+                        </button>
+                      </div>
+                    </button>
+                  </h2>
+                  <div
+                    [id]="'approvalRoomCollapse' + room.roomId"
+                    class="accordion-collapse collapse"
+                    [attr.aria-labelledby]="'approvalRoomHeading' + room.roomId"
+                    data-bs-parent="#approvalRoomsAccordion"
+                  >
+                    <div class="accordion-body bg-light p-4">
+                      <div class="row g-3">
+                        @for (item of room.desks; track item.desk.id) {
+                          <div class="col-12 col-xl-6">
+                            <div class="card h-100 border-0 shadow-sm rounded-4">
+                              <div class="card-body p-3 d-flex flex-column">
+                                <div class="d-flex align-items-start justify-content-between mb-2">
+                                  <div>
+                                    <h6 class="fw-bold mb-1">Postazione {{ item.desk.code }}</h6>
+                                    @if (item.ticket) {
+                                      <p class="small text-muted mb-0">{{ ticketRefLineOnly(item.ticket) }}</p>
+                                    } @else {
+                                      <p class="small text-muted mb-0">Ispezione post-manutenzione</p>
+                                    }
+                                  </div>
+                                  <span class="badge text-bg-warning">In attesa</span>
+                                </div>
+                                <div class="mt-auto pt-3 border-top d-flex gap-2">
+                                  @if (item.ticket) {
+                                    <button type="button" class="btn btn-sm btn-success rounded-pill flex-grow-1" (click)="requestApproveTicket(ticketNumericId(item.ticket)!)" [disabled]="isActionPerforming()">Approva</button>
+                                    <button type="button" class="btn btn-sm btn-outline-warning rounded-pill flex-grow-1" (click)="openMaintenanceReassignModal(item)" [disabled]="isActionPerforming()">Manut.</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill flex-grow-1" (click)="requestDismissDesk(ticketNumericId(item.ticket)!)" [disabled]="isActionPerforming()">Dismetti</button>
+                                  } @else {
+                                    <button type="button" class="btn btn-sm btn-success rounded-pill flex-grow-1" (click)="approveInspection(item.desk)" [disabled]="deskActionBusy(item.desk.id)">Approva</button>
+                                    <button type="button" class="btn btn-sm btn-outline-warning rounded-pill flex-grow-1" (click)="rejectInspection(item.desk)" [disabled]="deskActionBusy(item.desk.id)">Manut.</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill flex-grow-1" (click)="decommissionDesk(item.desk)" [disabled]="deskActionBusy(item.desk.id)">Dismetti</button>
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="row g-3">
+              @for (item of allVerifyingTickets(); track item.desk.id) {
+                <div class="col-12 col-md-6 col-xl-4">
+                  <div class="card h-100 border-0 shadow-sm rounded-4">
+                    <div class="card-body p-3 d-flex flex-column">
+                      <div class="d-flex align-items-start justify-content-between mb-2">
+                        <div>
+                          <h6 class="fw-bold mb-1">Postazione {{ item.desk.code }}</h6>
+                          <p class="small text-muted mb-0">{{ item.desk.roomName ?? 'Senza sala' }}</p>
+                        </div>
+                        <span class="badge text-bg-warning">In attesa</span>
+                      </div>
+                      <div class="mb-3">
+                        @if (item.ticket) {
+                          <div class="p-2 bg-light rounded-3 small">
+                            <strong>Ticket:</strong> {{ ticketHeading(item.ticket) }}
+                          </div>
+                        }
+                      </div>
+                      <div class="mt-auto border-top pt-3 d-flex gap-2">
+                        @if (item.ticket) {
+                          <button type="button" class="btn btn-sm btn-success rounded-pill flex-grow-1" (click)="requestApproveTicket(ticketNumericId(item.ticket)!)" [disabled]="isActionPerforming()">Approva</button>
+                          <button type="button" class="btn btn-sm btn-outline-warning rounded-pill flex-grow-1" (click)="openMaintenanceReassignModal(item)" [disabled]="isActionPerforming()">Manut.</button>
+                          <button type="button" class="btn btn-sm btn-outline-danger rounded-pill flex-grow-1" (click)="requestDismissDesk(ticketNumericId(item.ticket)!)" [disabled]="isActionPerforming()">Dismetti</button>
+                        } @else {
+                          <button type="button" class="btn btn-sm btn-success rounded-pill flex-grow-1" (click)="approveInspection(item.desk)" [disabled]="deskActionBusy(item.desk.id)">Approva</button>
+                          <button type="button" class="btn btn-sm btn-outline-warning rounded-pill flex-grow-1" (click)="rejectInspection(item.desk)" [disabled]="deskActionBusy(item.desk.id)">Manut.</button>
+                          <button type="button" class="btn btn-sm btn-outline-danger rounded-pill flex-grow-1" (click)="decommissionDesk(item.desk)" [disabled]="deskActionBusy(item.desk.id)">Dismetti</button>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer border-top-0 pt-0">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeApprovalQueueModal()" mdbRipple>
+            Chiudi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

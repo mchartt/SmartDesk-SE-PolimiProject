@@ -1,0 +1,135 @@
+<div class="d-flex justify-content-between align-items-end border-bottom pb-3 mb-4">
+  <div>
+    <p class="text-uppercase text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">Overview</p>
+    <h2 class="mb-0 fw-bolder" style="letter-spacing: -0.03em;">{{ title() }}</h2>
+  </div>
+</div>
+
+<div class="row g-3 g-md-4 mb-5 bento-grid">
+  <div class="col-md-6 col-xl-3">
+    <div class="card bg-white border-0 rounded-5 shadow-sm h-100 bento-card transition-all">
+      <div class="card-body p-4 d-flex align-items-center">
+        <div class="flex-shrink-0 bg-primary bg-opacity-25 rounded-circle me-3 text-primary d-inline-flex align-items-center justify-content-center" style="width: 3.5rem; height: 3.5rem">
+          <app-sd-icon name="desktop" [size]="24" />
+        </div>
+        <div class="min-w-0">
+          <p class="small text-uppercase text-muted fw-semibold mb-1">Utenti totali</p>
+          <p class="h3 fw-bolder mb-0 text-dark">{{ stats().totalUsers || 0 }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6 col-xl-3">
+    <div class="card bg-white border-0 rounded-5 shadow-sm h-100 bento-card transition-all">
+      <div class="card-body p-4 d-flex align-items-center">
+        <div class="flex-shrink-0 bg-warning bg-opacity-25 rounded-circle me-3 text-warning d-inline-flex align-items-center justify-content-center" style="width: 3.5rem; height: 3.5rem">
+          <app-sd-icon name="host-venue" [size]="24" />
+        </div>
+        <div class="min-w-0">
+          <p class="small text-uppercase text-muted fw-semibold mb-1">Host in attesa</p>
+          <p class="h3 fw-bolder mb-0 text-dark">{{ pendingHostsTotal() || 0 }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="card bg-white border-0 rounded-5 shadow-sm h-100 bento-card transition-all">
+      <div class="card-body p-4 d-flex align-items-center">
+        <div class="flex-shrink-0 bg-success bg-opacity-25 rounded-circle me-3 text-success d-inline-flex align-items-center justify-content-center" style="width: 3.5rem; height: 3.5rem">
+          <app-sd-icon name="building" [size]="24" />
+        </div>
+        <div class="min-w-0">
+          <p class="small text-uppercase text-muted fw-semibold mb-1">Spazi attivi</p>
+          <p class="h3 fw-bolder mb-0 text-dark">{{ stats().activeSpaces || 0 }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="card bg-white border-0 rounded-5 shadow-sm h-100 bento-card transition-all">
+      <div class="card-body p-4 d-flex align-items-center">
+        <div class="flex-shrink-0 bg-info bg-opacity-25 rounded-circle me-3 text-info d-inline-flex align-items-center justify-content-center" style="width: 3.5rem; height: 3.5rem">
+          <app-sd-icon name="calendar-check" [size]="24" />
+        </div>
+        <div class="min-w-0">
+          <p class="small text-uppercase text-muted fw-semibold mb-1">Spazi attesa</p>
+          <p class="h3 fw-bolder mb-0 text-dark">{{ stats().pendingSpaces || 0 }}</p>
+          <a routerLink="/admin/spaces" class="small text-primary fw-medium text-decoration-none d-inline-block mt-1" mdbRipple>
+            Gestisci <app-sd-icon name="arrow-right" [size]="12" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h4 class="fw-bolder mb-1" style="letter-spacing: -0.02em;">Richieste pendenti</h4>
+    @if (pendingRequestsTotal() > 0) {
+      <p class="text-muted small mb-0 fw-medium">
+        Ultime {{ pendingRequestsPreview().length }} su {{ pendingRequestsTotal() }} richieste
+        ({{ pendingHostsTotal() }} host · {{ pendingSpacesTotal() }} spazi)
+      </p>
+    }
+  </div>
+  <a routerLink="/admin/requests" class="btn btn-light text-dark fw-semibold rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 shadow-sm border" mdbRipple>
+    Vedi tutte <app-sd-icon name="arrow-right" [size]="14" />
+  </a>
+</div>
+
+@if (pendingRequestsTotal() === 0) {
+  <div class="card bg-white border-0 rounded-5 shadow-sm mb-5 bento-card">
+    <div class="card-body p-5 text-center">
+      <div class="mb-4 d-inline-flex align-items-center justify-content-center bg-success bg-opacity-25 rounded-circle p-4">
+        <app-sd-icon name="circle-check" [size]="48" class="text-success" />
+      </div>
+      <h4 class="fw-bold mb-2">Tutto in ordine</h4>
+      <p class="text-muted mb-0 mx-auto" style="max-width: 28rem">
+        Al momento non ci sono richieste in attesa di approvazione (host o spazi). Il sistema è aggiornato.
+      </p>
+    </div>
+  </div>
+} @else {
+  <div class="card bg-white border-0 rounded-5 shadow-sm overflow-hidden mb-5 bento-card">
+    <div class="table-responsive mb-0">
+      <table class="table table-borderless table-hover align-middle mb-0">
+        <thead class="table-light border-bottom">
+          <tr>
+            <th scope="col" class="py-3 px-4 text-muted fw-semibold small text-uppercase">Tipo</th>
+            <th scope="col" class="py-3 text-muted fw-semibold small text-uppercase">Nome</th>
+            <th scope="col" class="py-3 text-muted fw-semibold small text-uppercase">Dettaglio</th>
+            <th scope="col" class="py-3 text-muted fw-semibold small text-uppercase">Registrato</th>
+            <th scope="col" class="py-3 px-4 text-end text-muted fw-semibold small text-uppercase">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of pendingRequestsPreview(); track row.kind + '-' + row.id) {
+            <tr class="list-group-item d-table-row border-0 border-bottom border-light">
+              <td class="px-4">
+                <span class="badge rounded-pill fw-medium px-3 py-2 d-inline-flex align-items-center gap-1"
+                  [class.bg-warning-subtle]="row.kind === 'host'" [class.text-warning-emphasis]="row.kind === 'host'"
+                  [class.bg-info-subtle]="row.kind === 'space'" [class.text-info-emphasis]="row.kind === 'space'"
+                >
+                  <app-sd-icon [name]="row.kind === 'host' ? 'user' : 'building'" [size]="12" />
+                  {{ requestKindLabel(row.kind) }}
+                </span>
+              </td>
+              <td class="fw-bold text-dark text-break">{{ row.name }}</td>
+              <td class="text-break text-muted small fw-medium">{{ row.subtitle }}</td>
+              <td class="small text-muted fw-medium font-monospace">{{ row.registeredLabel }}</td>
+              <td class="text-end px-4">
+                <a routerLink="/admin/requests" class="btn btn-sm btn-outline-dark rounded-pill fw-semibold" mdbRipple>
+                  Gestisci
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

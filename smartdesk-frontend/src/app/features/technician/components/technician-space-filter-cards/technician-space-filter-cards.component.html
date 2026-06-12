@@ -1,0 +1,84 @@
+@if (showScopeHint()) {
+  <div class="alert alert-warning rounded-4 mb-3 d-flex gap-2 align-items-start" role="status">
+    <app-sd-icon name="circle-exclamation" [size]="20" class="flex-shrink-0 mt-1" aria-hidden="true" />
+    <div>
+      <strong class="d-block">Nessuno spazio assegnato</strong>
+      <p class="mb-0 small">
+        Chiedi al tuo host di associarti a un ufficio per usare i filtri per sede. Nel frattempo vedi tutti i ticket in coda.
+      </p>
+    </div>
+  </div>
+}
+
+<div
+  class="d-flex flex-nowrap gap-3 overflow-auto pt-2 pb-4 mb-3 px-1 align-items-stretch"
+  role="toolbar"
+  tabindex="0"
+  aria-label="Filtra i ticket per ufficio assegnato"
+  (keydown)="onToolbarKeydown($event)"
+>
+  <span id="sd-tech-filter-help" class="visually-hidden">
+    Usa le frecce sinistra e destra, Home e Fine per cambiare filtro.
+  </span>
+
+  <button
+    type="button"
+    class="card tech-space-card flex-shrink-0 border border-light rounded-4 p-3 text-start bg-white transition-all hover-shadow d-flex flex-column align-items-start"
+    style="width: 12rem"
+    [class.active]="isActive('all')"
+    [attr.aria-pressed]="isActive('all')"
+    aria-describedby="sd-tech-filter-help"
+    mdbRipple
+    (click)="pick('all')"
+  >
+    <div class="mb-3 w-100">
+      <span class="fw-semibold d-block text-truncate">Tutti</span>
+      <span class="small text-muted text-truncate d-block">In lista</span>
+    </div>
+    <div class="mt-auto pt-1">
+      <span class="badge text-bg-primary rounded-pill px-3 py-2 shadow-sm">{{ countAll() }}</span>
+    </div>
+  </button>
+
+  @for (s of spaces(); track s.spaceID) {
+    <button
+      type="button"
+      class="card tech-space-card flex-shrink-0 border border-light rounded-4 p-3 text-start bg-white transition-all hover-shadow d-flex flex-column align-items-start"
+      style="width: 12rem"
+      [class.active]="isActive(s.spaceID)"
+      [attr.aria-pressed]="isActive(s.spaceID)"
+      aria-describedby="sd-tech-filter-help"
+      mdbRipple
+      (click)="pick(s.spaceID)"
+    >
+      <div class="mb-3 w-100">
+        <span class="fw-semibold d-block text-truncate" [title]="spaceHeadline(s)">{{ spaceHeadline(s) }}</span>
+        <span class="small text-muted text-truncate d-block">{{ spaceMeta(s) }}</span>
+      </div>
+      <div class="mt-auto pt-1">
+        <span class="badge text-bg-primary rounded-pill px-3 py-2 shadow-sm">{{ countSpace(s.spaceID) }}</span>
+      </div>
+    </button>
+  }
+
+  @if (outOfScopeCount() > 0) {
+    <button
+      type="button"
+      class="card tech-space-card flex-shrink-0 border border-warning rounded-4 p-3 text-start bg-white transition-all hover-shadow d-flex flex-column align-items-start"
+      style="width: 12rem"
+      [class.active]="isActive('out-of-scope')"
+      [attr.aria-pressed]="isActive('out-of-scope')"
+      aria-describedby="sd-tech-filter-help"
+      mdbRipple
+      (click)="pick('out-of-scope')"
+    >
+      <div class="mb-3 w-100">
+        <span class="fw-semibold d-block text-truncate">Altri contesti</span>
+        <span class="small text-muted text-truncate d-block">Fuori dai tuoi spazi</span>
+      </div>
+      <div class="mt-auto pt-1">
+        <span class="badge text-bg-warning rounded-pill px-3 py-2 shadow-sm">{{ outOfScopeCount() }}</span>
+      </div>
+    </button>
+  }
+</div>

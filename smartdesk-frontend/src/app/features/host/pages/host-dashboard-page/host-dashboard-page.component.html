@@ -1,0 +1,141 @@
+<header class="mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 px-2">
+  <div class="d-flex align-items-center gap-4">
+    <div class="bg-primary bg-opacity-25 text-primary rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 4rem; height: 4rem">
+      <app-sd-icon name="gauge" [size]="28" />
+    </div>
+    <div>
+      <h1 class="display-6 fw-bold mb-1 tracking-tight">{{ dashboardTitle() }}</h1>
+      <p class="text-muted fw-medium mb-0">Panoramica completa dei tuoi spazi e attività</p>
+    </div>
+  </div>
+</header>
+
+<h2 class="fs-6 text-uppercase text-muted fw-semibold mb-3 ms-4 tracking-wide">Stato degli Spazi</h2>
+<div class="row g-3 mb-5">
+  <div class="col-12 col-md-4">
+    <div class="card border-0 rounded-5 h-100 shadow-sm bg-white overflow-hidden transition-hover" style="transition: transform 0.2s">
+      <div class="card-body p-4 p-md-5 d-flex flex-column justify-content-between">
+        <p class="small text-uppercase text-muted fw-semibold mb-3 tracking-wide">Spazi totali</p>
+        <div class="d-flex align-items-center gap-4">
+          <div class="rounded-circle bg-secondary bg-opacity-25 text-secondary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+            <app-sd-icon name="building" [size]="24" />
+          </div>
+          <p class="display-5 fw-bold mb-0 text-dark">{{ spacesTotal() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card border-0 rounded-5 h-100 shadow-sm bg-white overflow-hidden transition-hover" style="transition: transform 0.2s">
+      <div class="card-body p-4 p-md-5 d-flex flex-column justify-content-between">
+        <p class="small text-uppercase text-muted fw-semibold mb-3 tracking-wide">Approvati</p>
+        <div class="d-flex align-items-center gap-4">
+          <div class="rounded-circle bg-success bg-opacity-25 text-success d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+            <app-sd-icon name="circle-check" [size]="24" />
+          </div>
+          <p class="display-5 fw-bold mb-0 text-success">{{ spacesApproved() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card border-0 rounded-5 h-100 shadow-sm bg-white overflow-hidden transition-hover" style="transition: transform 0.2s">
+      <div class="card-body p-4 p-md-5 d-flex flex-column justify-content-between">
+        <p class="small text-uppercase text-muted fw-semibold mb-3 tracking-wide">In attesa</p>
+        <div class="d-flex align-items-center gap-4">
+          <div
+            class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 bg-opacity-25"
+            [class.bg-warning]="spacesPending() > 0"
+            [class.text-warning-emphasis]="spacesPending() > 0"
+            [class.bg-secondary]="spacesPending() === 0"
+            [class.text-secondary]="spacesPending() === 0"
+            style="width: 3.5rem; height: 3.5rem"
+          >
+            <app-sd-icon name="clock" [size]="24" />
+          </div>
+          <p class="display-5 fw-bold mb-0" [class.text-warning-emphasis]="spacesPending() > 0">{{ spacesPending() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="fs-6 text-uppercase text-muted fw-semibold mb-3 ms-4 tracking-wide">Azioni Rapide & Gestione</h2>
+<div class="row g-3 justify-content-center">
+  <div class="col-6 col-lg-4">
+    <a class="card h-100 border-0 rounded-5 text-center p-4 p-md-5 shadow-sm text-decoration-none d-block bg-white transition-hover" style="transition: transform 0.2s" routerLink="/host/spaces" mdbRipple>
+      <div class="mb-4 d-flex justify-content-center">
+        <div class="bg-primary bg-opacity-25 text-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem">
+          <app-sd-icon name="building" [size]="28" />
+        </div>
+      </div>
+      <h5 class="fw-bold mb-2 text-dark fs-5">I miei spazi</h5>
+      <p class="small text-muted mb-0 fw-medium">{{ spacesTotal() }} spazi gestiti</p>
+    </a>
+  </div>
+
+  <div class="col-6 col-lg-4">
+    <a class="card h-100 border-0 rounded-5 text-center p-4 p-md-5 shadow-sm text-decoration-none d-block bg-white transition-hover" style="transition: transform 0.2s" routerLink="/host/desks" mdbRipple>
+      <div class="mb-4 d-flex justify-content-center">
+        <div class="bg-success bg-opacity-25 text-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem">
+          <app-sd-icon name="chair" [size]="28" />
+        </div>
+      </div>
+      <h5 class="fw-bold mb-2 text-dark fs-5">Postazioni</h5>
+      <p class="small text-muted mb-0 fw-medium">{{ desksTotal() }} desk totali</p>
+    </a>
+  </div>
+
+  <div class="col-6 col-lg-4">
+    <a class="card h-100 border-0 rounded-5 text-center p-4 p-md-5 shadow-sm text-decoration-none d-block bg-white transition-hover" style="transition: transform 0.2s" routerLink="/host/technicians" mdbRipple>
+      <div class="mb-4 d-flex justify-content-center">
+        <div class="bg-warning bg-opacity-25 text-warning-emphasis rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem">
+          <app-sd-icon name="life-ring" [size]="28" />
+        </div>
+      </div>
+      <h5 class="fw-bold mb-2 text-dark fs-5">Tecnici</h5>
+      <p class="small text-muted mb-0 fw-medium">{{ techniciansCount() }} addetti</p>
+    </a>
+  </div>
+
+  <div class="col-6 col-lg-4">
+    <a class="card h-100 border-0 rounded-5 text-center p-4 p-md-5 shadow-sm text-decoration-none d-block bg-white transition-hover" style="transition: transform 0.2s" routerLink="/host/tickets" mdbRipple>
+      <div class="mb-4 d-flex justify-content-center">
+        <div class="bg-danger bg-opacity-25 text-danger rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem">
+          <app-sd-icon name="exclamation" [size]="28" />
+        </div>
+      </div>
+      <h5 class="fw-bold mb-2 text-dark fs-5">Ticket</h5>
+      <p class="small text-muted mb-0 fw-medium">
+        {{ ticketsOpenCount() }} segnalazioni
+        @if (ticketsCountIncomplete()) {
+          <span class="d-block small text-warning-emphasis mt-1">conteggio parziale</span>
+        }
+      </p>
+    </a>
+  </div>
+
+  <div class="col-6 col-lg-4">
+    <a class="card h-100 border-0 rounded-5 text-center p-4 p-md-5 shadow-sm text-decoration-none d-block bg-white transition-hover" style="transition: transform 0.2s" routerLink="/host/reviews" mdbRipple>
+      <div class="mb-4 d-flex justify-content-center">
+        <div class="bg-info bg-opacity-25 text-info rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem">
+          <app-sd-icon name="tag" [size]="28" />
+        </div>
+      </div>
+      <h5 class="fw-bold mb-2 text-dark fs-5">Recensioni</h5>
+      <p class="small text-muted mb-0 fw-medium">{{ reviewsCount() }} valutazioni</p>
+    </a>
+  </div>
+
+  <div class="col-6 col-lg-4">
+    <a class="card h-100 border-0 rounded-5 text-center p-4 p-md-5 shadow-sm text-decoration-none d-block bg-white transition-hover" style="transition: transform 0.2s" routerLink="/host/notifications" mdbRipple>
+      <div class="mb-4 d-flex justify-content-center">
+        <div class="bg-secondary bg-opacity-25 text-secondary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 4rem; height: 4rem">
+          <app-sd-icon name="bell" [size]="28" />
+        </div>
+      </div>
+      <h5 class="fw-bold mb-2 text-dark fs-5">Notifiche</h5>
+      <p class="small text-muted mb-0 fw-medium">Centro messaggi</p>
+    </a>
+  </div>
+</div>

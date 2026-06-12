@@ -1,0 +1,88 @@
+@if (assignPickTechModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-tech-assign-tech-pick-title"
+    (click)="closeAssignTechModal()"
+  >
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <app-sd-modal-header
+          title="Tecnico"
+          [subtitle]="selectedSpaceName() ?? 'Scegli un tecnico'"
+          icon="user-tie"
+          titleId="host-tech-assign-tech-pick-title"
+          (close)="closeAssignTechModal()"
+        />
+        <div class="modal-body">
+          <label class="form-label mb-2" for="host-tech-assign-tech-search">Cerca</label>
+          <div class="input-group mb-3">
+            <span class="input-group-text bg-transparent" aria-hidden="true">
+              <app-sd-icon name="search" [size]="18" />
+            </span>
+            <input
+              id="host-tech-assign-tech-search"
+              type="search"
+              mdbInput
+              class="form-control"
+              placeholder="Nome, email, codice…"
+              autocomplete="off"
+              aria-label="Cerca tra i tecnici"
+              [ngModel]="assignPickTechSearch()"
+              (ngModelChange)="assignPickTechSearch.set($event)"
+            />
+          </div>
+          <ul class="list-group list-group-flush rounded-3 border mb-0" role="listbox" aria-label="Tecnici">
+            @for (t of assignTechAssignmentFiltered(); track t.technicianID) {
+              <li class="list-group-item list-group-item-action p-0 border-0 border-bottom" role="presentation">
+                <button
+                  type="button"
+                  class="btn w-100 text-start d-flex align-items-start gap-3 p-3 rounded-0"
+                  [class.active]="isAssignTechPickSelected(t.technicianID)"
+                  role="option"
+                  [attr.aria-selected]="isAssignTechPickSelected(t.technicianID)"
+                  (click)="pickTechnicianForAssignment(t)"
+                  mdbRipple
+                >
+                  <span
+                    class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0 fw-semibold small"
+                    style="width: 2.25rem; height: 2.25rem"
+                    aria-hidden="true"
+                  >
+                    {{ techInitials(t.name) }}
+                  </span>
+                  <span class="flex-grow-1 min-w-0">
+                    <span class="fw-semibold d-block">{{ t.name }}</span>
+                    <span class="small text-muted d-block">
+                      {{ technicianDisplayCode(t) }}
+                      @if (technicianSpecDisplay(t)) {
+                        <span aria-hidden="true"> · </span>{{ technicianSpecDisplay(t) }}
+                      }
+                    </span>
+                  </span>
+                  <app-sd-icon name="arrow-right" [size]="18" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                </button>
+              </li>
+            } @empty {
+              <p class="text-muted small mb-0 px-3 py-3 text-center">
+                {{
+                  assignPickTechSearch().trim()
+                    ? 'Nessun tecnico corrisponde alla ricerca.'
+                    : 'Nessun tecnico nel sistema.'
+                }}
+              </p>
+            }
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeAssignTechModal()" mdbRipple>
+            Chiudi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

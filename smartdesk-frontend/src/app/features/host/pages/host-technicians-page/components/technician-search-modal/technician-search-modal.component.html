@@ -1,0 +1,123 @@
+@if (isTechSearchModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-tech-search-title"
+    (click)="closeTechSearchModal()"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          title="Tutti i tecnici"
+          [subtitle]="modalFilteredTechnicians().length + ' risultati su ' + technicianTotalCount() + ' totali'"
+          icon="search"
+          titleId="host-tech-search-title"
+          (close)="closeTechSearchModal()"
+        />
+
+        <div class="modal-body pb-0">
+          <div class="px-3 px-lg-4 pb-3 mb-0 border-bottom">
+            <label class="form-label small fw-semibold" for="host-tech-modal-unified-search">Cerca</label>
+            <div class="input-group">
+              <span class="input-group-text bg-transparent" aria-hidden="true">
+                <app-sd-icon name="search" [size]="18" />
+              </span>
+              <input
+                id="host-tech-modal-unified-search"
+                type="search"
+                mdbInput
+                class="form-control"
+                placeholder="Nome, email, codice, specializzazione, spazio…"
+                autocomplete="off"
+                aria-label="Cerca in tutti i tecnici"
+                [ngModel]="techModalUnifiedSearch()"
+                (ngModelChange)="techModalUnifiedSearch.set($event)"
+              />
+            </div>
+
+            <p class="text-muted small mb-2 mt-4">Filtri mirati</p>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label" for="host-tech-filter-nome">Nome</label>
+                <input
+                  id="host-tech-filter-nome"
+                  type="search"
+                  mdbInput
+                  class="form-control"
+                  placeholder="Primo nome"
+                  autocomplete="off"
+                  [ngModel]="techFilterNome()"
+                  (ngModelChange)="techFilterNome.set($event)"
+                />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="host-tech-filter-cognome">Cognome</label>
+                <input
+                  id="host-tech-filter-cognome"
+                  type="search"
+                  mdbInput
+                  class="form-control"
+                  placeholder="Cognome"
+                  autocomplete="off"
+                  [ngModel]="techFilterCognome()"
+                  (ngModelChange)="techFilterCognome.set($event)"
+                />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="host-tech-filter-codice">Codice</label>
+                <input
+                  id="host-tech-filter-codice"
+                  type="search"
+                  mdbInput
+                  class="form-control"
+                  placeholder="TC-… o ID"
+                  autocomplete="off"
+                  [ngModel]="techFilterCodice()"
+                  (ngModelChange)="techFilterCodice.set($event)"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="px-3 px-lg-4 pt-4 pb-2" style="max-height: min(50vh, 28rem); overflow-y: auto">
+            @if (!modalFilteredTechnicians().length) {
+              <div class="rounded-4 py-5 px-3 text-center border border-dashed">
+                <p class="text-muted small mb-1 fw-semibold">Nessun tecnico in questa selezione</p>
+                <p class="text-muted small mb-0">Modifica i termini di ricerca o azzera i filtri.</p>
+              </div>
+            } @else {
+              <div class="row g-3 mb-0 pb-2">
+                @for (t of modalFilteredTechnicians(); track t.technicianID) {
+                  <app-technician-mgmt-row [technician]="t" />
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="modal-footer flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 pt-3">
+          <button
+            type="button"
+            class="btn btn-outline-secondary rounded-pill px-4 order-2 order-sm-1"
+            [disabled]="!techMgmtModalFiltersActive()"
+            (click)="clearTechModalFilters()"
+            mdbRipple
+          >
+            Azzera filtri
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary rounded-pill px-5 order-1 order-sm-2 ms-sm-auto fw-semibold"
+            (click)="closeTechSearchModal()"
+            mdbRipple
+          >
+            Chiudi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

@@ -1,0 +1,207 @@
+<header class="mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 px-2">
+  <div class="d-flex align-items-center gap-3">
+    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+      <app-sd-icon name="ticket" [size]="24" />
+    </div>
+    <div>
+      <p class="text-muted text-uppercase small fw-bold mb-1 tracking-wide">Attività</p>
+      <h2 class="mb-0 fw-bold">{{ title() }}</h2>
+    </div>
+  </div>
+</header>
+
+@if (actionSuccessToast(); as toastMsg) {
+  <div class="alert alert-success rounded-3 shadow-sm d-flex align-items-center mb-4 py-3" role="status">
+    <app-sd-icon name="circle-check" [size]="20" class="me-2" />
+    <span>{{ toastMsg }}</span>
+  </div>
+}
+
+@if (errorMsg) {
+  <div class="alert alert-danger rounded-3 shadow-sm d-flex align-items-center mb-4" role="alert">
+    <app-sd-icon name="circle-xmark" [size]="20" class="me-2" />
+    <div class="flex-grow-1">{{ errorMsg }}</div>
+    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill ms-2" (click)="reload()" mdbRipple>
+      Riprova
+    </button>
+  </div>
+}
+
+<section class="card bg-white border-0 rounded-5 shadow-sm mb-4 border-start border-primary border-3">
+  <div class="card-body p-4 p-md-5 bg-transparent border-0 pt-4 pb-0 px-4">
+    <span class="small text-uppercase text-muted fw-semibold tracking-wide">Panoramica</span>
+    <h3 class="h5 fw-bold mb-0 mt-1 text-dark">Segnalazioni per ufficio</h3>
+  </div>
+
+  <div class="p-4">
+    @if (loading()) {
+      <div class="py-5 text-center">
+        <div class="spinner-border text-primary" role="status" aria-label="Caricamento"></div>
+        <p class="small text-muted mt-3 mb-0">Caricamento segnalazioni…</p>
+      </div>
+    } @else if (!sortedBundles().length && !errorMsg) {
+      <app-empty-state message="Nessuno spazio con segnalazioni attive." />
+    } @else {
+      <div class="card bg-white border-0 rounded-5 shadow-sm overflow-hidden mb-5" role="list">
+        <div class="list-group list-group-flush">
+          @for (bundle of sortedBundles(); track trackBundleSpaceId($index, bundle)) {
+            <button
+              type="button"
+              class="list-group-item list-group-item-action d-flex flex-column flex-md-row align-items-md-center gap-3 p-4 border-0 border-bottom"
+              [class.opacity-50]="unresolvedTicketCount(bundle) === 0"
+              [disabled]="unresolvedTicketCount(bundle) === 0"
+              (click)="openOfficeModal(bundle)"
+              mdbRipple
+            >
+              <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0 text-start">
+                <span
+                  class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                  style="width: 2.75rem; height: 2.75rem"
+                  aria-hidden="true"
+                >
+                  <app-sd-icon name="layers" [size]="22" />
+                </span>
+                <span class="min-w-0">
+                  <span class="d-block fw-bold mb-1 text-break">{{ bundle.space.name }}</span>
+                  <span class="d-block small text-muted">Codice ufficio {{ bundle.space.officeCode.trim() ? bundle.space.officeCode : '—' }}</span>
+                </span>
+              </div>
+              <div class="d-flex align-items-center gap-3 flex-shrink-0 mt-3 mt-md-0">
+                @if (unresolvedTicketCount(bundle) > 0) {
+                  <span class="badge rounded-pill text-bg-primary">{{ unresolvedTicketCount(bundle) }} attive</span>
+                } @else if (verifyingTicketCount(bundle) > 0) {
+                  <span class="badge rounded-pill text-bg-warning">
+                    {{ verifyingTicketCount(bundle) }} in verifica
+                  </span>
+                } @else {
+                  <span class="badge rounded-pill text-bg-secondary">Nessun problema</span>
+                }
+                <app-sd-icon name="chevron-right" [size]="16" class="text-muted" aria-hidden="true" />
+              </div>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+<section
+  class="card bg-white border-0 rounded-5 shadow-sm mb-4 border-start border-warning border-3"
+  aria-labelledby="host-tickets-approval-title"
+>
+  <div class="card-body p-4 p-md-5 bg-transparent border-0 d-flex flex-wrap align-items-start justify-content-between gap-3 pt-4 pb-0 px-4">
+    <div class="min-w-0">
+      <span class="small text-uppercase text-muted fw-semibold tracking-wide">Da Ispezionare</span>
+      <h3 id="host-tickets-approval-title" class="h5 fw-bold mb-1 mt-1 text-dark">In attesa di approvazione</h3>
+      <p class="text-muted small mb-0">
+        Riparazioni completate dai tecnici e uffici ripristinati. Approva le postazioni per renderle disponibili.
+      </p>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+      @if (!loading() && allVerifyingTickets().length) {
+        <span class="badge rounded-pill text-bg-info" aria-label="Segnalazioni in attesa">
+          {{ allVerifyingTickets().length }}
+        </span>
+      }
+      <button
+        type="button"
+        class="btn btn-outline-info d-inline-flex align-items-center gap-2 rounded-pill px-3"
+        [disabled]="loading() || !allVerifyingTickets().length"
+        (click)="openApprovalQueueModal()"
+        mdbRipple
+      >
+        <span>Vedi in attesa</span>
+        <app-sd-icon name="chevron-right" [size]="14" aria-hidden="true" />
+      </button>
+    </div>
+  </div>
+
+  <div class="px-4 px-md-5 pb-4 pb-md-5 pt-0">
+    @if (loading()) {
+      <p class="text-muted small mb-0">Caricamento coda approvazione…</p>
+    } @else if (!allVerifyingTickets().length) {
+      <p class="text-muted small mb-0">Nessuna segnalazione in attesa di approvazione.</p>
+    } @else {
+      <p class="text-muted small mb-0">
+        <strong>{{ allVerifyingTickets().length }}</strong>
+        {{
+          allVerifyingTickets().length === 1
+            ? 'segnalazione richiede la tua decisione.'
+            : 'segnalazioni richiedono la tua decisione.'
+        }}
+        Apri l'elenco per gestirle.
+      </p>
+    }
+  </div>
+</section>
+
+@if (!loading()) {
+  <section
+    class="card bg-white border-0 rounded-5 shadow-sm mb-4 border-start border-success border-3"
+    aria-labelledby="host-tickets-history-title"
+  >
+    <div class="card-body p-4 p-md-5 bg-transparent border-0 d-flex flex-wrap align-items-start justify-content-between gap-3 pt-4 pb-0 px-4">
+      <div class="min-w-0">
+        <span class="small text-uppercase text-muted fw-semibold tracking-wide">Storico</span>
+        <h3 id="host-tickets-history-title" class="h5 fw-bold mb-1 mt-1 text-dark">Completamente risolte</h3>
+        <p class="text-muted small mb-0">Archivio delle segnalazioni approvate e chiuse.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-shrink-0">
+        @if (resolvedHistoryFetched() && resolvedTickets().length) {
+          <span class="badge rounded-pill text-bg-success" aria-hidden="true">
+            {{ resolvedTickets().length }}
+          </span>
+        }
+        <button
+          type="button"
+          class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1 rounded-pill"
+          [disabled]="resolvedHistoryClearing() || !resolvedTickets().length"
+          (click)="requestClearResolvedHistory()"
+          aria-label="Svuota storico segnalazioni"
+          mdbRipple
+        >
+          @if (resolvedHistoryClearing()) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          } @else {
+            <app-sd-icon name="trash" [size]="14" aria-hidden="true" />
+          }
+          <span>Svuota</span>
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-success d-inline-flex align-items-center gap-2 rounded-pill px-3"
+          (click)="openResolvedHistoryModal()"
+          mdbRipple
+        >
+          <span>Mostra elenco</span>
+          <app-sd-icon name="chevron-right" [size]="14" aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+
+    <div class="px-4 px-md-5 pb-4 pb-md-5 pt-0">
+      @if (resolvedTicketsLoading() && !resolvedHistoryFetched()) {
+        <p class="text-muted small mb-0">Caricamento archivio…</p>
+      } @else if (!resolvedTickets().length) {
+        <p class="text-muted small mb-0">
+          Nessuna segnalazione archiviata. Le voci approvate compariranno qui.
+        </p>
+      } @else {
+        <p class="text-muted small mb-0">
+          <strong>{{ resolvedTickets().length }}</strong>
+          {{
+            resolvedTickets().length === 1 ? 'segnalazione archiviata.' : 'segnalazioni archiviate.'
+          }}
+          Apri l'elenco per cercare per titolo, codice o persona.
+        </p>
+      }
+    </div>
+  </section>
+}
+
+<app-office-tickets-modal />
+<app-approval-queue-modal [allVerifyingTickets]="allVerifyingTickets()" />
+<app-approval-detail-modal />
+<app-resolved-history-modal />
+<app-assign-technician-modal />

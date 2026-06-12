@@ -1,0 +1,3 @@
+-- Runtime state tables (e.g. rate limit buckets, revoked tokens) 
+-- are not currently used in this version of the project.
+-- This file is kept as a placeholder for future operational state.

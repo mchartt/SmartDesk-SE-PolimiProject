@@ -1,0 +1,16 @@
+<div class="sd-notification-bell">
+  <button
+    class="btn btn-outline-secondary sd-notification-bell__btn"
+    type="button"
+    mdbRipple
+    [attr.aria-label]="bellAriaLabel()"
+    (click)="openNotifications()"
+  >
+    <app-sd-icon name="bell" [size]="18" />
+  </button>
+  @if (hasBadge()) {
+    <span class="sd-notification-bell__badge" aria-hidden="true">
+      {{ badgeDisplay() }}
+    </span>
+  }
+</div>

@@ -1,0 +1,107 @@
+@if (spaceTechModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-tech-space-roster-title"
+    (click)="closeSpaceTechniciansModal()"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          [title]="selectedSpace()?.name ?? 'Spazio'"
+          [subtitle]="spaceSubtitle()"
+          icon="building"
+          titleId="host-tech-space-roster-title"
+          (close)="closeSpaceTechniciansModal()"
+        />
+        <div class="modal-body pt-0">
+          @if (hasNoApprovedSpaces) {
+            <div class="alert alert-warning rounded-3 mb-0 small">Nessuno spazio approvato.</div>
+          } @else {
+            <label class="form-label mb-2" for="host-tech-space-roster-search">Cerca tra i tecnici</label>
+            <div class="input-group mb-3">
+              <span class="input-group-text bg-transparent" aria-hidden="true">
+                <app-sd-icon name="search" [size]="18" />
+              </span>
+              <input
+                id="host-tech-space-roster-search"
+                type="search"
+                mdbInput
+                class="form-control"
+                placeholder="Nome, email, codice tecnico…"
+                autocomplete="off"
+                aria-label="Filtra i tecnici assegnati a questo spazio"
+                [disabled]="loadingTechs()"
+                [ngModel]="spaceModalTechSearch()"
+                (ngModelChange)="spaceModalTechSearch.set($event)"
+              />
+            </div>
+            @if (loadingTechs()) {
+              <div class="d-flex align-items-center gap-2 text-muted small py-4 justify-content-center" role="status">
+                <div class="spinner-border spinner-border-sm text-primary" aria-hidden="true"></div>
+                <span>Caricamento tecnici…</span>
+              </div>
+            } @else if (!spaceModalFilteredTechnicians().length) {
+              <p class="text-muted small mb-0 py-3 text-center px-2">
+                {{
+                  spaceModalTechSearch().trim()
+                    ? 'Nessun tecnico corrisponde alla ricerca.'
+                    : 'Nessun tecnico assegnato a questo spazio.'
+                }}
+              </p>
+            } @else {
+              <ul class="list-group list-group-flush rounded-3 border mb-0" role="list">
+                @for (t of spaceModalFilteredTechnicians(); track t.technicianID) {
+                  <li class="list-group-item p-0 border-0 border-bottom" role="listitem">
+                    <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 p-3">
+                      <div
+                        class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0 fw-bold"
+                        style="width: 2.5rem; height: 2.5rem; font-size: 0.75rem"
+                        aria-hidden="true"
+                      >
+                        {{ techInitials(t.name) }}
+                      </div>
+                      <div class="min-w-0 flex-grow-1">
+                        <div class="d-flex flex-wrap align-items-baseline gap-2 mb-1">
+                          <span class="fw-semibold">{{ t.name }}</span>
+                          <span class="badge rounded-pill bg-secondary-subtle text-secondary small">{{ technicianDisplayCode(t) }}</span>
+                        </div>
+                        <p class="small text-muted mb-0 d-flex align-items-center gap-1">
+                          <app-sd-icon name="envelope" [size]="14" aria-hidden="true" />
+                          <span class="text-truncate">{{ t.email }}</span>
+                        </p>
+                        @if (t.specialization) {
+                          <p class="small text-muted mb-0 d-flex align-items-center gap-1">
+                            <app-sd-icon name="wrench" [size]="14" aria-hidden="true" />
+                            {{ t.specialization }}
+                          </p>
+                        }
+                      </div>
+                      <button
+                        class="btn btn-outline-danger btn-sm rounded-pill d-inline-flex align-items-center gap-1 flex-shrink-0"
+                        type="button"
+                        (click)="unassign(t.technicianID)"
+                        mdbRipple
+                      >
+                        <app-sd-icon name="x" [size]="14" aria-hidden="true" />
+                        Rimuovi
+                      </button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeSpaceTechniciansModal()" mdbRipple>
+            Chiudi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

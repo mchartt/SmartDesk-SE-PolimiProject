@@ -1,0 +1,126 @@
+@if (isModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-tech-create-title"
+    (click)="closeModal()"
+  >
+    <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          title="Aggiungi tecnico"
+          eyebrow="Nuovo account"
+          icon="user-plus"
+          titleId="host-tech-create-title"
+          (close)="closeModal()"
+        />
+        <div class="modal-body">
+          @if (errorMsg) {
+            <div class="alert alert-danger rounded-3 py-2 px-3 mb-3 small" role="alert">{{ errorMsg }}</div>
+          }
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <label class="form-label" for="host-tech-create-nome">Nome</label>
+              <input
+                id="host-tech-create-nome"
+                mdbInput
+                class="form-control"
+                [class.is-invalid]="createNomeInvalid()"
+                [(ngModel)]="createNome"
+                placeholder="Mario"
+                autocomplete="given-name"
+                [attr.aria-invalid]="createNomeInvalid()"
+                [attr.aria-describedby]="createNomeInlineError() ? 'host-tech-err-nome' : null"
+              />
+              @if (createNomeInlineError(); as nomeErr) {
+                <div id="host-tech-err-nome" class="invalid-feedback d-block" role="alert">{{ nomeErr }}</div>
+              }
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label" for="host-tech-create-cognome">Cognome</label>
+              <input
+                id="host-tech-create-cognome"
+                mdbInput
+                class="form-control"
+                [class.is-invalid]="createCognomeInvalid()"
+                [(ngModel)]="createCognome"
+                placeholder="Rossi"
+                autocomplete="family-name"
+                [attr.aria-invalid]="createCognomeInvalid()"
+                [attr.aria-describedby]="createCognomeInlineError() ? 'host-tech-err-cognome' : null"
+              />
+              @if (createCognomeInlineError(); as cogErr) {
+                <div id="host-tech-err-cognome" class="invalid-feedback d-block" role="alert">{{ cogErr }}</div>
+              }
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="host-tech-email">Email</label>
+              <input
+                id="host-tech-email"
+                mdbInput
+                class="form-control"
+                [class.is-invalid]="createEmailInvalid()"
+                [(ngModel)]="email"
+                placeholder="nome@esempio.it"
+                type="email"
+                autocomplete="email"
+                [attr.aria-invalid]="createEmailInvalid()"
+                [attr.aria-describedby]="createEmailInlineError() ? 'host-tech-err-email' : null"
+              />
+              @if (createEmailInlineError(); as emErr) {
+                <div id="host-tech-err-email" class="invalid-feedback d-block" role="alert">{{ emErr }}</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="host-tech-password">Password</label>
+              <input
+                id="host-tech-password"
+                mdbInput
+                class="form-control"
+                [class.is-invalid]="createPasswordInvalid()"
+                type="password"
+                [(ngModel)]="password"
+                placeholder="Min. 8 caratteri, un numero e un simbolo"
+                autocomplete="new-password"
+                [attr.aria-invalid]="createPasswordInvalid()"
+                [attr.aria-describedby]="createPasswordInlineError() ? 'host-tech-err-password' : null"
+              />
+              @if (createPasswordInlineError(); as pwErr) {
+                <div id="host-tech-err-password" class="invalid-feedback d-block" role="alert">{{ pwErr }}</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="host-tech-spec">Specializzazione</label>
+              <input
+                id="host-tech-spec"
+                mdbInput
+                class="form-control"
+                [class.is-invalid]="createSpecializationInvalid()"
+                [(ngModel)]="specialization"
+                placeholder="Elettrico, reti…"
+                autocomplete="off"
+                [attr.aria-invalid]="createSpecializationInvalid()"
+                [attr.aria-describedby]="createSpecializationInlineError() ? 'host-tech-err-spec' : null"
+              />
+              @if (createSpecializationInlineError(); as specErr) {
+                <div id="host-tech-err-spec" class="invalid-feedback d-block" role="alert">{{ specErr }}</div>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4 order-2 order-sm-1" (click)="closeModal()" mdbRipple>
+            Annulla
+          </button>
+          <button type="button" class="btn btn-primary rounded-pill px-4 order-1 order-sm-2 ms-sm-auto d-inline-flex align-items-center gap-2" (click)="createTechnician()" mdbRipple>
+            <app-sd-icon name="check" [size]="16" aria-hidden="true" />
+            Aggiungi tecnico
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

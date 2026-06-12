@@ -1,0 +1,235 @@
+  <div class="d-flex justify-content-between align-items-end border-bottom pb-3 mb-4">
+    <div>
+      <p class="text-uppercase text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">Amministrazione</p>
+      <h2 class="mb-0 fw-bolder" style="letter-spacing: -0.03em;">{{ title() }}</h2>
+    </div>
+  </div>
+
+  @if (errorMsg) {
+    <div class="alert alert-danger rounded-4 shadow-sm d-flex align-items-center mb-4 border-0" role="alert">
+      <app-sd-icon name="circle-exclamation" [size]="20" class="me-3 flex-shrink-0" aria-hidden="true" />
+      <div class="fw-medium">{{ errorMsg }}</div>
+    </div>
+  }
+
+  @if (!spaces().length && !errorMsg) {
+    <app-empty-state message="Nessuno spazio approvato." />
+  } @else {
+    <div class="card bg-white border-0 rounded-5 shadow-sm mb-4">
+      <div class="card-body p-4">
+        <h6 class="fw-bold  mb-2 d-flex align-items-center gap-2">
+          <app-sd-icon name="layers" [size]="18" class="text-primary" aria-hidden="true" /> Spazi per città
+        </h6>
+        <p class="text-muted small mb-3 mb-md-4">
+          Qui sono elencati <strong class="fw-semibold ">solo gli spazi approvati</strong>.
+          Usa le due ricerche per ridurre le città visibili, poi apri una città: nel riquadro puoi affinare ancora la lista (indirizzo, host, codice).
+        </p>
+
+        <div class="row g-3">
+          <div class="col-12 col-lg-6">
+            <label class="form-label small fw-bold text-uppercase text-muted mb-2 d-block" for="admin-spaces-city-filter">
+              Cerca città
+            </label>
+            <div class="input-group mb-0">
+              <span class="input-group-text apple-surface-bg border-0 rounded-start-pill ps-4 text-muted" aria-hidden="true">
+                <app-sd-icon name="search" [size]="18" />
+              </span>
+              <input
+                id="admin-spaces-city-filter"
+                type="search"
+                class="form-control border-0 shadow-none apple-surface-bg rounded-end-pill px-3"
+                placeholder="Es. Milano, Torino…"
+                autocomplete="off"
+                [ngModel]="mainCityFilterQuery()"
+                (ngModelChange)="mainCityFilterQuery.set($event)"
+                aria-describedby="admin-spaces-city-filter-hint"
+              />
+            </div>
+            <p id="admin-spaces-city-filter-hint" class="text-muted small mb-0 mt-2">
+              Riduce le sezioni in base al nome della città.
+            </p>
+          </div>
+          <div class="col-12 col-lg-6">
+            <label class="form-label small fw-bold text-uppercase text-muted mb-2 d-block" for="admin-spaces-office-filter">
+              Cerca nome ufficio
+            </label>
+            <div class="input-group mb-0">
+              <span class="input-group-text apple-surface-bg border-0 rounded-start-pill ps-4 text-muted" aria-hidden="true">
+                <app-sd-icon name="building" [size]="18" />
+              </span>
+              <input
+                id="admin-spaces-office-filter"
+                type="search"
+                class="form-control border-0 shadow-none apple-surface-bg rounded-end-pill px-3"
+                placeholder="Es. Milano Central, coworking…"
+                autocomplete="off"
+                [ngModel]="mainOfficeFilterQuery()"
+                (ngModelChange)="mainOfficeFilterQuery.set($event)"
+                aria-describedby="admin-spaces-office-filter-hint"
+              />
+            </div>
+            <p id="admin-spaces-office-filter-hint" class="text-muted small mb-0 mt-2">
+              Mostra solo le città dove esiste uno spazio il cui nome (o codice ufficio) contiene il testo cercato.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    @if (hasMainFilterNoResults()) {
+      <app-empty-state message="Nessuna città corrisponde alle ricerche: modifica città o nome ufficio." />
+    } @else {
+      <div class="row g-3">
+        @for (tile of visibleCityTiles(); track tile.cityKey) {
+          <div class="col-12">
+            <button
+              type="button"
+              class="card bg-white border-0 rounded-5 shadow-sm w-100 text-start"
+              (click)="cityCollapse.toggle()"
+              [attr.aria-expanded]="!cityCollapse.collapsed"
+              mdbRipple
+            >
+              <div class="card-body d-flex justify-content-between align-items-center w-100">
+                <span class="d-flex align-items-center gap-3 min-w-0">
+                  <span
+                    class="rounded-circle bg-primary bg-opacity-25 text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                    style="width: 2.75rem; height: 2.75rem"
+                    aria-hidden="true"
+                  >
+                    <app-sd-icon name="building" [size]="22" />
+                  </span>
+                  <span class="min-w-0">
+                    <span class="d-block fw-semibold text-truncate">{{ tile.label }}</span>
+                    <span class="d-block small text-muted">
+                      {{ tile.count }} spaz{{ tile.count === 1 ? 'io' : 'i' }}
+                    </span>
+                  </span>
+                  <span class="badge rounded-pill text-bg-primary flex-shrink-0 ms-2">{{ tile.count }}</span>
+                </span>
+                <app-sd-icon [name]="cityCollapse.collapsed ? 'chevron-down' : 'chevron-up'" [size]="20" class="flex-shrink-0 text-muted" aria-hidden="true" />
+              </div>
+            </button>
+            <div class="mt-3" mdbCollapse #cityCollapse="mdbCollapse">
+              @if (!getSpacesForCity(tile.cityKey).length) {
+                <p class="text-muted small py-2 px-3 mb-0">Nessuno spazio corrisponde alla ricerca.</p>
+              } @else {
+                <div class="d-flex flex-column gap-3 px-2 pb-2">
+                  @for (space of getSpacesForCity(tile.cityKey); track spaceTrackId(space)) {
+                    <article class="card bg-white border-0 rounded-5 shadow-sm border border-success border-opacity-25">
+                      <div class="card-body p-3 p-md-4">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3">
+                          <div class="d-flex align-items-start min-w-0 flex-grow-1">
+                            <div
+                              class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0 bg-success bg-opacity-25 text-success"
+                              style="width: 2.75rem; height: 2.75rem"
+                            >
+                              <app-sd-icon name="workspace" [size]="22" aria-hidden="true" />
+                            </div>
+                            <div class="min-w-0 flex-grow-1">
+                              <h6 class="fw-bold mb-1 ">{{ space.name }}</h6>
+                              <div class="text-muted small mb-2 d-flex align-items-center flex-wrap gap-2">
+                                <span class="d-inline-flex align-items-center gap-1">
+                                  <app-sd-icon name="location-pin" [size]="14" class="text-primary" aria-hidden="true" />
+                                  {{ space.city }}
+                                </span>
+                                <span class="text-secondary" aria-hidden="true">&bull;</span>
+                                <span>{{ space.address }}</span>
+                                <span class="text-secondary" aria-hidden="true">&bull;</span>
+                                <span class="d-inline-flex align-items-center gap-1 fw-semibold">
+                                  <app-sd-icon name="desktop" [size]="14" class="text-primary" aria-hidden="true" />
+                                  {{ space.deskCount || 0 }} scrivanie
+                                </span>
+                              </div>
+                              @if (space.officeCode) {
+                                <div class="text-muted small mb-2 d-inline-flex align-items-center gap-1">
+                                  <app-sd-icon name="tag" [size]="14" class="text-secondary" aria-hidden="true" />
+                                  Codice {{ space.officeCode }}
+                                </div>
+                              }
+                              <div class="text-muted small mb-2 text-break">
+                                <div><strong class="">Nome:</strong> {{ hostGivenDisplay(space) }}</div>
+                                <div><strong class="">Cognome:</strong> {{ hostFamilyDisplay(space) }}</div>
+                                <div><strong class="">Email:</strong> {{ hostEmailDisplay(space) }}</div>
+                              </div>
+                              <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                                <span class="badge rounded-pill text-bg-success">Approvato</span>
+                                <button
+                                  type="button"
+                                  class="btn btn-link btn-sm p-0 text-primary text-decoration-none fw-semibold d-inline-flex align-items-center gap-1"
+                                  (click)="toggleSpaceDetails(space)"
+                                  [attr.aria-expanded]="spaceDetailsExpanded(space)"
+                                  [attr.aria-controls]="'space-detail-' + numericSpaceId(space)"
+                                  mdbRipple
+                                >
+                                  <app-sd-icon
+                                    [name]="spaceDetailsExpanded(space) ? 'chevron-up' : 'chevron-down'"
+                                    [size]="14"
+                                    aria-hidden="true"
+                                  />
+                                  {{ spaceDetailsExpanded(space) ? 'Nascondi dettagli' : 'Mostra dettagli' }}
+                                </button>
+                              </div>
+                              @if (spaceDetailsExpanded(space)) {
+                                <div
+                                  [id]="'space-detail-' + numericSpaceId(space)"
+                                  class="mt-2 pt-3 border-top border-secondary border-opacity-25"
+                                  role="region"
+                                  [attr.aria-label]="'Dettagli ' + space.name"
+                                >
+                                  <dl class="row small mb-3 gx-3 gy-2">
+                                    <dt class="col-sm-4 text-muted mb-0">Partita IVA</dt>
+                                    <dd class="col-sm-8 mb-0 ">{{ vatDisplay(space) }}</dd>
+                                    <dt class="col-sm-4 text-muted mb-0 align-self-start pt-1">Descrizione ufficio</dt>
+                                    <dd class="col-sm-8 mb-0 text-break ">{{ descriptionDisplay(space) }}</dd>
+                                  </dl>
+                                  <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <span class="small fw-bold text-uppercase text-muted mb-0">Media recensioni</span>
+                                    @if (space.averageReviewRating != null) {
+                                      <div
+                                        class="d-flex align-items-center gap-2 flex-wrap"
+                                        [attr.aria-label]="'Media ' + formatRatingIt(space.averageReviewRating) + ' su 5'"
+                                      >
+                                        <span class="d-inline-flex gap-1" aria-hidden="true">
+                                          @for (s of ratingStarIndexes; track s) {
+                                            <app-sd-icon
+                                              name="star"
+                                              [size]="18"
+                                              [class.text-warning]="s <= space.averageReviewRating"
+                                              [class.text-muted]="s > space.averageReviewRating"
+                                            />
+                                          }
+                                        </span>
+                                        <span class="fw-semibold tabular-nums">{{ formatRatingIt(space.averageReviewRating) }}</span>
+                                        <span class="text-muted small">/ 5</span>
+                                      </div>
+                                    } @else {
+                                      <span class="text-muted small mb-0">Nessuna recensione ancora.</span>
+                                    }
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                          </div>
+                          <div class="d-flex gap-2 align-items-start flex-shrink-0 align-self-lg-center">
+                            <button
+                              class="btn btn-light text-danger btn-sm apple-button px-3 shadow-0 border text-nowrap d-inline-flex align-items-center gap-1"
+                              type="button"
+                              (click)="moderate(space, 'FORCE_CLOSE')"
+                              mdbRipple
+                            >
+                              <app-sd-icon name="circle-exclamation" [size]="16" aria-hidden="true" />
+                              Chiusura forzata
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }

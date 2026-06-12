@@ -1,0 +1,66 @@
+@if (isEditModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-tech-edit-title"
+    (click)="closeEditModal()"
+  >
+    <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          title="Modifica tecnico"
+          eyebrow="Profilo tecnico"
+          icon="edit"
+          titleId="host-tech-edit-title"
+          (close)="closeEditModal()"
+        />
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="host-tech-edit-name">Nome</label>
+              <input id="host-tech-edit-name" mdbInput class="form-control" [(ngModel)]="editName" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="host-tech-edit-email">Email</label>
+              <input id="host-tech-edit-email" mdbInput class="form-control" [(ngModel)]="editEmail" type="email" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="host-tech-edit-spec">Specializzazione</label>
+              <input id="host-tech-edit-spec" mdbInput class="form-control" [(ngModel)]="editSpecialization" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="host-tech-edit-password">Nuova password</label>
+              <input
+                id="host-tech-edit-password"
+                mdbInput
+                class="form-control"
+                [(ngModel)]="editPassword"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Lascia vuoto per non cambiare"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeEditModal()" mdbRipple>Annulla</button>
+          <button
+            type="button"
+            class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-2"
+            (click)="saveEditedTechnician()"
+            [disabled]="editSaving()"
+            mdbRipple
+          >
+            @if (editSaving()) {
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            }
+            Salva modifiche
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

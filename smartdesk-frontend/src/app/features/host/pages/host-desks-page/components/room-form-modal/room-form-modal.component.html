@@ -1,0 +1,60 @@
+@if (isRoomModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-room-modal-title"
+    (click)="closeRoomModal()"
+  >
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          [title]="editingRoomId === null ? 'Nuova stanza' : 'Modifica stanza'"
+          eyebrow="Stanze"
+          titleId="host-room-modal-title"
+          (close)="closeRoomModal()"
+        />
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold" for="host-room-name">Nome stanza / ambiente</label>
+            <input
+              id="host-room-name"
+              mdbInput
+              class="form-control"
+              [(ngModel)]="roomFormName"
+              [maxlength]="roomNameMaxLen"
+              placeholder="es. Torre A, Sala riunioni"
+            />
+          </div>
+          <div class="mb-2">
+            <label class="form-label small fw-semibold" for="host-room-code">
+              Codice stanza
+              <span class="text-muted fw-normal">2–{{ roomCodeMaxLen }} · maiuscolo</span>
+            </label>
+            <input
+              id="host-room-code"
+              mdbInput
+              class="form-control text-uppercase"
+              [(ngModel)]="roomFormCode"
+              [maxlength]="roomCodeMaxLen"
+              placeholder="es. TA"
+              autocomplete="off"
+            />
+            <p class="small text-muted mt-2 mb-0">
+              Univoco nello spazio: non puoi creare due stanze con lo stesso codice. Le postazioni useranno questo prefisso (es. TA1, TA2).
+            </p>
+          </div>
+          @if (errorMsg) {
+            <div class="alert alert-danger mt-3 mb-0 py-2 rounded-3" role="alert">{{ errorMsg }}</div>
+          }
+        </div>
+        <div class="modal-footer gap-2">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeRoomModal()" mdbRipple>Annulla</button>
+          <button type="button" class="btn btn-primary rounded-pill px-4" (click)="saveRoom()" mdbRipple>Salva stanza</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

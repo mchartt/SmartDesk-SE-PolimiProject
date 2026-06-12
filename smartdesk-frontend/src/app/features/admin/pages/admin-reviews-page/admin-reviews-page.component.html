@@ -1,0 +1,295 @@
+<div class="d-flex justify-content-between align-items-end border-bottom pb-3 mb-4">
+  <div>
+    <p class="text-uppercase text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">Amministrazione</p>
+    <h2 class="mb-0 fw-bolder" style="letter-spacing: -0.03em;">{{ title() }}</h2>
+  </div>
+</div>
+
+@if (errorMsg()) {
+  <div class="alert alert-danger rounded-4 shadow-sm d-flex align-items-center mb-4 border-0" role="alert">
+    <app-sd-icon name="circle-exclamation" [size]="20" class="me-3 flex-shrink-0" aria-hidden="true" />
+    <div class="fw-medium">{{ errorMsg() }}</div>
+  </div>
+}
+
+<div class="card bg-white border-0 rounded-5 shadow-sm mb-4">
+  <div class="card-body p-4">
+    <h6 class="fw-bold mb-2 d-flex align-items-center gap-2">
+      <app-sd-icon name="building" [size]="18" class="text-primary" aria-hidden="true" /> Ufficio da gestire
+    </h6>
+    <p class="text-muted small mb-3 mb-md-4">
+      Clicca per aprire il riquadro di selezione: dentro potrai scegliere la <strong class="fw-semibold">città</strong>
+      (anche cercandola per nome) e filtrare gli uffici per <strong class="fw-semibold">nome o indirizzo</strong>.
+    </p>
+    @if (loadingSpaces()) {
+      <p class="text-muted small mb-0" role="status">Caricamento elenco spazi…</p>
+    } @else if (!spaces().length) {
+      <p class="text-muted small mb-0">Nessuno spazio disponibile.</p>
+    } @else {
+      <button
+        id="admin-space-picker-trigger"
+        type="button"
+        class="btn apple-surface-bg border-0 shadow-none w-100 text-start d-flex justify-content-between align-items-center rounded-pill px-4 py-3 text-dark fw-medium"
+        [class.active]="spacePickerOpen()"
+        mdbRipple
+        (click)="toggleSpacePicker($event)"
+        aria-haspopup="dialog"
+        [attr.aria-expanded]="spacePickerOpen()"
+        aria-controls="admin-space-picker-dialog"
+      >
+        <span class="text-truncate me-2">
+          {{ selectedSpace() ? selectedSpaceLabel() : 'Apri selezione ufficio…' }}
+        </span>
+        <app-sd-icon name="building" [size]="20" class="flex-shrink-0 text-muted" aria-hidden="true" />
+      </button>
+    }
+  </div>
+</div>
+
+@if (selectedSpace()) {
+  @if (loadingReviews()) {
+    <div class="d-flex flex-column align-items-center py-5 gap-2" role="status">
+      <div class="spinner-border text-primary" aria-hidden="true"></div>
+      <span class="text-muted small">Caricamento recensioni…</span>
+    </div>
+  } @else if (!reviews().length) {
+    <app-empty-state message="Nessuna recensione per questo ufficio." />
+  } @else {
+    <p class="text-muted small mb-3">
+      {{ reviews().length }} recension{{ reviews().length === 1 ? 'e' : 'i' }} · {{ selectedSpaceLabel() }}
+    </p>
+    <ul class="list-unstyled d-flex flex-column gap-3 mb-0" role="list">
+      @for (r of reviews(); track r.reviewID) {
+        <li role="listitem">
+          <article class="card bg-white border-0 rounded-5 shadow-sm border border-light">
+            <div class="card-body p-4">
+              <div class="d-flex flex-column flex-lg-row gap-4">
+                <div class="d-flex gap-3 min-w-0 flex-grow-1">
+                  <div class="min-w-0 flex-grow-1">
+                    <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-1">
+                      <strong>Recensione #{{ r.reviewID }}</strong>
+                      @if (r.createdAt) {
+                        <time class="text-muted small" [attr.datetime]="r.createdAt">{{ formatReviewDate(r.createdAt) }}</time>
+                      }
+                    </div>
+                    <div class="mb-2" [attr.aria-label]="'Valutazione ' + r.rating + ' su 5'">
+                      @for (s of stars; track s) {
+                        <app-sd-icon
+                          name="star"
+                          [size]="18"
+                          [class.text-warning]="s <= r.rating"
+                          [class.text-muted]="s > r.rating"
+                          aria-hidden="true"
+                        />
+                      }
+                    </div>
+                    <p class="text-muted small mb-2 d-flex align-items-center gap-2 flex-wrap">
+                      <app-sd-icon name="user-circle" [size]="16" aria-hidden="true" />
+                      @if (r.reviewerFullName || r.workerEmail) {
+                        <span>{{ r.reviewerFullName || '—' }}</span>
+                        @if (r.workerEmail) {
+                          <span aria-hidden="true">·</span>
+                          <a class="link-underline link-underline-opacity-0 text-break" [href]="'mailto:' + r.workerEmail">{{ r.workerEmail }}</a>
+                        }
+                      } @else {
+                        <span>Lavoratore #{{ r.workerID }}</span>
+                      }
+                    </p>
+                    <p class="mb-2 text-break">{{ r.comment }}</p>
+                  </div>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-2 flex-shrink-0">
+                  <button type="button" class="btn btn-outline-primary btn-sm apple-button d-inline-flex align-items-center gap-1" mdbRipple (click)="adminRevCollapse.toggle()" [attr.aria-expanded]="!adminRevCollapse.collapsed">
+                    Dettagli
+                    <app-sd-icon [name]="adminRevCollapse.collapsed ? 'chevron-down' : 'chevron-up'" [size]="14" />
+                  </button>
+                  <button type="button" class="btn btn-outline-danger btn-sm apple-button" mdbRipple (click)="deleteReview(r)">
+                    Elimina
+                  </button>
+                </div>
+              </div>
+              <div class="mt-3" mdbCollapse #adminRevCollapse="mdbCollapse">
+                <div class="p-3 bg-light rounded-4 border d-flex flex-wrap gap-4">
+                  <div>
+                    <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem;"><app-sd-icon name="ticket" [size]="12" /> Prenotazione</span>
+                    <span class="fw-medium text-dark small">{{ r.bookingID }}</span>
+                  </div>
+                  <div>
+                    <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem;"><app-sd-icon name="building" [size]="12" /> Spazio</span>
+                    <span class="fw-medium text-dark small">{{ selectedSpace()?.name?.trim() || '—' }} ({{ selectedSpace()?.city?.trim() || '—' }})</span>
+                  </div>
+                  <div>
+                    <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem;"><app-sd-icon name="building" [size]="12" /> Codice Ufficio</span>
+                    <span class="badge bg-secondary text-white">{{ r.spaceOfficeCode || selectedSpace()?.officeCode || '—' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem;"><app-sd-icon name="user-tie" [size]="12" /> Host</span>
+                    <span class="fw-medium text-dark small">Host #{{ r.hostID }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </li>
+      }
+    </ul>
+  }
+} @else if (!loadingSpaces() && spaces().length) {
+  <app-empty-state message="Apri il riquadro e scegli un ufficio per visualizzare le relative recensioni." />
+}
+
+@if (spacePickerOpen()) {
+  <div
+    id="admin-space-picker-dialog"
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="admin-space-picker-title"
+    (click)="closeSpacePicker()"
+  >
+    <div
+      class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered"
+      role="document"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          title="Seleziona ufficio"
+          [subtitle]="pickerCity() + ' · ' + filteredPickerSpaces().length + ' uffici · filtra con la ricerca sotto'"
+          icon="building"
+          titleId="admin-space-picker-title"
+          (close)="closeSpacePicker()"
+        />
+
+        <div class="modal-body">
+          <div class="mb-4">
+            <label class="form-label small fw-bold text-uppercase text-muted mb-2" for="admin-picker-city-search">
+              Città
+            </label>
+            @if (!cities().length) {
+              <p class="text-muted small mb-0">Nessuna città negli spazi caricati.</p>
+            } @else {
+              <div class="input-group mb-2">
+                <span class="input-group-text apple-surface-bg border-0 rounded-start-pill ps-4" aria-hidden="true">
+                  <app-sd-icon name="search" [size]="18" />
+                </span>
+                <input
+                  id="admin-picker-city-search"
+                  type="search"
+                  mdbInput
+                  class="form-control border-0 shadow-none apple-surface-bg rounded-end-pill px-3"
+                  placeholder="Cerca città…"
+                  [ngModel]="pickerCitySearchQuery()"
+                  (ngModelChange)="pickerCitySearchQuery.set($event)"
+                  autocomplete="off"
+                  aria-controls="admin-picker-city-chips-scroll"
+                />
+              </div>
+              <div
+                id="admin-picker-city-chips-scroll"
+                class="overflow-auto pb-1"
+                role="region"
+                aria-label="Elenco città — scorri orizzontalmente"
+              >
+                <div class="d-flex flex-nowrap gap-2">
+                  @if (!filteredPickerCities().length) {
+                    <p class="text-muted small mb-0 py-2 px-1">Nessuna città corrisponde alla ricerca.</p>
+                  } @else {
+                    @for (city of filteredPickerCities(); track city) {
+                      <button
+                        type="button"
+                        class="btn btn-light rounded-pill shadow-0 flex-shrink-0"
+                        [class.btn-primary]="pickerCity() === city"
+                        [attr.aria-pressed]="pickerCity() === city"
+                        mdbRipple
+                        (click)="selectPickerCity(city)"
+                      >
+                        {{ city }}
+                        @if (pickerCity() === city) {
+                          <app-sd-icon name="check" [size]="16" class="ms-1" aria-hidden="true" />
+                        }
+                      </button>
+                    }
+                  }
+                </div>
+              </div>
+            }
+            <label class="form-label small fw-bold text-uppercase text-muted mb-2 mt-3" for="admin-picker-office-search">
+              Nome ufficio / luogo
+            </label>
+            <div class="input-group">
+              <span class="input-group-text apple-surface-bg border-0 rounded-start-pill ps-4" aria-hidden="true">
+                <app-sd-icon name="search" [size]="18" />
+              </span>
+              <input
+                id="admin-picker-office-search"
+                type="search"
+                mdbInput
+                class="form-control border-0 shadow-none apple-surface-bg rounded-end-pill px-3"
+                placeholder="Nome ufficio, indirizzo, host…"
+                [ngModel]="pickerSearchQuery()"
+                (ngModelChange)="pickerSearchQuery.set($event)"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <div id="admin-space-list-wrap" class="rounded-3 border overflow-hidden">
+            @if (!filteredPickerSpaces().length) {
+              <p class="text-muted small text-center py-4 mb-0">Nessun ufficio corrisponde ai filtri.</p>
+            } @else {
+              <ul class="list-group list-group-flush" role="listbox" aria-labelledby="admin-space-picker-title">
+                @for (sp of filteredPickerSpaces(); track sp.spaceID) {
+                  <li class="list-group-item list-group-item-action p-0 border-0 border-bottom" role="presentation">
+                    <button
+                      type="button"
+                      class="btn w-100 text-start d-flex align-items-start gap-3 p-3 rounded-0"
+                      role="option"
+                      [attr.aria-selected]="selectedSpace()?.spaceID === sp.spaceID"
+                      mdbRipple
+                      (click)="pickSpace(sp)"
+                    >
+                      <span
+                        class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                        style="width: 2.5rem; height: 2.5rem"
+                        aria-hidden="true"
+                      >
+                        <app-sd-icon name="building" [size]="20" />
+                      </span>
+                      <span class="flex-grow-1 min-w-0">
+                        <span class="fw-semibold d-block text-break">{{ sp.name }}</span>
+                        <span class="small text-muted d-flex align-items-center gap-1 mt-1">
+                          <app-sd-icon name="layers" [size]="14" aria-hidden="true" />
+                          <span class="text-truncate">{{ sp.city }}</span>
+                        </span>
+                        @if (sp.address) {
+                          <span class="small text-muted d-flex align-items-center gap-1 mt-1">
+                            <app-sd-icon name="clipboard-list" [size]="14" aria-hidden="true" />
+                            <span class="text-truncate">{{ sp.address }}</span>
+                          </span>
+                        }
+                        @if (sp.hostName) {
+                          <span class="small text-muted d-flex align-items-center gap-1 mt-1">
+                            <app-sd-icon name="user-tie" [size]="14" aria-hidden="true" />
+                            <span class="text-truncate">{{ sp.hostName }}</span>
+                          </span>
+                        }
+                        <span class="small text-muted d-flex align-items-center gap-1 mt-1">
+                          <app-sd-icon name="chair" [size]="14" aria-hidden="true" />
+                          <span>{{ sp.deskCount }} desk · Codice {{ sp.officeCode }}</span>
+                        </span>
+                      </span>
+                      <app-sd-icon name="arrow-right" [size]="18" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

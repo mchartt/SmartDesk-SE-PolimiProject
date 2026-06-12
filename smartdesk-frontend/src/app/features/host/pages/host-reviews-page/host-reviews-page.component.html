@@ -1,0 +1,277 @@
+<header class="mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 px-2">
+  <div class="d-flex align-items-center gap-3">
+    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+      <app-sd-icon name="star" [size]="24" />
+    </div>
+    <div>
+      <p class="text-muted text-uppercase small fw-bold mb-1 tracking-wide">Recensioni</p>
+      <h2 class="mb-0 fw-bold">{{ title() }}</h2>
+    </div>
+  </div>
+</header>
+
+@if (errorMsg()) {
+  <div class="alert alert-danger rounded-4 mb-4 py-3 px-3" role="alert">{{ errorMsg() }}</div>
+}
+
+@if (loading()) {
+  <p class="text-muted" role="status">Caricamento…</p>
+} @else if (!spaceSummaries().length && !errorMsg()) {
+  <app-empty-state message="Nessuna recensione disponibile." />
+} @else if (spaceSummaries().length) {
+  <section class="card bg-white border-0 rounded-5 shadow-sm mb-4" aria-labelledby="host-rev-spaces-heading">
+    <div class="card-body p-4 p-md-5 bg-transparent border-0 pt-4 pb-0 px-4 d-flex flex-wrap align-items-center gap-3">
+      <div
+        class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+        style="width: 2.75rem; height: 2.75rem"
+        aria-hidden="true"
+      >
+        <app-sd-icon name="building" [size]="22" />
+      </div>
+      <h3 id="host-rev-spaces-heading" class="fw-bold mb-0 flex-grow-1">Uffici con recensioni</h3>
+    </div>
+
+    <div class="p-4">
+      <label class="form-label small fw-semibold" for="host-rev-space-search">Cerca per nome ufficio</label>
+      <div class="input-group mb-4">
+        <span class="input-group-text bg-transparent" aria-hidden="true">
+          <app-sd-icon name="search" [size]="18" />
+        </span>
+        <input
+          id="host-rev-space-search"
+          type="search"
+          class="form-control"
+          [ngModel]="spaceSearchQuery()"
+          (ngModelChange)="spaceSearchQuery.set($event)"
+          placeholder="Cerca per nome ufficio"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+
+      @if (!filteredSpaceSummaries().length) {
+        <p class="text-muted mb-0" role="status">Nessun risultato.</p>
+      } @else {
+        <div class="card bg-white border-0 rounded-5 shadow-sm overflow-hidden mb-5" role="list">
+          <div class="list-group list-group-flush">
+            @for (s of filteredSpaceSummaries(); track s.spaceID) {
+              <div class="list-group-item d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 p-4">
+                <div class="d-flex align-items-center gap-3 min-w-0 flex-grow-1">
+                  <span
+                    class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                    style="width: 2.75rem; height: 2.75rem"
+                    aria-hidden="true"
+                  >
+                    <app-sd-icon name="building" [size]="22" />
+                  </span>
+                  <span class="min-w-0">
+                    <span class="fw-bold d-block text-break mb-1">{{ s.spaceDisplayName }}</span>
+                    <span class="small text-muted d-block">{{ s.detailLine }}</span>
+                  </span>
+                </div>
+                <div class="d-flex flex-wrap gap-2 flex-shrink-0">
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary d-inline-flex align-items-center gap-2 rounded-pill px-3"
+                    (click)="openOffice(s.spaceID, 'nuove')"
+                    mdbRipple
+                  >
+                    <span class="fw-semibold">Vedi nuove</span>
+                    <span class="badge bg-primary rounded-pill">{{ s.nuoveCount }}</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 rounded-pill px-3"
+                    (click)="openOffice(s.spaceID, 'storico')"
+                    mdbRipple
+                  >
+                    <span class="fw-semibold">Vedi storico</span>
+                    <span class="badge bg-secondary rounded-pill">{{ s.storicoCount }}</span>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+}
+
+@if (officeOverlaySpaceId() !== null && officeModal(); as office) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'host-rev-office-' + office.spaceID"
+    (click)="closeOffice()"
+  >
+    <div
+      class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
+      role="document"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          [title]="office.spaceDisplayName"
+          [subtitle]="office.detailLine"
+          icon="building"
+          [titleId]="'host-rev-office-' + office.spaceID"
+          (close)="closeOffice()"
+        />
+
+        <div class="modal-body">
+          <ul class="nav nav-pills nav-fill gap-2 mb-4" role="tablist" aria-label="Sezione recensioni">
+            <li class="nav-item" role="presentation">
+              <button
+                type="button"
+                role="tab"
+                class="nav-link rounded-pill"
+                [class.active]="officeSheetTab() === 'nuove'"
+                [attr.aria-selected]="officeSheetTab() === 'nuove'"
+                (click)="officeSheetTab.set('nuove')"
+                mdbRipple
+              >
+                Nuove
+                <span class="badge bg-primary ms-1 rounded-pill">{{ nuoveInOffice().length }}</span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                type="button"
+                role="tab"
+                class="nav-link rounded-pill"
+                [class.active]="officeSheetTab() === 'storico'"
+                [attr.aria-selected]="officeSheetTab() === 'storico'"
+                (click)="officeSheetTab.set('storico')"
+                mdbRipple
+              >
+                Storico
+                <span class="badge bg-secondary ms-1 rounded-pill">{{ storicoInOffice().length }}</span>
+              </button>
+            </li>
+          </ul>
+
+          @if (officeSheetTab() === 'nuove') {
+            <label class="form-label small fw-semibold visually-hidden" for="host-rev-nuove-search">Cerca nelle nuove</label>
+            <div class="input-group mb-3">
+              <span class="input-group-text bg-transparent" aria-hidden="true">
+                <app-sd-icon name="search" [size]="18" />
+              </span>
+              <input
+                id="host-rev-nuove-search"
+                type="search"
+                mdbInput
+                class="form-control"
+                [ngModel]="officeNuoveQuery()"
+                (ngModelChange)="officeNuoveQuery.set($event)"
+                placeholder="Cerca"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+          } @else {
+            <label class="form-label small fw-semibold visually-hidden" for="host-rev-storico-search">Cerca nello storico</label>
+            <div class="input-group mb-3">
+              <span class="input-group-text bg-transparent" aria-hidden="true">
+                <app-sd-icon name="search" [size]="18" />
+              </span>
+              <input
+                id="host-rev-storico-search"
+                type="search"
+                mdbInput
+                class="form-control"
+                [ngModel]="officeStoricoQuery()"
+                (ngModelChange)="officeStoricoQuery.set($event)"
+                placeholder="Cerca"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+          }
+
+          @if (sheetError()) {
+            <div class="alert alert-warning rounded-3 py-2 small mb-3" role="status">{{ sheetError() }}</div>
+          }
+
+          <section [attr.aria-labelledby]="officeSheetTab() === 'nuove' ? 'host-rev-new-heading' : 'host-rev-hist-heading'">
+            @if (officeSheetTab() === 'nuove') {
+              <h5 id="host-rev-new-heading" class="h6 fw-bold d-flex align-items-center gap-2 mb-3">
+                Elenco
+                <span class="badge bg-primary rounded-pill small">{{ nuoveInOfficeFiltered().length }}</span>
+              </h5>
+            } @else {
+              <h5 id="host-rev-hist-heading" class="h6 fw-bold d-flex align-items-center gap-2 mb-3">
+                Elenco
+                <span class="badge bg-secondary rounded-pill small">{{ storicoInOfficeFiltered().length }}</span>
+              </h5>
+            }
+            @if (officeSheetTab() === 'nuove' ? !nuoveInOfficeFiltered().length : !storicoInOfficeFiltered().length) {
+              <p class="text-muted mb-0">Nessun elemento.</p>
+            } @else {
+              <ul class="list-group list-group-flush rounded-3 border mb-0">
+                @for (r of officeSheetTab() === 'nuove' ? nuoveInOfficeFiltered() : storicoInOfficeFiltered(); track r.reviewID) {
+                  <li class="list-group-item list-group-item-action p-0 border-0 border-bottom">
+                    <button
+                      type="button"
+                      class="btn w-100 text-start d-flex align-items-start gap-3 p-3 rounded-0"
+                      (click)="hostRevCollapse.toggle(); toggleDetail(r)"
+                      mdbRipple
+                      [attr.aria-expanded]="!hostRevCollapse.collapsed"
+                    >
+                      <div class="flex-shrink-0" [attr.aria-label]="'Valutazione ' + r.rating + ' su 5'">
+                        @for (st of stars; track st) {
+                          <app-sd-icon
+                            name="star"
+                            [size]="16"
+                            [class.text-warning]="st <= r.rating"
+                            [class.text-muted]="st > r.rating"
+                            aria-hidden="true"
+                          />
+                        }
+                      </div>
+                      <span class="flex-grow-1 min-w-0">
+                        <span class="d-flex justify-content-between align-items-start gap-2">
+                          <span class="fw-semibold d-block text-break">{{ reviewerLabel(r) }}</span>
+                          <span class="small text-muted text-nowrap mt-1">{{ formatReviewDate(r.createdAt) }}</span>
+                        </span>
+                        <span class="small text-muted d-block text-break">{{ r.comment }}</span>
+                      </span>
+                      <app-sd-icon [name]="hostRevCollapse.collapsed ? 'chevron-down' : 'chevron-up'" [size]="18" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                    </button>
+                    <div mdbCollapse #hostRevCollapse="mdbCollapse">
+                      <div class="px-4 pb-4">
+                        <div class="p-3 bg-light rounded-4 border">
+                          <div class="d-flex flex-wrap gap-4 mb-3">
+                            <div>
+                              <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem;"><app-sd-icon name="calendar" [size]="12" /> Data</span>
+                              <time class="fw-medium text-dark small" [attr.datetime]="r.createdAt">{{ formatReviewDate(r.createdAt) }}</time>
+                            </div>
+                            <div>
+                              <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem;"><app-sd-icon name="ticket" [size]="12" /> Prenotazione</span>
+                              <span class="fw-medium text-dark small">{{ r.bookingID }}</span>
+                            </div>
+                            <div>
+                              <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem;"><app-sd-icon name="building" [size]="12" /> Codice Ufficio</span>
+                              <span class="badge bg-secondary text-white">{{ r.spaceOfficeCode || '—' }}</span>
+                            </div>
+                          </div>
+                          <h6 class="text-uppercase text-muted fw-bold mb-2 d-flex align-items-center gap-1" style="font-size: 0.7rem;">
+                            <app-sd-icon name="clipboard-list" [size]="12" /> Commento
+                          </h6>
+                          <div class="text-break fst-italic text-dark small" style="line-height: 1.5;">"{{ r.comment }}"</div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

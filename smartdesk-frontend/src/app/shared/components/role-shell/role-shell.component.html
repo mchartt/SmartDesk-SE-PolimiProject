@@ -1,0 +1,32 @@
+<app-navbar [menuItems]="menuItems()" [role]="role()" />
+
+@if (accountRestricted()) {
+  <div class="container-fluid px-3 px-md-4 pt-3 pb-0 mb-3">
+    <div class="alert alert-warning border-0 rounded-3 shadow-sm mb-0 py-3" role="alert">
+      <strong>Account limitato.</strong>
+      Il profilo risulta disattivato o non autorizzato: alcune azioni (prenotazioni, ticket) possono essere bloccate. Contatta un amministratore.
+    </div>
+  </div>
+}
+
+<section class="container-fluid px-3 px-md-4 pt-navbar pb-4">
+  <div class="row g-4">
+    <aside class="col-lg-3 col-xl-2" aria-label="Menu laterale area riservata">
+      <div class="card border-0 shadow-sm sticky-top custom-sidebar-card" style="top: calc(var(--sd-navbar-height) + 1.5rem)">
+        <div class="card-body p-3 p-xl-4">
+          <app-role-menu [items]="menuItems()" />
+        </div>
+      </div>
+    </aside>
+
+    <main id="contenuto-principale" class="col-lg-9 col-xl-10" tabindex="-1">
+      <div class="container-fluid py-2 px-0">
+        @if (shellLayout()) {
+          <router-outlet />
+        } @else {
+          <ng-content />
+        }
+      </div>
+    </main>
+  </div>
+</section>

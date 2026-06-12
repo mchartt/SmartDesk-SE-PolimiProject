@@ -1,0 +1,185 @@
+<header class="mb-4 text-start card bg-white border-0 rounded-5 shadow-sm p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+  <div class="d-flex align-items-center gap-3">
+    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+      <app-sd-icon name="ticket" [size]="24" />
+    </div>
+    <div>
+      <p class="text-muted text-uppercase small fw-bold mb-1" style="letter-spacing: 0.5px">Coda di lavoro</p>
+      <h2 class="mb-0 fw-bold">{{ title() }}</h2>
+    </div>
+  </div>
+</header>
+
+@if (errorMsg) {
+  <div class="alert alert-danger rounded-3 shadow-sm d-flex align-items-center mb-4" role="alert">
+    <app-sd-icon name="circle-exclamation" [size]="20" class="me-2" aria-hidden="true" />
+    <div>{{ errorMsg }}</div>
+  </div>
+}
+
+@if (loading()) {
+  <div class="d-flex flex-column align-items-center justify-content-center py-5 gap-3" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" aria-hidden="true"></div>
+    <p class="text-muted small mb-0">Caricamento ticket…</p>
+  </div>
+} @else if (!ticketsAll().length && !errorMsg) {
+  <app-empty-state message="Nessuna segnalazione in attesa al momento." />
+} @else {
+  <app-technician-space-filter-cards
+    [spaces]="assignedSpaces()"
+    [tickets]="ticketsAll()"
+    [selectedFilter]="spaceFilter()"
+    (selectedFilterChange)="onSpaceFilterChange($event)"
+  />
+
+  @if (listEmptyAfterFilter()) {
+    <div class="text-center py-5 rounded-4 border border-dashed mb-5" role="status">
+      <p class="fw-semibold mb-1">Nessun ticket per questo filtro</p>
+      <p class="text-muted small mb-0">Prova un altro ufficio o torna a «Tutti».</p>
+    </div>
+  } @else {
+    <div class="row g-4">
+      @for (ticket of visibleTickets(); track ticket.ticketID) {
+        <div class="col-md-6 col-xl-4">
+          <article class="card bg-white border-0 rounded-5 shadow-sm h-100 transition-all">
+            <div class="p-4 d-flex flex-column h-100">
+              <div class="d-flex align-items-start gap-3 mb-3">
+                <span
+                  class="bg-primary bg-opacity-25 text-primary rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                  style="width: 2.75rem; height: 2.75rem"
+                  aria-hidden="true"
+                >
+                  <app-sd-icon name="ticket" [size]="22" />
+                </span>
+                <div class="min-width-0 flex-grow-1">
+                  <h3 class="h6 fw-bold mb-1 text-truncate" [attr.title]="ticketTitleTooltip(ticket) || null">
+                    {{ ticketPrimaryHeading(ticket) }}
+                  </h3>
+                  @if (ticketRefSubtitle(ticket); as tref) {
+                    <p class="text-muted small mb-0">{{ tref }}</p>
+                  }
+                </div>
+              </div>
+
+              @if (ticketDescriptionText(ticket); as desc) {
+                <p class="small mb-3 flex-grow-1">{{ ticketDescriptionPreview(ticket) ?? desc }}</p>
+              } @else {
+                <p class="small text-muted mb-3 flex-grow-1">Nessuna descrizione fornita dal lavoratore.</p>
+              }
+
+              <div class="d-flex flex-wrap gap-2 mt-auto">
+                <button
+                  type="button"
+                  class="btn btn-outline-primary btn-sm rounded-pill"
+                  mdbRipple
+                  (click)="openTicketDetail(ticket)"
+                >
+                  Vedi dettagli
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm rounded-pill"
+                  mdbRipple
+                  [disabled]="claimingTicketId() === ticket.ticketID"
+                  (click)="claimTicket(ticket.ticketID)"
+                >
+                  @if (claimingTicketId() === ticket.ticketID) {
+                    <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                  }
+                  Prendi in carico
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      }
+    </div>
+  }
+}
+
+@if (detailTicket(); as ticket) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="tech-pending-detail-title"
+    (click)="closeTicketDetail()"
+  >
+    <div
+      class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
+      role="document"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          [title]="ticketPrimaryHeading(ticket)"
+          [subtitle]="ticketRefSubtitle(ticket) || null"
+          icon="ticket"
+          titleId="tech-pending-detail-title"
+          closeLabel="Chiudi dettagli segnalazione"
+          (close)="closeTicketDetail()"
+        />
+
+        <div class="modal-body">
+          <section class="mb-4" aria-labelledby="tech-pending-desc-label">
+            <h3 id="tech-pending-desc-label" class="small text-uppercase text-muted fw-semibold mb-2">Descrizione</h3>
+            <p class="text-break mb-0">
+              {{ ticketDescriptionText(ticket) || 'Nessuna descrizione fornita dal lavoratore.' }}
+            </p>
+          </section>
+
+          <section class="mb-4" aria-labelledby="tech-pending-meta-label">
+            <h3 id="tech-pending-meta-label" class="small text-uppercase text-muted fw-semibold mb-2">Informazioni</h3>
+            <ul class="list-group list-group-flush rounded-3 border">
+              @if (ticket.workerName || ticket.workerSurname) {
+                <li class="list-group-item d-flex align-items-center gap-2">
+                  <app-sd-icon name="user" [size]="16" class="text-muted flex-shrink-0" aria-hidden="true" />
+                  <span><strong>Segnalato da</strong> {{ ticket.workerName }} {{ ticket.workerSurname }}</span>
+                </li>
+              }
+              @if (spaceCaption(ticket)) {
+                <li class="list-group-item d-flex align-items-center gap-2">
+                  <app-sd-icon name="building" [size]="16" class="text-muted flex-shrink-0" aria-hidden="true" />
+                  <span>{{ spaceCaption(ticket) }}</span>
+                </li>
+              }
+              <li class="list-group-item d-flex align-items-center gap-2">
+                <app-sd-icon name="desktop" [size]="16" class="text-muted flex-shrink-0" aria-hidden="true" />
+                <span>{{ deskLabel(ticket) }}</span>
+              </li>
+              <li class="list-group-item d-flex align-items-center gap-2">
+                <app-sd-icon name="calendar" [size]="16" class="text-muted flex-shrink-0" aria-hidden="true" />
+                <span>Creato il {{ formatTicketWhen(ticket.createdAt) }}</span>
+              </li>
+            </ul>
+          </section>
+
+          <p class="alert alert-light border small mb-0 d-flex align-items-start gap-2">
+            <app-sd-icon name="shield" [size]="16" class="flex-shrink-0 mt-1" aria-hidden="true" />
+            <span>Chat, gravità e aggiornamenti saranno disponibili dopo aver preso in carico il ticket.</span>
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" mdbRipple (click)="closeTicketDetail()">
+            Chiudi
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary rounded-pill px-4"
+            mdbRipple
+            [disabled]="claimingTicketId() === ticket.ticketID"
+            (click)="claimTicket(ticket.ticketID)"
+          >
+            @if (claimingTicketId() === ticket.ticketID) {
+              <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+            }
+            Prendi in carico
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

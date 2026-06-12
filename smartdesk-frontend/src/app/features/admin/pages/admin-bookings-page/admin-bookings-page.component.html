@@ -1,0 +1,159 @@
+<div class="d-flex justify-content-between align-items-end border-bottom pb-3 mb-4">
+  <div>
+    <p class="text-uppercase text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">Amministrazione</p>
+    <h2 class="mb-0 fw-bolder" style="letter-spacing: -0.03em;">{{ title() }}</h2>
+  </div>
+</div>
+
+@if (errorMsg) {
+  <div class="alert alert-danger rounded-4 shadow-sm d-flex align-items-center mb-4 border-0" role="alert">
+    <app-sd-icon name="circle-exclamation" [size]="20" class="me-3 flex-shrink-0" aria-hidden="true" />
+    <div class="fw-medium">{{ errorMsg }}</div>
+  </div>
+}
+
+<div class="card bg-white border-0 rounded-5 shadow-sm mb-4">
+  <div class="card-body p-4">
+    <div class="row g-4 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small fw-bold text-muted text-uppercase mb-2" for="admin-bookings-status">Stato</label>
+        <select
+          id="admin-bookings-status"
+          class="form-select border-0 shadow-none apple-surface-bg rounded-pill px-3"
+          [ngModel]="filterStatus()"
+          (ngModelChange)="filterStatus.set($event)"
+        >
+          <option value="ALL">Tutti gli stati</option>
+          <option value="PENDING">In attesa</option>
+          <option value="CONFIRMED">Confermate</option>
+          <option value="CANCELLED">Annullate</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <app-sd-search-calendar-field
+          inputId="admin-bookings-date"
+          label="Giorno"
+          placeholder="Tutti i giorni"
+          [selectedIso]="filterDate()"
+          (selectedIsoChange)="filterDate.set($event)"
+          [highlightedDays]="highlightedBookingDays()"
+        />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small fw-bold text-muted text-uppercase mb-2" for="admin-bookings-search">Cerca</label>
+        <div class="input-group">
+          <span class="input-group-text apple-surface-bg border-0 text-muted rounded-start-pill ps-4"><app-sd-icon name="search" [size]="16" /></span>
+          <input
+            id="admin-bookings-search"
+            class="form-control border-0 shadow-none apple-surface-bg rounded-end-pill px-3"
+            type="search"
+            placeholder="Codice, lavoratore, spazio, postazione…"
+            [ngModel]="filterQuery()"
+            (ngModelChange)="filterQuery.set($event)"
+          />
+        </div>
+      </div>
+      <div class="col-md-2 d-flex align-items-end justify-content-md-end">
+        <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-medium">
+          {{ filteredBookings().length }} / {{ bookings().length }} risultati
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="d-flex flex-column align-items-center justify-content-center py-5 gap-3" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" aria-hidden="true" style="width: 3rem; height: 3rem;"></div>
+    <p class="text-muted fw-medium mb-0">Caricamento prenotazioni…</p>
+  </div>
+} @else if (!filteredBookings().length && !errorMsg) {
+  <app-empty-state message="Nessuna prenotazione trovata con i filtri attuali." />
+} @else {
+  <div class="card bg-white border-0 rounded-5 shadow-sm overflow-hidden mb-5">
+    <ul class="list-group list-group-flush" role="list">
+      @for (booking of filteredBookings(); track booking.bookingID) {
+        <li class="list-group-item p-4 border-bottom border-light" role="listitem">
+          <div class="d-flex flex-column flex-lg-row justify-content-between gap-4">
+            <div class="d-flex gap-4 min-w-0">
+              <span
+                class="bg-primary bg-opacity-25 text-primary rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                style="width: 3.5rem; height: 3.5rem"
+                aria-hidden="true"
+              >
+                <app-sd-icon name="calendar-check" [size]="24" />
+              </span>
+              <div class="min-w-0">
+                <h6 class="fw-bold mb-2 text-dark">Prenotazione #{{ bookingPublicRef(booking) }}</h6>
+                <div class="text-muted small mb-2">
+                  @if (booking.workerName || booking.workerEmail) {
+                    <span class="d-inline-flex align-items-center gap-2 flex-wrap fw-medium">
+                      <app-sd-icon name="user" [size]="14" class="opacity-50 text-primary" aria-hidden="true" />
+                      @if (booking.workerName) {
+                        <span class="text-dark">{{ booking.workerName }}</span>
+                      }
+                      @if (booking.workerEmail) {
+                        <a class="text-muted text-decoration-none hover-primary transition-all text-break" [href]="'mailto:' + booking.workerEmail">
+                          {{ booking.workerEmail }}
+                        </a>
+                      }
+                    </span>
+                  } @else {
+                    <span class="fw-medium">Lavoratore #{{ booking.workerID ?? '—' }}</span>
+                  }
+                </div>
+                <div class="text-muted small d-flex flex-wrap align-items-center gap-2 fw-medium">
+                  <span class="badge rounded-pill bg-light text-dark border d-inline-flex align-items-center gap-1">
+                    <app-sd-icon name="desktop" [size]="12" class="opacity-50 text-primary" aria-hidden="true" />
+                    Postazione #{{ booking.deskCode || booking.deskID }}
+                  </span>
+                  @if (booking.spaceName) {
+                    <span class="badge rounded-pill bg-light text-dark border d-inline-flex align-items-center gap-1">
+                      <app-sd-icon name="building" [size]="12" class="opacity-50 text-primary" aria-hidden="true" />
+                      {{ booking.spaceName }}
+                      @if (booking.city) {
+                        <span class="text-muted">({{ booking.city }})</span>
+                      }
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex flex-column flex-md-row align-items-md-center gap-4 flex-shrink-0">
+              <div class="text-muted small bg-light rounded-4 p-3 border border-light">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <span class="fw-semibold text-dark text-uppercase" style="font-size: 0.7rem;">Inizio</span>
+                  <span class="font-monospace">{{ booking.startTime | date: 'd MMM y, HH:mm': '': 'it' }}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-semibold text-dark text-uppercase" style="font-size: 0.7rem;">Fine</span>
+                  <span class="font-monospace">{{ booking.endTime | date: 'd MMM y, HH:mm': '': 'it' }}</span>
+                </div>
+              </div>
+              <div class="d-flex flex-column gap-2 align-items-end">
+                <span class="badge rounded-pill px-3 py-2 fw-bold {{ statusBadgeClass(booking.status) }}">
+                  {{ statusLabel(booking.status) }}
+                </span>
+                @if (canCancel(booking)) {
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger btn-sm apple-button px-4 fw-semibold mt-1"
+                    mdbRipple
+                    [disabled]="cancellingId() === booking.bookingID"
+                    (click)="cancelBooking(booking)"
+                  >
+                    @if (cancellingId() === booking.bookingID) {
+                      <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                    }
+                    Annulla
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+}

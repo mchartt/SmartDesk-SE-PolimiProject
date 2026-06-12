@@ -1,0 +1,44 @@
+.hero-visual-container {
+  perspective: 1000px;
+}
+
+.floating-wrapper {
+  animation: hero-float 6s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.tilt-wrapper {
+  transition: transform 0.1s ease-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.tilt-wrapper.resetting {
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.ticket-float {
+  
+  animation: ticket-float 5s ease-in-out infinite alternate;
+}
+
+@keyframes hero-float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes ticket-float {
+  0% {
+    transform: translateY(0px) translateZ(20px);
+  }
+  100% {
+    transform: translateY(-8px) translateZ(20px);
+  }
+}

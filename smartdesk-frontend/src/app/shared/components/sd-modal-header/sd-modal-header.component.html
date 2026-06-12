@@ -1,0 +1,32 @@
+<div class="modal-header align-items-start gap-3">
+  <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0">
+    @if (icon(); as iconName) {
+      <div
+        class="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0"
+        [ngClass]="iconCircleClass()"
+        style="width: 2.75rem; height: 2.75rem"
+        aria-hidden="true"
+      >
+        <app-sd-icon [name]="iconName" [size]="24" />
+      </div>
+    }
+    <div class="min-w-0">
+      @if (eyebrow()) {
+        <p class="text-muted text-uppercase small fw-semibold mb-1">{{ eyebrow() }}</p>
+      }
+      <h4 class="modal-title fw-bold mb-0 text-break lh-sm" [id]="titleId()">{{ title() }}</h4>
+      @if (subtitle()) {
+        <p class="text-muted small mb-0 mt-1 text-break">{{ subtitle() }}</p>
+      }
+    </div>
+  </div>
+  @if (showClose()) {
+    <button
+      type="button"
+      class="btn-close flex-shrink-0"
+      [attr.aria-label]="closeLabel()"
+      mdbRipple
+      (click)="close.emit()"
+    ></button>
+  }
+</div>

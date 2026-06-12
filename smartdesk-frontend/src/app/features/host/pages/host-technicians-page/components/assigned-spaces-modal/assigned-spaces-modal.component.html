@@ -1,0 +1,54 @@
+@if (assignedSpacesModalTechnician(); as asmTech) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'host-tech-assigned-spaces-title-' + asmTech.technicianID"
+    (click)="closeAssignedSpacesModal()"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          [title]="asmTech.name"
+          [subtitle]="'Spazi assegnati · ' + asmTech.email"
+          icon="user-tie"
+          [titleId]="'host-tech-assigned-spaces-title-' + asmTech.technicianID"
+          (close)="closeAssignedSpacesModal()"
+        />
+        <div class="modal-body pt-0">
+          @if (!(asmTech.assignedSpaces ?? []).length) {
+            <p class="text-muted small mb-0 py-3">Non assegnato ad alcuno spazio.</p>
+          } @else {
+            <ul class="list-unstyled mb-0 d-flex flex-column gap-2" role="list">
+              @for (sp of asmTech.assignedSpaces!; track sp.spaceID) {
+                <li role="listitem">
+                  <span class="badge rounded-pill bg-primary-subtle text-primary d-inline-flex align-items-center gap-2 py-2 px-3">
+                    <span>{{ sp.name }} · {{ sp.officeCode || '—' }}</span>
+                    @if (!hasNoApprovedSpaces) {
+                      <button
+                        type="button"
+                        class="btn btn-link btn-sm p-0 text-primary"
+                        (click)="unassignFromHostSpace(sp.spaceID, asmTech.technicianID)"
+                        [attr.aria-label]="'Rimuovi da ' + sp.name"
+                        mdbRipple
+                      >
+                        <app-sd-icon name="x" [size]="14" aria-hidden="true" />
+                      </button>
+                    }
+                  </span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeAssignedSpacesModal()" mdbRipple>
+            Chiudi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

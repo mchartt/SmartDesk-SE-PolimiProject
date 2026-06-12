@@ -1,0 +1,46 @@
+<section class="mb-4" aria-labelledby="host-tech-spaces-heading">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+      <h3 id="host-tech-spaces-heading" class="fw-bold h5 mb-1">Spazi e team</h3>
+      <p class="text-muted small mb-0">Apri uno spazio per vedere i tecnici assegnati.</p>
+    </div>
+    <span class="badge rounded-pill bg-primary-subtle text-primary">{{ approvedSpaces().length }} spazi</span>
+  </div>
+  <div class="card bg-white border-0 rounded-5 shadow-sm overflow-hidden mb-5" role="list">
+    <div class="list-group list-group-flush">
+      @for (space of approvedSpaces(); track space.spaceID) {
+        <button
+          type="button"
+          class="list-group-item list-group-item-action p-4 d-flex align-items-center gap-3 border-0 border-bottom"
+          [attr.aria-pressed]="selectedSpaceId() === space.spaceID"
+          [attr.aria-label]="spaceCardAriaLabel(space)"
+          (click)="openSpaceTechniciansModal(space)"
+          mdbRipple
+        >
+          <span
+            class="rounded-3 bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+            style="width: 2.75rem; height: 2.75rem"
+            aria-hidden="true"
+          >
+            <app-sd-icon name="building" [size]="22" />
+          </span>
+          <span class="min-w-0 flex-grow-1 text-start">
+            <span class="fw-bold d-block text-truncate mb-1">{{ space.name }}</span>
+            <span class="small d-block text-break mb-2 text-muted">
+              @if (space.officeCode.trim()) {
+                {{ space.officeCode }}
+                <span aria-hidden="true"> · </span>
+              }
+              {{ space.city }}
+            </span>
+            <span class="badge rounded-pill bg-secondary-subtle text-secondary">
+              {{ technicianCountForSpace(space.spaceID) }}
+              {{ technicianCountForSpace(space.spaceID) === 1 ? ' tecnico' : ' tecnici' }}
+            </span>
+          </span>
+          <app-sd-icon name="chevron-right" [size]="20" class="text-muted flex-shrink-0" aria-hidden="true" />
+        </button>
+      }
+    </div>
+  </div>
+</section>

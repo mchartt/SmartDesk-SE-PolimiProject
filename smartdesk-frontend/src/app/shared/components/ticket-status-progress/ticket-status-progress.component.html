@@ -1,0 +1,57 @@
+<div
+  class="sd-ticket-progress"
+  [class.sd-ticket-progress--compact]="compact()"
+  [class.sd-ticket-progress--card-side]="cardSide()"
+  [class.sd-ticket-progress--detail]="detail()"
+  role="group"
+  [attr.aria-label]="'Avanzamento ticket: ' + statusCaption()"
+>
+  <div class="sd-ticket-progress__track">
+    <div class="sd-ticket-progress__rail" aria-hidden="true">
+      <span class="sd-ticket-progress__rail-bg"></span>
+      <span
+        class="sd-ticket-progress__rail-fill"
+        [style.width.%]="trackFillPercent()"
+        [style.background]="railColor()"
+      ></span>
+    </div>
+
+    <div class="sd-ticket-progress__steps">
+      @for (step of steps(); track step.key) {
+        <div
+          class="sd-ticket-progress__step"
+          [attr.data-state]="step.state"
+          [attr.data-tone]="step.tone"
+          [class.is-current]="step.current"
+        >
+          <div class="sd-ticket-progress__dot-wrap">
+            <span class="sd-ticket-progress__dot" [attr.aria-current]="step.current ? 'step' : null">
+              @if (step.state === 'done') {
+                <app-sd-icon name="check" [size]="14" class="sd-ticket-progress__check" />
+              } @else if (step.state === 'current') {
+                <span class="sd-ticket-progress__core" aria-hidden="true"></span>
+                <span class="sd-ticket-progress__pulse" aria-hidden="true"></span>
+              } @else {
+                <span class="sd-ticket-progress__core sd-ticket-progress__core--empty" aria-hidden="true"></span>
+              }
+            </span>
+          </div>
+
+          @if (!compact()) {
+            <span
+              class="sd-ticket-progress__label"
+              [attr.data-state]="step.state"
+              [attr.data-tone]="step.tone"
+              [class.is-current]="step.current"
+              [attr.aria-label]="step.labelLines.join(' ')"
+            >
+              @for (line of step.labelLines; track line) {
+                <span class="sd-ticket-progress__label-line">{{ line }}</span>
+              }
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

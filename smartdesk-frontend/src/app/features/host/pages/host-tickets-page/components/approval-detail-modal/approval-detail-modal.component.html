@@ -1,0 +1,74 @@
+@if (approvalDetailRow(); as detailRow) {
+  @if (detailRow.ticket; as ticket) {
+    <div
+      class="modal fade show d-block"
+      tabindex="-1"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="host-tickets-approval-detail-title"
+      (click)="closeApprovalTicketDetail()"
+    >
+      <div
+        class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
+        role="document"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+          <app-sd-modal-header
+            [title]="ticketHeading(ticket)"
+            [subtitle]="workerLabel(ticket) ? 'Segnalato da ' + workerLabel(ticket) : null"
+            icon="ticket"
+            titleId="host-tickets-approval-detail-title"
+            closeLabel="Chiudi dettaglio"
+            (close)="closeApprovalTicketDetail()"
+          />
+
+          <div class="modal-body">
+            <dl class="row small g-2 mb-3">
+              @for (fact of approvalDetailBullets(detailRow); track fact.label) {
+                <div class="col-sm-6">
+                  <dt class="text-muted fw-normal mb-0">{{ fact.label }}</dt>
+                  <dd class="mb-0">{{ fact.value }}</dd>
+                </div>
+              }
+            </dl>
+
+            @if (approvalResolutionSnippet(ticket); as resolution) {
+              <div class="alert alert-light border rounded-3 mb-3">
+                <span class="small text-muted d-block mb-1">Risoluzione tecnico</span>
+                <p class="mb-0">{{ resolution }}</p>
+              </div>
+            }
+
+            <app-ticket-status-progress
+              [status]="ticketStatusForProgress(ticket)"
+              [detail]="true"
+            />
+
+            <app-ticket-chat-panel
+              class="mt-3"
+              [ticket]="ticketToChatSource(ticket)"
+              viewer="host"
+              [canComment]="canAddComment(ticket)"
+              [sending]="isCommentSending(ticketNumericId(ticket)!)"
+              [commentError]="commentError(ticketNumericId(ticket)!)"
+              [commentDraft]="commentDraft(ticketNumericId(ticket)!)"
+              (commentDraftChange)="setCommentDraft(ticketNumericId(ticket)!, $event)"
+              (submitComment)="submitComment(ticketNumericId(ticket)!)"
+              commentPlaceholder="Scrivi una nota per il team"
+              [relaxed]="true"
+              sectionLabel="Conversazione"
+            />
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeApprovalTicketDetail()" mdbRipple>
+              Torna alla coda
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+  }
+}

@@ -1,0 +1,50 @@
+<div class="collapse" mdbCollapse #filtersCollapse="mdbCollapse">
+  <div class="p-4 p-md-5 bg-light border-top border-light">
+    <h6 class="fw-bold mb-3 text-muted">Filtra per dotazioni richieste</h6>
+    @if (availableTags.length === 0) {
+      <p class="small text-muted mb-0">
+        Nessuna dotazione da filtrare in questo momento.
+      </p>
+    } @else {
+      <div class="d-flex flex-wrap gap-2 mb-4">
+        @for (tag of availableTags; track tag) {
+          <button
+            type="button"
+            class="btn btn-sm rounded-pill fw-semibold shadow-0"
+            [class.btn-primary]="isTagSelected(tag)"
+            [class.btn-white]="!isTagSelected(tag)"
+            [class.border]="!isTagSelected(tag)"
+            (click)="toggleAmenityTag(tag)"
+            mdbRipple
+          >
+            {{ formatTag(tag) }}
+          </button>
+        }
+      </div>
+      <button class="btn btn-sm btn-link text-muted px-0 text-decoration-none fw-semibold" (click)="onClearFilters()">Azzera filtri</button>
+    }
+  </div>
+</div>
+
+<ng-template #amenitiesModal>
+  @if (amenitiesModalDesk; as d) {
+    <div class="modal-content overflow-hidden">
+      <app-sd-modal-header
+        eyebrow="Dotazioni"
+        [title]="deskResultsHeading(d)"
+        [subtitle]="d.amenities.length + (d.amenities.length === 1 ? ' elemento · scorri per vedere tutto' : ' elementi · scorri per vedere tutto')"
+        icon="chair"
+        (close)="closeAmenitiesModal()"
+      />
+      <div class="modal-body">
+        <div class="list-group list-group-flush overflow-auto" style="max-height: min(50vh, 320px)" tabindex="0" role="region" aria-label="Elenco dotazioni">
+          @for (tag of d.amenities; track $index) {
+            <div class="list-group-item">
+              <span>{{ formatTag(tag) }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</ng-template>

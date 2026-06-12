@@ -1,0 +1,57 @@
+<div class="d-flex align-items-center gap-2 bg-light p-2 rounded-pill">
+  <div class="position-relative flex-grow-1">
+    <button
+      id="desk-search-slot-start"
+      type="button"
+      class="btn btn-white w-100 desk-search-time-btn fw-bold fs-6 py-2 rounded-pill shadow-sm"
+      [class.text-muted]="!slotStart()"
+      [disabled]="!bookingHoursAvailable()"
+      (click)="toggleTimePicker('start')"
+      [attr.aria-expanded]="activeTimePicker === 'start'"
+      aria-haspopup="listbox"
+      [attr.aria-invalid]="selectionIncludesPastSlot() ? 'true' : null"
+      [attr.aria-describedby]="selectionIncludesPastSlot() ? 'sd-past-slot-warning' : null"
+      mdbRipple
+    >
+      {{ slotStart() || 'Inizio' }}
+    </button>
+    @if (activeTimePicker === 'start') {
+      <div class="time-picker-popover position-absolute top-100 start-0 mt-2 card shadow-4 border-0 rounded-4 p-2 z-3 w-100" role="group" aria-label="Selettore orario inizio">
+        <button type="button" class="btn btn-sm btn-link w-100 text-dark" aria-label="Orario successivo" [disabled]="!canNudgeTimePicker(1)" (click)="nudgeTimePicker(1)"><app-sd-icon name="chevron-up" [size]="24" /></button>
+        <div class="text-center fw-bold fs-3 py-2" aria-live="polite">
+          <span>{{ timePickerHour() }}</span>:<span>{{ timePickerMinute() }}</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-link w-100 text-dark" aria-label="Orario precedente" [disabled]="!canNudgeTimePicker(-1)" (click)="nudgeTimePicker(-1)"><app-sd-icon name="chevron-down" [size]="24" /></button>
+      </div>
+    }
+  </div>
+  <span class="text-muted" aria-hidden="true">
+    <app-sd-icon name="arrow-right" [size]="16" />
+  </span>
+  <div class="position-relative flex-grow-1">
+    <button
+      id="desk-search-slot-end"
+      type="button"
+      class="btn btn-white w-100 desk-search-time-btn fw-bold fs-6 py-2 rounded-pill shadow-sm"
+      [class.text-muted]="!slotEnd()"
+      [disabled]="!bookingHoursAvailable()"
+      (click)="toggleTimePicker('end')"
+      [attr.aria-expanded]="activeTimePicker === 'end'"
+      aria-haspopup="listbox"
+      [attr.aria-invalid]="selectionIncludesPastSlot() ? 'true' : null"
+      [attr.aria-describedby]="selectionIncludesPastSlot() ? 'sd-past-slot-warning' : null"
+      mdbRipple
+    >
+      {{ slotEnd() || 'Fine' }}
+    </button>
+    @if (activeTimePicker === 'end') {
+      <div class="time-picker-popover position-absolute top-100 start-0 mt-2 card shadow-4 border-0 rounded-4 p-2 z-3 w-100" role="group" aria-label="Selettore orario fine">
+        <button type="button" class="btn btn-sm btn-link w-100 text-dark" aria-label="Orario successivo" [disabled]="!canNudgeTimePicker(1)" (click)="nudgeTimePicker(1)"><app-sd-icon name="chevron-up" [size]="24" /></button>
+        <div class="text-center fw-bold fs-3 py-2" aria-live="polite">
+          <span>{{ timePickerHour() }}</span>:<span>{{ timePickerMinute() }}</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-link w-100 text-dark" aria-label="Orario precedente" [disabled]="!canNudgeTimePicker(-1)" (click)="nudgeTimePicker(-1)"><app-sd-icon name="chevron-down" [size]="24" /></button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,14 @@
+.transition-all {
+  transition: all 0.3s ease-in-out;
+}
+
+.hover-bg-light:hover {
+  background-color: #f8f9fa !important;
+}
+
+.bento-card {
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+  }
+}

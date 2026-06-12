@@ -1,0 +1,354 @@
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 px-2">
+  <div>
+    <h1 class="display-6 fw-bold mb-0 tracking-tight">{{ title() }}</h1>
+  </div>
+</div>
+
+@if (errorMsg) {
+  <div class="alert alert-danger rounded-4 border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+    <app-sd-icon name="exclamation" [size]="20" class="me-3 flex-shrink-0" aria-hidden="true" />
+    <div class="fw-medium">{{ errorMsg }}</div>
+  </div>
+}
+
+@if (loading()) {
+  <div class="d-flex flex-column align-items-center justify-content-center py-5 gap-3" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" aria-hidden="true"></div>
+    <p class="text-muted small mb-0 fw-medium">Caricamento prenotazioni…</p>
+  </div>
+} @else if (!bookings().length && !errorMsg) {
+  <div class="card border-0 rounded-5 mb-5 p-5 text-center bg-white shadow-sm">
+    <div class="mb-4 text-muted">
+      <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 5rem; height: 5rem">
+        <app-sd-icon name="calendar-check" [size]="32" class="opacity-50" />
+      </div>
+    </div>
+    <h3 class="fw-bold mb-2">Nessuna prenotazione</h3>
+    <p class="text-muted mb-4">Non hai ancora effettuato nessuna prenotazione.</p>
+    <div>
+      <a routerLink="/worker/desks" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-0" mdbRipple>
+        Prenota una postazione
+      </a>
+    </div>
+  </div>
+} @else if (bookings().length) {
+  <div class="d-flex flex-wrap gap-2 align-items-center mb-4 px-2">
+    <button
+      type="button"
+      class="btn btn-white shadow-sm rounded-pill d-inline-flex align-items-center gap-2 px-4 py-2 fw-bold text-primary"
+      (click)="openSearchModal()"
+      mdbRipple
+    >
+      <app-sd-icon name="search" [size]="16" aria-hidden="true" />
+      Cerca prenotazioni
+    </button>
+    @if (hasActiveSearch()) {
+      <button type="button" class="btn btn-link btn-sm text-decoration-none fw-semibold px-3" (click)="resetSearch()">
+        Azzera filtri
+      </button>
+    }
+  </div>
+
+  @if (hasActiveSearch()) {
+    <div class="mb-3 px-3" role="status" aria-live="polite">
+      <span class="text-muted small me-2 fw-semibold text-uppercase">Filtri attivi:</span>
+      @if (searchCode()) {
+        <span class="badge rounded-pill bg-primary bg-opacity-25 text-primary me-2 fw-semibold px-3 py-2">Codice: {{ searchCode() }}</span>
+      }
+      @if (searchDate()) {
+        <span class="badge rounded-pill bg-primary bg-opacity-25 text-primary me-2 fw-semibold px-3 py-2">Data: {{ searchDate() | date:'d MMM y':'':'it' }}</span>
+      }
+    </div>
+    <p class="text-muted small mb-4 px-3 fw-medium" role="status" aria-live="polite">
+      @if (searchResultCount() > 0) {
+        {{ searchResultCount() }}
+        {{ searchResultCount() === 1 ? 'prenotazione trovata' : 'prenotazioni trovate' }}
+      } @else {
+        Nessuna prenotazione corrisponde ai filtri impostati.
+      }
+    </p>
+  }
+
+  <div class="max-w-4xl">
+    @if (todayBookings().length) {
+      <section class="mb-5" aria-labelledby="bookings-today-heading">
+        <h2 id="bookings-today-heading" class="fs-6 text-uppercase text-muted fw-semibold mb-2 ms-4 tracking-wide">Oggi</h2>
+        <div class="card border-0 rounded-5 shadow-sm overflow-hidden bg-white">
+          <div class="list-group list-group-flush">
+            @if (filteredTodayBookings().length) {
+              @for (booking of filteredTodayBookings(); track booking.bookingID) {
+                <ng-container *ngTemplateOutlet="upcomingBookingRow; context: { $implicit: booking }" />
+              }
+            } @else if (hasActiveSearch()) {
+              <div class="list-group-item p-4 text-center text-muted small fw-medium">Nessun risultato in questa sezione.</div>
+            }
+          </div>
+        </div>
+      </section>
+    }
+
+    <section class="mb-5" aria-labelledby="bookings-future-heading">
+      <h2 id="bookings-future-heading" class="fs-6 text-uppercase text-muted fw-semibold mb-2 ms-4 tracking-wide">Prenotazioni future</h2>
+      <div class="card border-0 rounded-5 shadow-sm overflow-hidden bg-white">
+        <div class="list-group list-group-flush">
+          @if (filteredFutureBookings().length) {
+            @for (booking of filteredFutureBookings(); track booking.bookingID) {
+              <ng-container *ngTemplateOutlet="upcomingBookingRow; context: { $implicit: booking }" />
+            }
+          } @else if (hasActiveSearch()) {
+            <div class="list-group-item p-4 text-center text-muted small fw-medium">Nessun risultato in questa sezione.</div>
+          } @else {
+            <div class="list-group-item text-center py-5" role="status" aria-live="polite">
+              <div class="text-primary opacity-50 mb-3" aria-hidden="true">
+                <app-sd-icon name="calendar" [size]="36" />
+              </div>
+              <p class="fw-bold mb-1 fs-5">Nessuna prenotazione futura</p>
+              <p class="text-muted small mb-4 fw-medium">Le tue prossime prenotazioni appariranno qui</p>
+              <a routerLink="/worker/desks" class="btn btn-light rounded-pill px-4 fw-bold shadow-0" mdbRipple>Prenota una postazione</a>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-5" aria-labelledby="bookings-past-heading">
+      <div class="d-flex flex-wrap justify-content-between align-items-end mb-2 ms-4 me-2">
+        <h2 id="bookings-past-heading" class="fs-6 text-uppercase text-muted fw-semibold mb-0 tracking-wide">Storico prenotazioni</h2>
+        @if (pastBookings().length) {
+          <button
+            type="button"
+            class="btn btn-white btn-sm text-danger shadow-sm rounded-pill px-4 py-2 fw-bold"
+            [disabled]="clearingHistory()"
+            (click)="clearPastHistory()"
+          >
+            @if (clearingHistory()) {
+              <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+            }
+            Svuota storico
+          </button>
+        }
+      </div>
+      <div class="card border-0 rounded-5 shadow-sm overflow-hidden bg-white">
+        <div class="list-group list-group-flush">
+          @if (filteredPastBookings().length) {
+            @for (booking of filteredPastBookings(); track booking.bookingID) {
+              <ng-container *ngTemplateOutlet="pastBookingRow; context: { $implicit: booking }" />
+            }
+          } @else if (hasActiveSearch()) {
+            <div class="list-group-item p-4 text-center text-muted small fw-medium">Nessun risultato in questa sezione.</div>
+          } @else {
+            <div class="list-group-item text-center py-5" role="status" aria-live="polite">
+              <div class="text-muted opacity-50 mb-3" aria-hidden="true">
+                <app-sd-icon name="history" [size]="36" />
+              </div>
+              <p class="fw-bold mb-1 fs-5">Nessuna prenotazione passata</p>
+              <p class="text-muted small mb-0 fw-medium">Le prenotazioni concluse dei giorni precedenti appariranno qui</p>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+}
+
+<ng-template #upcomingBookingRow let-booking>
+  <div class="list-group-item p-4 p-md-4 border-bottom border-light">
+    <div class="d-flex flex-column flex-lg-row gap-4 align-items-lg-center justify-content-between">
+      <div class="d-flex gap-3 min-w-0 flex-grow-1 align-items-center">
+        <div
+          class="rounded-circle bg-primary bg-opacity-25 text-primary d-flex align-items-center justify-content-center flex-shrink-0"
+          style="width: 3.5rem; height: 3.5rem"
+          aria-hidden="true"
+        >
+          <app-sd-icon name="calendar-check" [size]="24" />
+        </div>
+        <div class="min-w-0 flex-grow-1">
+          <h4 class="h5 fw-bold mb-2 text-truncate text-dark">Prenotazione #{{ bookingPublicRef(booking) }}</h4>
+          <p class="text-muted small mb-0 text-truncate d-flex flex-wrap align-items-center gap-2">
+            <span class="d-inline-flex align-items-center gap-1 fw-bold text-dark bg-light px-2 py-1 rounded-pill" [title]="'Postazione #' + (booking.deskCode || booking.deskID)">
+              <app-sd-icon name="desktop" [size]="14" aria-hidden="true" />
+              <span>Desk #{{ booking.deskCode || booking.deskID }}</span>
+            </span>
+            @if (booking.spaceName || booking.buildingName) {
+              <span class="text-muted opacity-50">•</span>
+              <span
+                class="d-inline-flex align-items-center gap-1 text-truncate"
+                [title]="(booking.spaceName || '') + (booking.spaceName && booking.buildingName ? ' • ' : '') + (booking.buildingName || '')"
+              >
+                @if (booking.spaceName) {
+                  <span>{{ booking.spaceName }}</span>
+                }
+                @if (booking.spaceName && booking.buildingName) {
+                  <span aria-hidden="true">•</span>
+                }
+                @if (booking.buildingName) {
+                  <span>{{ booking.buildingName }}</span>
+                }
+              </span>
+            }
+          </p>
+          <div class="mt-2">
+             <ng-container *ngTemplateOutlet="bookingSchedule; context: { $implicit: booking }" />
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center flex-shrink-0">
+        @if (hasReviewFor(booking.bookingID)) {
+          <span class="badge bg-warning bg-opacity-25 text-warning-emphasis rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-1" role="status">
+            <app-sd-icon name="star" [size]="12" aria-hidden="true" />
+            <span>Recensione inviata</span>
+          </span>
+        }
+        @if (canCancelBooking(booking) || isBookingInProgress(booking)) {
+          <button
+            type="button"
+            class="btn rounded-pill px-4 py-2 fw-bold shadow-0"
+            [class.btn-light]="bookingActionMode(booking) === 'cancel'"
+            [class.text-danger]="bookingActionMode(booking) === 'cancel'"
+            [class.btn-danger]="bookingActionMode(booking) === 'leave'"
+            [disabled]="leavingBookingId() === booking.bookingID"
+            (click)="bookingActionMode(booking) === 'leave' ? leaveDesk(booking.bookingID) : cancelBooking(booking.bookingID)"
+            mdbRipple
+          >
+            @if (leavingBookingId() === booking.bookingID) {
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            } @else {
+              {{ bookingActionMode(booking) === 'leave' ? 'Lascia postazione' : 'Annulla' }}
+            }
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #pastBookingRow let-booking>
+  <div class="list-group-item p-4 border-bottom border-light" style="transition: background-color 0.2s">
+    <div class="d-flex flex-column flex-lg-row gap-4 align-items-lg-center justify-content-between">
+      <div class="d-flex gap-4 min-w-0 flex-grow-1 align-items-center">
+        <div
+          class="rounded-circle bg-light text-muted d-flex align-items-center justify-content-center flex-shrink-0"
+          style="width: 4rem; height: 4rem"
+          aria-hidden="true"
+        >
+          <app-sd-icon name="history" [size]="24" />
+        </div>
+        <div class="min-w-0 flex-grow-1">
+          <h4 class="h5 fw-bold mb-2 text-truncate text-dark">Prenotazione #{{ bookingPublicRef(booking) }}</h4>
+          <p class="text-muted small mb-0 text-truncate d-flex flex-wrap align-items-center gap-2">
+            <span class="d-inline-flex align-items-center gap-1 fw-bold text-dark bg-light px-2 py-1 rounded-pill" [title]="'Postazione #' + (booking.deskCode || booking.deskID)">
+              <app-sd-icon name="desktop" [size]="14" aria-hidden="true" />
+              <span>Desk #{{ booking.deskCode || booking.deskID }}</span>
+            </span>
+            @if (booking.spaceName || booking.buildingName) {
+              <span class="text-muted opacity-50">•</span>
+              <span
+                class="d-inline-flex align-items-center gap-1 text-truncate"
+                [title]="(booking.spaceName || '') + (booking.spaceName && booking.buildingName ? ' • ' : '') + (booking.buildingName || '')"
+              >
+                @if (booking.spaceName) {
+                  <span>{{ booking.spaceName }}</span>
+                }
+                @if (booking.spaceName && booking.buildingName) {
+                  <span aria-hidden="true">•</span>
+                }
+                @if (booking.buildingName) {
+                  <span>{{ booking.buildingName }}</span>
+                }
+              </span>
+            }
+          </p>
+          <div class="mt-2">
+            <ng-container *ngTemplateOutlet="bookingSchedule; context: { $implicit: booking }" />
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center flex-shrink-0">
+        @if (hasReviewFor(booking.bookingID)) {
+          <span class="badge bg-warning bg-opacity-25 text-warning-emphasis rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-1" role="status">
+            <app-sd-icon name="star" [size]="12" aria-hidden="true" />
+            <span>Recensione inviata</span>
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #bookingSchedule let-booking>
+  <div
+    class="d-flex flex-wrap gap-3 small text-secondary align-items-center bg-white border border-light shadow-sm rounded-pill px-4 py-2 d-inline-flex mt-1"
+    role="group"
+    [attr.aria-label]="'Orario prenotazione dal ' + (booking.startTime | date:'d MMMM y HH:mm':'':'it') + ' al ' + (booking.endTime | date:'d MMMM y HH:mm':'':'it')"
+  >
+    <div class="d-flex align-items-center gap-2">
+      <span class="fw-bold text-dark">{{ booking.startTime | date:'HH:mm':'':'it' }}</span>
+      <span class="opacity-75">{{ booking.startTime | date:'d MMM':'':'it' }}</span>
+    </div>
+    <app-sd-icon name="arrow-right" [size]="14" class="text-muted opacity-50 flex-shrink-0" aria-hidden="true" />
+    <div class="d-flex align-items-center gap-2">
+      <span class="fw-bold text-dark">{{ booking.endTime | date:'HH:mm':'':'it' }}</span>
+      <span class="opacity-75">{{ booking.endTime | date:'d MMM':'':'it' }}</span>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #bookingSearchModal>
+  <div
+    class="modal-content border-0 rounded-5 shadow-lg overflow-hidden"
+    role="dialog"
+    aria-labelledby="booking-search-modal-title"
+  >
+    <app-sd-modal-header
+      title="Cerca prenotazioni"
+      subtitle="Codice prenotazione o giorno"
+      icon="search"
+      titleId="booking-search-modal-title"
+      (close)="closeSearchModal()"
+    />
+
+    <div class="modal-body p-4 p-md-5" (keyup.enter)="canApplySearchFromModal && applySearchFromModal()">
+      <div class="mb-4">
+        <label class="form-label small text-uppercase text-muted fw-semibold" for="booking-search-modal-code">Codice</label>
+        <input
+          id="booking-search-modal-code"
+          name="bookingSearchModalCode"
+          type="search"
+          mdbInput
+          class="form-control form-control-lg bg-light border-0 rounded-4"
+          placeholder="DSY8JB"
+          autocomplete="off"
+          [(ngModel)]="searchCodeDraft"
+        />
+      </div>
+
+      <div class="mb-0">
+        <app-sd-search-calendar-field
+          inputId="booking-search-modal-date"
+          label="Giorno"
+          placeholder="Qualsiasi giorno"
+          [closeOnSelect]="false"
+          [(selectedIso)]="searchDateDraft"
+          [highlightedDays]="highlightedBookingDays()"
+        />
+      </div>
+    </div>
+
+    <div class="modal-footer bg-light border-0 p-4 gap-2">
+      <button type="button" class="btn btn-white rounded-pill px-4 fw-bold shadow-sm" mdbRipple (click)="clearSearchDraftInModal()">
+        Reset
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary rounded-pill px-5 fw-bold shadow-0"
+        [disabled]="!canApplySearchFromModal"
+        (click)="applySearchFromModal()"
+        mdbRipple
+      >
+        Cerca
+      </button>
+    </div>
+  </div>
+</ng-template>

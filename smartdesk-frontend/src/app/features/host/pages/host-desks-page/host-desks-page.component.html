@@ -1,0 +1,290 @@
+<header class="mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 px-2">
+  <div class="d-flex align-items-center gap-3">
+    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+      <app-sd-icon name="workspace" [size]="24" />
+    </div>
+    <div>
+      <p class="text-muted text-uppercase small fw-bold mb-1 tracking-wide">Configurazione</p>
+      <h2 class="mb-0 fw-bold">{{ title() }}</h2>
+    </div>
+  </div>
+  <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+    <button
+      class="btn btn-outline-primary rounded-pill px-4 shadow-sm d-inline-flex align-items-center gap-2"
+      type="button"
+      aria-label="Nuova stanza"
+      (click)="openRoomModal()"
+      [disabled]="!selectedSpace()?.approved"
+      mdbRipple
+    >
+      <app-sd-icon name="layers" [size]="18" aria-hidden="true" />
+      <span class="fw-semibold">Nuova stanza</span>
+    </button>
+    <button
+      class="btn btn-primary rounded-pill px-4 shadow-sm d-inline-flex align-items-center gap-2"
+      type="button"
+      aria-label="Aggiungi postazione"
+      (click)="openDeskModal()"
+      [disabled]="!canManageDesks()"
+      mdbRipple
+    >
+      <app-sd-icon name="workspace" [size]="18" aria-hidden="true" />
+      <span class="fw-semibold">Aggiungi postazione</span>
+    </button>
+  </div>
+</header>
+
+<app-desk-form-modal />
+<app-room-form-modal />
+<app-host-preset-create-modal />
+<app-host-preset-library-modal />
+<app-room-browse-modal />
+
+@if (loadingSpaces()) {
+  <div class="d-flex flex-column align-items-center justify-content-center py-5 gap-3" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" aria-hidden="true"></div>
+    <p class="text-muted small mb-0">Caricamento spazi…</p>
+  </div>
+} @else {
+  @if (!spaces().length && !errorMsg) {
+    <div class="alert alert-danger rounded-4 shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+      <app-sd-icon name="exclamation" [size]="22" class="flex-shrink-0" aria-hidden="true" />
+      <div>
+        <strong>Nessuno spazio disponibile.</strong>
+        Crea prima uno spazio nella sezione <a routerLink="/host/spaces" class="alert-link fw-bold">Spazi</a>.
+      </div>
+    </div>
+  }
+
+  @if (spaces().length > 0) {
+    <div class="card bg-white border-0 rounded-5 shadow-sm mb-4">
+      <div class="card-body p-4 p-md-5">
+        <label id="host-desks-space-label" class="form-label small fw-semibold text-uppercase text-muted mb-2" for="host-desks-space-select">Spazio</label>
+        <select
+          id="host-desks-space-select"
+          class="form-select"
+          [ngModel]="selectedSpaceId()"
+          (ngModelChange)="selectedSpaceId.set($event)"
+          aria-labelledby="host-desks-space-label"
+        >
+          @for (space of spaces(); track space.spaceID) {
+            <option [ngValue]="space.spaceID">
+              {{ space.name }} · codice {{ space.officeCode || '—' }}
+              {{ !space.approved ? '(In attesa di approvazione)' : '' }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+
+    @if (!selectedSpace()?.approved) {
+      <div class="alert alert-warning rounded-4 shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+        <app-sd-icon name="calendar" [size]="22" class="flex-shrink-0 opacity-75" aria-hidden="true" />
+        <div>
+          <strong>Spazio non ancora approvato.</strong>
+          Potrai gestire stanze e postazioni dopo l’approvazione dell’amministratore.
+        </div>
+      </div>
+    }
+  }
+}
+
+@if (selectedSpace()?.approved) {
+  @if (errorMsg && !anyModalOpen()) {
+    <div class="alert alert-danger rounded-4 shadow-sm mb-4" role="alert">{{ errorMsg }}</div>
+  }
+
+  <section class="mb-4" aria-labelledby="host-presets-heading">
+    @if (presetSectionError()) {
+      <div class="alert alert-warning rounded-3 py-2 small mb-3 d-flex align-items-center gap-2" role="status">
+        <app-sd-icon name="exclamation" [size]="18" class="flex-shrink-0 opacity-75" aria-hidden="true" />
+        <span>{{ presetSectionError() }}</span>
+      </div>
+    }
+
+    <div class="card bg-white border-0 rounded-5 shadow-sm">
+      <div class="card-body p-4 p-md-5 d-flex flex-column flex-lg-row align-items-lg-center gap-4">
+        <div class="d-flex align-items-start gap-3 flex-grow-1 min-w-0">
+          <div
+            class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+            style="width: 2.75rem; height: 2.75rem"
+            aria-hidden="true"
+          >
+            <app-sd-icon name="tag" [size]="22" />
+          </div>
+          <div class="min-w-0">
+            <h3 id="host-presets-heading" class="h5 fw-bold mb-1">Set dotazioni</h3>
+            <p class="text-muted small mb-0">
+              Profili riutilizzabili su ogni postazione dello spazio
+            </p>
+          </div>
+        </div>
+
+        <div class="flex-grow-1" role="status">
+          @if (loadingPresets()) {
+            <div class="d-flex align-items-center gap-2 text-muted small">
+              <div class="spinner-border spinner-border-sm text-primary" aria-hidden="true"></div>
+              <span>Caricamento…</span>
+            </div>
+          } @else if (!hostCustomPresets().length) {
+            <p class="text-muted small mb-0">
+              Nessun set salvato. Crea il primo profilo o consulta la libreria quando ne avrai.
+            </p>
+          } @else {
+            <p class="mb-1">
+              <span class="badge bg-primary rounded-pill me-1">{{ hostCustomPresets().length }}</span>
+              {{ hostCustomPresets().length === 1 ? 'set salvato' : 'set salvati' }}
+            </p>
+            @if (hostPresetSummaryText()) {
+              <p class="text-muted small mb-0">{{ hostPresetSummaryText() }}</p>
+            }
+          }
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 flex-shrink-0">
+          <button
+            type="button"
+            class="btn btn-outline-primary rounded-pill px-3 d-inline-flex align-items-center gap-2"
+            (click)="openHostPresetLibraryModal()"
+            [disabled]="loadingPresets() || presetsMutating()"
+            mdbRipple
+          >
+            <app-sd-icon name="layers" [size]="16" aria-hidden="true" />
+            Mostra set
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary rounded-pill px-3 d-inline-flex align-items-center gap-2"
+            (click)="openHostPresetCreateModal()"
+            [disabled]="loadingPresets() || presetsMutating()"
+            mdbRipple
+          >
+            <app-sd-icon name="plus" [size]="16" aria-hidden="true" />
+            Crea set
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  @if (maintenanceDesks().length > 0) {
+    <div class="alert alert-warning rounded-4 shadow-sm d-flex align-items-center gap-3 mb-3" role="status">
+      <div
+        class="rounded-circle bg-warning-subtle text-warning d-inline-flex align-items-center justify-content-center flex-shrink-0"
+        style="width: 2.5rem; height: 2.5rem"
+        aria-hidden="true"
+      >
+        <app-sd-icon name="wrench" [size]="18" />
+      </div>
+      <div>
+        <strong>{{ maintenanceDesks().length }} in manutenzione</strong>
+        <p class="text-muted small mb-0">Intervento tecnico in corso</p>
+      </div>
+    </div>
+  }
+
+  <section class="mb-4" aria-labelledby="host-rooms-heading">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
+      <div>
+        <h3 id="host-rooms-heading" class="h5 fw-bold mb-1">Stanze</h3>
+        <p class="text-muted small mb-0">
+          Apri una stanza per elencare le postazioni, cercare per codice e gestirle.
+        </p>
+      </div>
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        @if (!loadingDesks() && rooms().length) {
+          <p class="text-muted small mb-0" role="status">
+            <strong>{{ rooms().length }}</strong>
+            {{ rooms().length === 1 ? 'stanza' : 'stanze' }}
+            <span class="mx-1" aria-hidden="true">·</span>
+            <strong>{{ desks().length }}</strong>
+            {{ desks().length === 1 ? 'postazione' : 'postazioni' }}
+          </p>
+        }
+        @if (loadingDesks()) {
+          <div class="spinner-border spinner-border-sm text-primary" role="status">
+            <span class="visually-hidden">Caricamento...</span>
+          </div>
+        } @else {
+          <button
+            type="button"
+            class="btn btn-outline-primary rounded-pill btn-sm px-3 d-inline-flex align-items-center gap-2"
+            (click)="openRoomModal()"
+            mdbRipple
+          >
+            <app-sd-icon name="layers" [size]="16" aria-hidden="true" />
+            Nuova stanza
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (!loadingDesks() && !rooms().length) {
+      <div class="card bg-white border-0 rounded-5 shadow-sm text-center py-5 px-4 mb-4 d-flex flex-column align-items-center justify-content-center">
+        <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 5rem; height: 5rem" aria-hidden="true">
+          <app-sd-icon name="layers" [size]="40" />
+        </div>
+        <h4 class="fw-bold mb-2">Nessuna stanza ancora</h4>
+        <p class="text-muted mb-4" style="max-width: 450px;">
+          Organizza le postazioni per ambienti (es. piani, ali, sale). Ogni stanza ha un codice breve mostrato in dashboard.
+        </p>
+        <button type="button" class="btn btn-primary rounded-pill px-5 py-2 fw-semibold d-inline-flex align-items-center gap-2" style="width: auto; min-width: 200px; justify-content: center;" (click)="openRoomModal()" mdbRipple>
+          <app-sd-icon name="plus" [size]="18" aria-hidden="true" />
+          Crea la prima stanza
+        </button>
+      </div>
+    }
+
+    @if (!loadingDesks() && rooms().length) {
+      @if (!desks().length && !errorMsg) {
+        <div class="alert alert-info rounded-4 d-flex align-items-start gap-3 mb-4" role="status">
+          <app-sd-icon name="workspace" [size]="20" class="flex-shrink-0 mt-1" aria-hidden="true" />
+          <div>
+            <p class="fw-semibold mb-1">Nessuna postazione nello spazio</p>
+            <p class="text-muted small mb-0">
+              Le stanze sono pronte: usa «Aggiungi postazione» in alto a destra per crearne una.
+            </p>
+          </div>
+        </div>
+      }
+
+      <div class="card border-0 rounded-5 shadow-sm overflow-hidden bg-white mb-5" role="list">
+        <div class="list-group list-group-flush">
+          @for (section of deskSections(); track trackRoomSection($index, section)) {
+            <div class="list-group-item d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 p-3">
+              <div class="d-flex align-items-center min-w-0 flex-grow-1 cursor-pointer"
+                   role="button"
+                   [attr.aria-label]="section.room ? 'Apri postazioni: ' + section.room.name : 'Apri postazioni senza stanza assegnata'"
+                   (click)="openRoomBrowseModal(section)"
+              >
+                @if (section.room; as room) {
+                  <span class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center flex-shrink-0 fw-semibold me-3" style="width: 3rem; height: 3rem; font-size: 0.8rem;" aria-hidden="true">{{ room.code }}</span>
+                  <div class="min-w-0">
+                    <span class="fw-bold d-block text-truncate mb-1">{{ room.name }}</span>
+                    <span class="text-muted small d-block" [class.text-warning]="section.desks.length === 0">
+                      @if (section.desks.length === 0) { Nessuna postazione } @else { {{ section.desks.length }} {{ section.desks.length === 1 ? ' postazione' : ' postazioni' }} }
+                    </span>
+                  </div>
+                } @else {
+                  <span class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 3rem; height: 3rem" aria-hidden="true"><app-sd-icon name="workspace" [size]="20" /></span>
+                  <div class="min-w-0">
+                    <span class="fw-bold d-block mb-1">Senza stanza</span>
+                    <span class="text-muted small d-block">Assegna da «Modifica» sulla postazione.</span>
+                  </div>
+                }
+              </div>
+              @if (section.room; as room) {
+                <div class="d-flex gap-2 flex-shrink-0">
+                  <button type="button" class="btn btn-light btn-sm rounded-pill px-4 shadow-none" (click)="openRoomModal(room)" mdbRipple><span class="fw-semibold">Modifica</span></button>
+                  <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-4" (click)="deleteRoom(room)" mdbRipple><span class="fw-semibold">Elimina</span></button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </section>
+} @else if (selectedSpaceId()) {
+  <app-empty-state message="Questo spazio è in attesa di approvazione." />
+}

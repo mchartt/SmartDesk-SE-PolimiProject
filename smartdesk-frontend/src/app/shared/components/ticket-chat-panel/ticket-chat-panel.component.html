@@ -1,0 +1,96 @@
+<section
+  class="sd-ticket-chat-panel"
+  [class.sd-ticket-chat-panel--compact]="compact()"
+  [class.sd-ticket-chat-panel--relaxed]="relaxed()"
+  aria-label="Conversazione ticket"
+>
+  <div class="sd-ticket-chat-panel__head">
+    <h3 class="sd-ticket-chat-panel__label mb-0">{{ sectionLabel() }}</h3>
+    <span class="sd-ticket-chat-panel__count small text-muted">{{ messageCountLabel() }}</span>
+  </div>
+
+  <div #chatLog class="sd-ticket-chat" role="log" aria-live="polite">
+    @for (m of messages(); track m.id) {
+      <div
+        class="sd-ticket-chat__row"
+        [class.sd-ticket-chat__row--worker]="m.role === 'worker'"
+        [class.sd-ticket-chat__row--technician]="m.role === 'technician'"
+        [class.sd-ticket-chat__row--host]="m.role === 'host'"
+        [class.sd-ticket-chat__row--me]="m.role === viewer()"
+        [class.sd-ticket-chat__row--other]="m.role !== viewer()"
+      >
+        <div class="sd-ticket-chat__bubble">
+          <div class="sd-ticket-chat__meta">
+            <span class="sd-ticket-chat__author">
+              @if (authorParts(m.label); as parts) {
+                <strong class="sd-ticket-chat__author-name">{{ parts.name }}</strong>
+                <span class="sd-ticket-chat__author-role">{{ parts.role }}</span>
+              } @else {
+                {{ m.label }}
+              }
+            </span>
+            @if (m.at) {
+              <time class="sd-ticket-chat__time">{{ formatWhen(m.at) }}</time>
+            }
+          </div>
+          <p class="sd-ticket-chat__text mb-0 text-break">{{ m.body }}</p>
+        </div>
+      </div>
+    } @empty {
+      <p class="sd-ticket-chat__empty small mb-0">{{ emptyHint() }}</p>
+    }
+  </div>
+
+  @if (canComment()) {
+    <form
+      class="sd-ticket-chat-composer sd-ticket-chat-composer--inline"
+      (ngSubmit)="onSubmit()"
+      aria-label="Aggiungi commento al ticket"
+    >
+      <div class="sd-ticket-chat-composer__row">
+        <mdb-form-control class="flex-grow-1 min-w-0">
+          <textarea
+            mdbInput
+            id="ticket-chat-comment-input"
+            class="form-control sd-ticket-chat-composer__input"
+            rows="2"
+            [ngModel]="commentDraft()"
+            (ngModelChange)="commentDraft.set($event)"
+            name="ticketChatComment"
+            [disabled]="sending()"
+            [placeholder]="commentPlaceholder()"
+            [attr.maxlength]="maxLength"
+          ></textarea>
+          <label mdbLabel class="form-label visually-hidden" for="ticket-chat-comment-input">Nuovo commento</label>
+        </mdb-form-control>
+        <button
+          type="submit"
+          class="btn btn-primary sd-ticket-chat-composer__send-btn"
+          [disabled]="!canSubmit"
+          mdbRipple
+          [attr.aria-label]="sending() ? 'Invio in corso' : 'Invia messaggio'"
+        >
+          @if (sending()) {
+            <span class="sd-ticket-chat-composer__send-spinner" aria-hidden="true"></span>
+          } @else {
+            <app-sd-icon name="send" [size]="18" aria-hidden="true" />
+          }
+        </button>
+      </div>
+      @if (commentLength > 0 || commentError()) {
+        <div class="sd-ticket-chat-composer__meta">
+          @if (commentLength > 0) {
+            <span class="sd-ticket-chat-composer__hint small text-muted">
+              {{ commentLength }}/{{ maxLength }}
+            </span>
+          }
+          @if (commentError()) {
+            <p class="sd-ticket-chat-composer__error small text-danger mb-0">{{ commentError() }}</p>
+          }
+        </div>
+      }
+    </form>
+  } @else if (closedHint()) {
+    <p class="sd-ticket-chat-composer__closed small text-muted mb-0">{{ closedHint() }}</p>
+  }
+</section>

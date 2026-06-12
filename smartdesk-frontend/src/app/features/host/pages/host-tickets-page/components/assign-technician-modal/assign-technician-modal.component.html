@@ -1,0 +1,281 @@
+@if (assignTicketTechModalTicket(); as ticketCtx) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="isReassigning() ? 'host-tickets-maint-title' : 'host-tickets-assign-tech-title'"
+    (click)="closeAssignTicketTechModal()"
+  >
+    @if (isReassigning()) {
+      <div
+        class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
+        role="document"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-content">
+          <app-sd-modal-header
+            [title]="ticketHeading(ticketCtx)"
+            subtitle="Scegli il tecnico, poi conferma: la postazione tornerà in manutenzione."
+            icon="rotate-left"
+            iconVariant="warning"
+            titleId="host-tickets-maint-title"
+            (close)="closeAssignTicketTechModal()"
+          />
+
+          <div class="modal-body">
+            @if (assignModalContext(); as ctx) {
+              <div class="px-4 py-2 bg-light border-bottom d-flex flex-wrap gap-2" aria-label="Contesto segnalazione">
+                <span class="badge text-bg-light border">{{ ctx.space }}</span>
+                <span class="badge text-bg-light border">{{ ctx.desk }}</span>
+                @if (ticketRefLineOnly(ticketCtx); as ref) {
+                  <span class="badge text-bg-secondary">{{ ref }}</span>
+                }
+              </div>
+            }
+
+            <div class="alert alert-warning d-flex align-items-start gap-2 mx-4 mt-3 mb-0 rounded-3" role="note">
+              <app-sd-icon name="circle-exclamation" [size]="18" class="flex-shrink-0 mt-1" aria-hidden="true" />
+              <p class="mb-0 small">{{ maintDeskMaintenanceNotice() }}</p>
+            </div>
+
+            <div class="px-4 py-3">
+              @if (assignTicketTechError()) {
+                <div class="alert alert-danger small py-2 mb-3 rounded-3" role="alert">{{ assignTicketTechError() }}</div>
+              }
+              @if (assignTicketTechLoading()) {
+                <div class="py-5 text-center">
+                  <div class="spinner-border text-primary" role="status" aria-label="Caricamento tecnici"></div>
+                  <p class="text-muted small mb-0 mt-3">Caricamento tecnici dell'ufficio…</p>
+                </div>
+              } @else {
+                @if (assignModalSameTechnicianVisible()) {
+                  <section class="mb-4" aria-labelledby="host-maint-keep-heading">
+                    <h6 id="host-maint-keep-heading" class="small fw-semibold text-uppercase text-muted mb-2">Tecnico in carico</h6>
+                    <button
+                      type="button"
+                      class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3 rounded-3 border w-100 text-start"
+                      [class.active]="isMaintReassignSameSelected()"
+                      [attr.aria-pressed]="isMaintReassignSameSelected()"
+                      [disabled]="assignTicketTechAssigning()"
+                      (click)="selectMaintReassignSame()"
+                      mdbRipple
+                    >
+                      <span
+                        class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                        style="width: 2.5rem; height: 2.5rem"
+                        aria-hidden="true"
+                      >
+                        <app-sd-icon name="user-tie" [size]="22" />
+                      </span>
+                      <span class="min-w-0 flex-grow-1">
+                        <span class="d-block fw-semibold">Mantieni tecnico attuale</span>
+                        @if (assignedTechnicianLabel(ticketCtx); as sameTech) {
+                          @if (sameTech) {
+                            <span class="d-block small">{{ sameTech }}</span>
+                          }
+                        }
+                        <span class="d-block small text-muted">Nessun cambio di assegnazione</span>
+                      </span>
+                      @if (isMaintReassignSameSelected()) {
+                        <app-sd-icon name="check" [size]="16" class="text-primary flex-shrink-0" aria-hidden="true" />
+                      }
+                    </button>
+                  </section>
+                }
+
+                <section aria-labelledby="host-maint-others-heading">
+                  <h6 id="host-maint-others-heading" class="small fw-semibold text-uppercase text-muted mb-2">Altri tecnici</h6>
+                  <label class="form-label small fw-semibold visually-hidden" for="host-maint-tech-search">Cerca tecnico</label>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text bg-transparent" aria-hidden="true">
+                      <app-sd-icon name="search" [size]="18" />
+                    </span>
+                    <input
+                      id="host-maint-tech-search"
+                      type="search"
+                      mdbInput
+                      class="form-control"
+                      placeholder="Nome, codice o specializzazione"
+                      aria-label="Cerca tecnico dell'ufficio"
+                      [ngModel]="assignTicketTechSearch()"
+                      (ngModelChange)="assignTicketTechSearch.set($event)"
+                    />
+                  </div>
+                  @if (!assignTicketTechFiltered().length) {
+                    <p class="text-muted small mb-0">Nessun tecnico trovato.</p>
+                  } @else {
+                    <div class="list-group list-group-flush rounded-3 border">
+                      @for (tech of assignTicketTechFiltered(); track tech.technicianID) {
+                        @if (!isCurrentAssignTechnician(tech)) {
+                          <button
+                            type="button"
+                            class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3"
+                            [class.active]="isMaintReassignTechSelected(tech.technicianID)"
+                            [attr.aria-pressed]="isMaintReassignTechSelected(tech.technicianID)"
+                            [disabled]="assignTicketTechAssigning()"
+                            (click)="selectMaintReassignTechnician(tech.technicianID)"
+                            mdbRipple
+                          >
+                            <span
+                              class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                              style="width: 2.25rem; height: 2.25rem"
+                              aria-hidden="true"
+                            >
+                              <app-sd-icon name="user-tie" [size]="20" />
+                            </span>
+                            <span class="min-w-0 flex-grow-1 text-start">
+                              <span class="d-block fw-semibold">{{ tech.name }}</span>
+                              <span class="d-block small text-muted">
+                                {{ technicianDisplayCode(tech) }} · {{ tech.specialization }}
+                              </span>
+                            </span>
+                            @if (isMaintReassignTechSelected(tech.technicianID)) {
+                              <app-sd-icon name="check" [size]="16" class="text-primary flex-shrink-0" aria-hidden="true" />
+                            }
+                          </button>
+                        }
+                      }
+                    </div>
+                  }
+                </section>
+              }
+            </div>
+          </div>
+
+          <div class="modal-footer flex-column flex-sm-row gap-2">
+            <button
+              type="button"
+              class="btn btn-outline-secondary rounded-pill px-4 order-2 order-sm-1"
+              (click)="closeAssignTicketTechModal()"
+              [disabled]="assignTicketTechAssigning()"
+              mdbRipple
+            >
+              Annulla
+            </button>
+            <button
+              type="button"
+              class="btn btn-warning rounded-pill px-4 order-1 order-sm-2 ms-sm-auto d-inline-flex align-items-center"
+              [disabled]="!canConfirmMaintReassign()"
+              (click)="confirmMaintReassignChoice()"
+              mdbRipple
+            >
+              @if (assignTicketTechAssigning()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              }
+              Conferma
+            </button>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div
+        class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
+        role="document"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-content">
+          <app-sd-modal-header
+            [title]="ticketHeading(ticketCtx)"
+            [subtitle]="
+              (ticketCodeSubtitle(ticketCtx) ? ticketCodeSubtitle(ticketCtx) + ' · ' : '') +
+              'L\'ufficio è quello della postazione collegata al ticket; il tecnico viene associato anche a quello spazio se serve.'
+            "
+            icon="user-tie"
+            titleId="host-tickets-assign-tech-title"
+            (close)="closeAssignTicketTechModal()"
+          />
+
+          <div class="modal-body">
+            @if (assignTicketTechError()) {
+              <div class="alert alert-danger small py-2 mb-3 rounded-3" role="alert">{{ assignTicketTechError() }}</div>
+            }
+            @if (assignTicketTechLoading()) {
+              <div class="py-5 text-center">
+                <div class="spinner-border text-primary" role="status" aria-label="Caricamento tecnici"></div>
+              </div>
+            } @else {
+              <label class="form-label fw-semibold small mb-2" for="host-ticket-assign-severity">Gravità</label>
+              <select
+                id="host-ticket-assign-severity"
+                class="form-select rounded-3 mb-3"
+                [ngModel]="assignTicketSeverity()"
+                (ngModelChange)="assignTicketSeverity.set($event)"
+                [disabled]="assignTicketTechAssigning()"
+              >
+                @for (option of ticketSeverityOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+
+              <label class="form-label small fw-semibold visually-hidden" for="host-tickets-assign-search">Cerca tecnico</label>
+              <div class="input-group mb-3">
+                <span class="input-group-text bg-transparent" aria-hidden="true">
+                  <app-sd-icon name="search" [size]="18" />
+                </span>
+                <input
+                  id="host-tickets-assign-search"
+                  type="search"
+                  mdbInput
+                  class="form-control"
+                  placeholder="Cerca tecnico"
+                  aria-label="Cerca tecnico da assegnare"
+                  [ngModel]="assignTicketTechSearch()"
+                  (ngModelChange)="assignTicketTechSearch.set($event)"
+                />
+              </div>
+
+              @if (!assignTicketTechFiltered().length) {
+                <p class="text-muted small mb-0 text-center py-4">Nessun tecnico trovato.</p>
+              } @else {
+                <div class="list-group list-group-flush rounded-3 border">
+                  @for (tech of assignTicketTechFiltered(); track tech.technicianID) {
+                    <button
+                      type="button"
+                      class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3"
+                      [disabled]="assignTicketTechAssigning()"
+                      (click)="confirmAssignTicketTechnician(tech.technicianID)"
+                      mdbRipple
+                    >
+                      <span
+                        class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                        style="width: 2.25rem; height: 2.25rem"
+                        aria-hidden="true"
+                      >
+                        <app-sd-icon name="user-tie" [size]="18" />
+                      </span>
+                      <span class="flex-grow-1 min-w-0 text-start">
+                        <span class="d-block fw-semibold">{{ tech.name }}</span>
+                        <span class="d-block small text-muted">
+                          {{ technicianDisplayCode(tech) }} · {{ tech.specialization }}
+                        </span>
+                      </span>
+                      @if (assignTicketTechAssigning()) {
+                        <span class="spinner-border spinner-border-sm flex-shrink-0" aria-hidden="true"></span>
+                      } @else {
+                        <app-sd-icon name="chevron-right" [size]="16" class="text-muted flex-shrink-0" aria-hidden="true" />
+                      }
+                    </button>
+                  }
+                </div>
+              }
+            }
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-secondary rounded-pill px-4 w-100"
+              (click)="closeAssignTicketTechModal()"
+              [disabled]="assignTicketTechAssigning()"
+              mdbRipple
+            >
+              Annulla
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

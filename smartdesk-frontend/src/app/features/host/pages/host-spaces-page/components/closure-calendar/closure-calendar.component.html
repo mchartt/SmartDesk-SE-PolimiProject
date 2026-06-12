@@ -1,0 +1,211 @@
+<section class="mb-4" aria-labelledby="host-space-section-closures">
+  <h3 id="host-space-section-closures" class="fs-6 text-uppercase text-muted fw-semibold mb-3 tracking-wide">Chiusure Straordinarie</h3>
+  <div class="card border-0 bg-light rounded-4 overflow-hidden mb-4">
+    <div class="card-body p-4 p-md-5">
+      <ul class="nav nav-pills nav-fill bg-white rounded-pill p-1 mb-4 shadow-sm border border-light" role="tablist" aria-label="Tipo operazione sulle chiusure">
+        <li class="nav-item" role="presentation">
+          <button
+            type="button"
+            class="nav-link rounded-pill fw-bold py-2"
+            role="tab"
+            [class.active]="closureWorkflow() === 'schedule'"
+            [attr.aria-selected]="closureWorkflow() === 'schedule'"
+            (click)="setClosureWorkflow('schedule')"
+            mdbRipple
+          >
+            Programma chiusure
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            type="button"
+            class="nav-link rounded-pill fw-bold py-2"
+            role="tab"
+            [class.active]="closureWorkflow() === 'revoke'"
+            [attr.aria-selected]="closureWorkflow() === 'revoke'"
+            (click)="setClosureWorkflow('revoke')"
+            mdbRipple
+          >
+            Revoca chiusure
+          </button>
+        </li>
+      </ul>
+
+      <div class="bg-white rounded-4 shadow-sm p-4 border border-light position-relative mb-4" #closureCalRoot>
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <button
+            type="button"
+            class="btn btn-light rounded-circle p-2 shadow-none"
+            aria-label="Mese precedente"
+            (click)="closureNavigateMonth(-1)"
+            mdbRipple
+          >
+            <app-sd-icon name="chevron-left" [size]="18" />
+          </button>
+
+          <div class="d-flex flex-wrap justify-content-center gap-2">
+            <button
+              type="button"
+              class="btn btn-white border-0 shadow-sm rounded-pill fw-bold d-inline-flex align-items-center gap-2 px-3 py-2"
+              [attr.aria-expanded]="closureMonthPanelOpen()"
+              aria-haspopup="dialog"
+              (click)="toggleClosureMonthMenu($event)"
+              mdbRipple
+            >
+              <span class="text-capitalize">{{ closureMonthButtonLabel() }}</span>
+              <app-sd-icon name="chevron-down" [size]="14" class="text-muted" />
+            </button>
+            <button
+              type="button"
+              class="btn btn-white border-0 shadow-sm rounded-pill fw-bold d-inline-flex align-items-center gap-2 px-3 py-2"
+              [attr.aria-expanded]="closureYearPanelOpen()"
+              aria-haspopup="dialog"
+              (click)="toggleClosureYearMenu($event)"
+              mdbRipple
+            >
+              <span>{{ closureYearButtonLabel() }}</span>
+              <app-sd-icon name="chevron-down" [size]="14" class="text-muted" />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-light rounded-circle p-2 shadow-none"
+            aria-label="Mese successivo"
+            (click)="closureNavigateMonth(1)"
+            mdbRipple
+          >
+            <app-sd-icon name="chevron-right" [size]="18" />
+          </button>
+        </div>
+
+        <div class="row g-2 text-center small fw-bold text-muted mb-2 text-uppercase" style="font-size: 0.75rem;">
+          @for (w of closureWeekdayLabels; track w) {
+            <div class="col">{{ w }}</div>
+          }
+        </div>
+
+        @for (week of closureCalendarRows(); track $index) {
+          <div class="row g-2 mb-2">
+            @for (cell of week; track cell.iso) {
+              <div class="col">
+                <button
+                  type="button"
+                  class="btn w-100 p-0 fw-bold d-flex align-items-center justify-content-center mx-auto transition-hover"
+                  style="width: 2.5rem; height: 2.5rem; border: 2px solid transparent;"
+                  [class.opacity-25]="!cell.inMonth"
+                  [class.bg-light]="!cell.isPending && !cell.isRevokeBand && !cell.isRangeAnchor && cell.inMonth"
+                  [class.text-muted]="!cell.inMonth"
+                  [class.bg-primary]="cell.isPending || cell.isRangeAnchor"
+                  [class.text-white]="cell.isPending || cell.isRangeAnchor || cell.isRevokeBand"
+                  [class.bg-danger]="cell.isRevokeBand"
+                  [class.border-danger]="cell.isExisting && !cell.isRevokeBand"
+                  [disabled]="closureCellDisabled(cell)"
+                  [attr.aria-pressed]="(closureWorkflow() === 'schedule' && cell.isPending) || (closureWorkflow() === 'revoke' && cell.isRevokeBand)"
+                  [attr.aria-label]="closureCalendarDayAria(cell)"
+                  (click)="onClosureCalendarDayClick(cell)"
+                  mdbRipple
+                >
+                  <span>{{ cell.dayNum }}</span>
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+        @if (closureMonthPanelOpen() || closureYearPanelOpen()) {
+          <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3" style="z-index: 5">
+            <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75" style="backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);" (click)="closeClosureCalMenusPublic()"></div>
+            <div class="card shadow-lg border-0 rounded-4 w-100" style="max-width: 20rem; z-index: 6">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h4 class="h6 fw-bold mb-0">{{ closureMonthPanelOpen() ? 'Seleziona mese' : 'Seleziona anno' }}</h4>
+                  <button type="button" class="btn-close" aria-label="Chiudi" (click)="closeClosureCalMenusPublic()"></button>
+                </div>
+                @if (closureMonthPanelOpen()) {
+                  <div class="row g-2" role="listbox">
+                    @for (opt of closureMonthOptions(); track opt.value) {
+                      <div class="col-4">
+                        <button type="button" class="btn btn-sm w-100 rounded-3 text-capitalize" role="option" [class.btn-primary]="opt.value === closureCalendarMonth()" [class.btn-light]="opt.value !== closureCalendarMonth()" (click)="pickClosureMonth(opt.value)" mdbRipple>{{ opt.label }}</button>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="row g-2" role="listbox">
+                    @for (y of closureYearOptions(); track y) {
+                      <div class="col-6">
+                        <button type="button" class="btn btn-sm w-100 rounded-3" role="option" [class.btn-primary]="y === closureCalendarYear()" [class.btn-light]="y !== closureCalendarYear()" (click)="pickClosureYear(y)" mdbRipple>{{ y }}</button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (closureWorkflow() === 'schedule') {
+        <div class="mb-4">
+          @if (closurePendingDates().length) {
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              @for (g of closurePendingDisplayGroups(); track g.trackKey) {
+                <span class="badge rounded-pill bg-primary bg-opacity-25 text-primary d-inline-flex align-items-center gap-2 py-2 px-3 fs-6">
+                  <span class="fw-bold">{{ formatItDateRange(g.startIso, g.endIso) }}</span>
+                  <button type="button" class="btn btn-link btn-sm p-0 text-primary lh-1 ms-1" aria-label="Rimuovi" (click)="removeClosurePendingGroup(g)" mdbRipple><app-sd-icon name="x" [size]="16" /></button>
+                </span>
+              }
+            </div>
+          }
+
+          <label class="form-label small fw-bold text-dark" for="closure-reason-modal">Motivazione (obbligatoria)</label>
+          <textarea
+            id="closure-reason-modal"
+            class="form-control bg-white border-0 rounded-4 p-3 shadow-sm mb-3"
+            [class.is-invalid]="closureReasonInvalid"
+            rows="2"
+            placeholder="Es. manutenzione impianti, festivo aziendale…"
+            [ngModel]="closureReason"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onClosureReasonChange($event)"
+          ></textarea>
+
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm" (click)="submitClosures()" [disabled]="closureSaving()" mdbRipple>
+              @if (closureSaving()) { <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> }
+              Registra chiusure
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (closureWorkflow() === 'revoke') {
+        <div class="d-flex justify-content-end mb-4">
+          <button type="button" class="btn btn-danger rounded-pill px-4 py-2 fw-bold shadow-sm" [disabled]="!closureRevokeCanSubmit() || closureRevoking()" (click)="submitRevokeClosures()" mdbRipple>
+            @if (closureRevoking()) { <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> }
+            Revoca chiusure selezionate
+          </button>
+        </div>
+      }
+
+      <h4 class="fs-6 text-uppercase text-muted fw-semibold mb-3 tracking-wide border-top pt-4">Programmate</h4>
+      @if (!closureRows().length) {
+        <p class="small text-muted fw-medium mb-0">Nessuna chiusura straordinaria registrata.</p>
+      } @else {
+        <div class="list-group list-group-flush bg-white rounded-4 shadow-sm border border-light">
+          @for (g of closureDisplayGroups(); track g.trackKey) {
+            <div class="list-group-item d-flex flex-wrap align-items-center justify-content-between gap-3 p-3">
+              <div class="min-w-0">
+                <div class="fw-bold text-dark">{{ g.dateLabelOverride ?? formatItDateRange(g.startIso, g.endIso) }}</div>
+                <div class="small text-muted text-truncate fw-medium">{{ g.reasonText }}</div>
+              </div>
+              <button type="button" class="btn btn-light text-danger btn-sm rounded-circle p-2 shadow-none flex-shrink-0" (click)="removeClosureGroup(g)" mdbRipple aria-label="Rimuovi">
+                <app-sd-icon name="trash" [size]="16" />
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,352 @@
+<section
+  id="contenuto-principale"
+  class="auth-page sd-register-wizard"
+  tabindex="-1"
+  [ngClass]="roleClass()"
+  [class.sd-register-wizard--role-chosen]="roleExplicitlyChosen()"
+>
+  <header class="sd-register-wizard__chrome">
+    <a routerLink="/" class="sd-register-wizard__brand text-decoration-none border border-2 border-primary rounded-pill pe-3 ps-1 py-1" aria-label="SmartDesk, vai alla home">
+      <span class="sd-register-wizard__brand-mark" aria-hidden="true">
+        <app-sd-brand-mark class="sd-register-wizard__brand-svg" [size]="18" />
+      </span>
+      <span class="sd-register-wizard__brand-text">SmartDesk</span>
+    </a>
+    <div class="sd-register-wizard__chrome-actions">
+      <a routerLink="/" class="sd-register-wizard__exit-link text-decoration-none" title="Chiudi la registrazione e torna alla home">Esci</a>
+    </div>
+  </header>
+
+  <main class="sd-register-wizard__main py-2 py-lg-3">
+    <div class="card apple-card border-0 p-3 p-md-3 register-form-shell sd-register-wizard__card mx-auto position-relative">
+      <div class="sd-register-wizard__progress-block">
+        <div class="sd-wizard-progress" aria-hidden="true">
+          <div class="sd-wizard-progress__track">
+            <span [ngClass]="wizardProgressClass(1)"></span>
+            <div [ngClass]="wizardLineClass(1)"></div>
+            <span [ngClass]="wizardProgressClass(2)"></span>
+            <div [ngClass]="wizardLineClass(2)"></div>
+            <span [ngClass]="wizardProgressClass(3)"></span>
+          </div>
+        </div>
+        <p class="sd-wizard-meta sd-register-wizard__meta">{{ stepMeta() }}</p>
+      </div>
+
+      @if (step() === 1) {
+        <header class="sd-register-wizard__step-head">
+          <h1 class="sd-register-wizard__title">Il tuo profilo</h1>
+          <p class="sd-register-wizard__lead mb-0">
+            Un accesso, due percorsi: operativo con i desk, oppure gestionale sulla struttura.
+          </p>
+        </header>
+
+        <div class="sd-register-wizard__pick-grid row g-3 g-lg-4">
+          <div class="col-md-6">
+            <button
+              type="button"
+              class="sd-register-wizard__pick w-100 text-start h-100"
+              [class.sd-register-wizard__pick--active]="selectedRole() === 'WORKER' && roleExplicitlyChosen()"
+              (click)="selectRole('WORKER')"
+              [attr.aria-pressed]="selectedRole() === 'WORKER' && roleExplicitlyChosen() ? 'true' : 'false'"
+            >
+              <span class="sd-register-wizard__pick-icon sd-register-wizard__pick-icon--worker" aria-hidden="true">
+                <app-sd-icon name="user-circle" [size]="22" />
+              </span>
+              <span class="sd-register-wizard__pick-title">Lavoratore</span>
+              <span class="sd-register-wizard__pick-sub">Prenotazioni, calendario e ticket legati al tuo posto.</span>
+              <ul class="sd-register-wizard__features list-unstyled mb-0">
+                <li>Slot per giorno e fascia</li>
+                <li>Storico e promemoria</li>
+                <li>Segnalazioni in sede</li>
+              </ul>
+            </button>
+          </div>
+          <div class="col-md-6">
+            <button
+              type="button"
+              class="sd-register-wizard__pick w-100 text-start h-100"
+              [class.sd-register-wizard__pick--active]="selectedRole() === 'HOST' && roleExplicitlyChosen()"
+              (click)="selectRole('HOST')"
+              [attr.aria-pressed]="selectedRole() === 'HOST' && roleExplicitlyChosen() ? 'true' : 'false'"
+            >
+              <span class="sd-register-wizard__pick-icon sd-register-wizard__pick-icon--host" aria-hidden="true">
+                <app-sd-icon name="host-venue" [size]="22" />
+              </span>
+              <span class="sd-register-wizard__pick-title">Host</span>
+              <span class="sd-register-wizard__pick-sub">Catalogo spazi, desk e richieste con workflow admin.</span>
+              <ul class="sd-register-wizard__features list-unstyled mb-0">
+                <li>Coworking e sale</li>
+                <li>Dotazioni e regole</li>
+                <li>Approvazioni utilizzo</li>
+              </ul>
+            </button>
+          </div>
+        </div>
+
+        <div class="sd-register-wizard__actions">
+          <button
+            type="button"
+            class="btn btn-primary sd-register-wizard__btn-primary"
+            [disabled]="!roleExplicitlyChosen()"
+            (click)="continueFromStep1()"
+          >
+            Continua
+          </button>
+        </div>
+      }
+
+      @if (step() === 2) {
+        <header class="sd-register-wizard__step-head">
+          <h1 class="sd-register-wizard__title">Registrati</h1>
+          <p class="sd-register-wizard__lead mb-0">
+            Nome e cognome servono per l’account: al passo successivo sceglierai una password.
+          </p>
+        </header>
+
+        <div *ngIf="errorMessage()" class="alert alert-danger mb-3 rounded-3 d-flex align-items-center gap-2" role="alert">
+          <app-sd-icon name="exclamation" [size]="20" class="flex-shrink-0" />
+          <div>{{ errorMessage() }}</div>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="$event.preventDefault()" novalidate>
+          <div class="sd-register-wizard__preview mb-3">
+            <p class="mb-0 sd-register-wizard__preview-text">
+              <span class="sd-register-wizard__preview-k">Ruolo</span>
+              {{ selectedRole() === 'HOST' ? 'Host' : 'Lavoratore' }}
+              <span class="sd-register-wizard__preview-sep" aria-hidden="true">·</span>
+              <span class="sd-register-wizard__preview-k">Nome utente</span>
+              <span class="sd-register-wizard__accent-mono">{{ usernamePreview() }}</span>
+            </p>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <mdb-form-control>
+                <input
+                  mdbInput
+                  class="form-control rounded-4"
+                  id="nameInput"
+                  formControlName="name"
+                  autocomplete="given-name"
+                  [attr.aria-describedby]="fieldShowError('name') ? 'nameInput-hint nameInput-err' : 'nameInput-hint'"
+                  [class.is-invalid]="fieldShowError('name')"
+                  [attr.aria-invalid]="fieldShowError('name') ? 'true' : null"
+                />
+                <label mdbLabel class="form-label" for="nameInput">Nome <span class="text-danger">*</span></label>
+              </mdb-form-control>
+              <p id="nameInput-hint" class="sd-register-wizard__field-hint mb-0 mt-1">Come su documento o badge.</p>
+              @if (fieldShowError('name')) {
+                <div id="nameInput-err" class="invalid-feedback d-block mt-1 text-danger" role="alert">{{ nameErrorMessage() }}</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <mdb-form-control>
+                <input
+                  mdbInput
+                  class="form-control rounded-4"
+                  id="surnameInput"
+                  formControlName="surname"
+                  autocomplete="family-name"
+                  [attr.aria-describedby]="fieldShowError('surname') ? 'surnameInput-hint surnameInput-err' : 'surnameInput-hint'"
+                  [class.is-invalid]="fieldShowError('surname')"
+                  [attr.aria-invalid]="fieldShowError('surname') ? 'true' : null"
+                />
+                <label mdbLabel class="form-label" for="surnameInput">Cognome <span class="text-danger">*</span></label>
+              </mdb-form-control>
+              <p id="surnameInput-hint" class="sd-register-wizard__field-hint mb-0 mt-1">Stesso criterio del nome.</p>
+              @if (fieldShowError('surname')) {
+                <div id="surnameInput-err" class="invalid-feedback d-block mt-1 text-danger" role="alert">{{ surnameErrorMessage() }}</div>
+              }
+            </div>
+          </div>
+
+          @if (selectedRole() === 'HOST') {
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <mdb-form-control class="mt-md-0 mt-2">
+                  <input
+                    mdbInput
+                    class="form-control rounded-4"
+                    id="vatInput"
+                    formControlName="vatNumber"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    [attr.aria-describedby]="fieldShowError('vatNumber') ? 'vatInput-hint vatInput-err' : 'vatInput-hint'"
+                    [class.is-invalid]="fieldShowError('vatNumber')"
+                    [attr.aria-invalid]="fieldShowError('vatNumber') ? 'true' : null"
+                  />
+                  <label mdbLabel class="form-label" for="vatInput">Partita IVA <span class="text-danger">*</span></label>
+                </mdb-form-control>
+                <p id="vatInput-hint" class="sd-register-wizard__field-hint mb-0 mt-1">11 cifre, senza spazi.</p>
+                @if (fieldShowError('vatNumber')) {
+                  <div id="vatInput-err" class="invalid-feedback d-block mt-1 text-danger" role="alert">{{ vatErrorMessage() }}</div>
+                }
+              </div>
+              <div class="col-md-6">
+                <mdb-form-control class="mt-md-0 mt-2">
+                  <input
+                    mdbInput
+                    class="form-control rounded-4"
+                    id="structureInput"
+                    formControlName="nameStructure"
+                    autocomplete="organization"
+                    [attr.aria-describedby]="fieldShowError('nameStructure') ? 'structureInput-hint structureInput-err' : 'structureInput-hint'"
+                    [class.is-invalid]="fieldShowError('nameStructure')"
+                    [attr.aria-invalid]="fieldShowError('nameStructure') ? 'true' : null"
+                  />
+                  <label mdbLabel class="form-label" for="structureInput">Nome struttura <span class="text-danger">*</span></label>
+                </mdb-form-control>
+                <p id="structureInput-hint" class="sd-register-wizard__field-hint mb-0 mt-1">Nome visibile agli utenti.</p>
+                @if (fieldShowError('nameStructure')) {
+                  <div id="structureInput-err" class="invalid-feedback d-block mt-1 text-danger" role="alert">{{ nameStructureErrorMessage() }}</div>
+                }
+              </div>
+            </div>
+          }
+
+          <mdb-form-control class="mt-3">
+            <input
+              mdbInput
+              class="form-control rounded-4"
+              id="emailInput"
+              formControlName="email"
+              type="email"
+              autocomplete="email"
+              [attr.aria-describedby]="fieldShowError('email') ? 'emailInput-hint emailInput-err' : 'emailInput-hint'"
+              [class.is-invalid]="fieldShowError('email')"
+              [attr.aria-invalid]="fieldShowError('email') ? 'true' : null"
+            />
+            <label mdbLabel class="form-label" for="emailInput">Email <span class="text-danger">*</span></label>
+          </mdb-form-control>
+          <p id="emailInput-hint" class="sd-register-wizard__field-hint mb-0 mt-1">Per accesso e comunicazioni operative.</p>
+          @if (fieldShowError('email')) {
+            <div id="emailInput-err" class="invalid-feedback d-block mt-1 text-danger" role="alert">{{ emailErrorMessage() }}</div>
+          }
+
+          @if (selectedRole() === 'HOST') {
+            <mdb-form-control class="mt-3">
+              <textarea
+                mdbInput
+                class="form-control rounded-4"
+                id="bioInput"
+                rows="2"
+                formControlName="description"
+                maxlength="2000"
+                [attr.aria-describedby]="fieldShowError('description') ? 'bioInput-hint bioInput-err' : 'bioInput-hint'"
+                [class.is-invalid]="fieldShowError('description')"
+                [attr.aria-invalid]="fieldShowError('description') ? 'true' : null"
+              ></textarea>
+              <label mdbLabel class="form-label" for="bioInput">Descrizione struttura</label>
+            </mdb-form-control>
+            <p id="bioInput-hint" class="sd-register-wizard__field-hint mb-0 mt-1">Minimo 50 caratteri: sedi, servizi, orari e pubblico.</p>
+            @if (fieldShowError('description')) {
+              <div id="bioInput-err" class="invalid-feedback d-block mt-1 text-danger" role="alert">{{ descriptionErrorMessage() }}</div>
+            }
+          }
+
+          <div class="sd-register-wizard__actions sd-register-wizard__actions--split mt-3 pt-1">
+            <button type="button" class="btn btn-outline-secondary sd-register-wizard__btn-ghost rounded-pill" (click)="backToStep1()">Indietro</button>
+            <button type="button" class="btn btn-primary sd-register-wizard__btn-primary rounded-pill" (click)="continueFromStep2()">Continua</button>
+          </div>
+        </form>
+      }
+
+      @if (step() === 3) {
+        <header class="sd-register-wizard__step-head">
+          <h1 class="sd-register-wizard__title">Password</h1>
+          <p class="sd-register-wizard__lead mb-0">Scegli una chiave sicura per completare la registrazione.</p>
+        </header>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="sd-register-wizard__form vstack gap-3">
+          <div>
+            <div class="position-relative">
+              <mdb-form-control>
+                <input
+                  mdbInput
+                  mdbValidate
+                  class="form-control pe-5 rounded-4"
+                  id="passwordInput"
+                  formControlName="password"
+                  [type]="passwordVisible() ? 'text' : 'password'"
+                  autocomplete="new-password"
+                  aria-describedby="password-reg-hint"
+                  [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched"
+                />
+                <label mdbLabel class="form-label" for="passwordInput">Password</label>
+              </mdb-form-control>
+              <button
+                type="button"
+                class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2"
+                (click)="togglePasswordVisible()"
+                mdbRipple
+                [attr.aria-label]="passwordVisible() ? 'Nascondi password' : 'Mostra password'"
+                [attr.aria-pressed]="passwordVisible()"
+              >
+                <app-sd-icon [name]="passwordVisible() ? 'eye-off' : 'eye'" [size]="20" />
+              </button>
+            </div>
+            <p id="password-reg-hint" class="sd-register-wizard__field-hint mb-0 mt-1">Minimo 8 caratteri con maiuscola, minuscola e numero.</p>
+          </div>
+
+          <div class="sd-register-wizard__meter" role="status" [attr.aria-label]="'Forza password: ' + passwordStrengthHint()">
+            @for (on of passwordStrengthSegments(); track $index) {
+              <span class="sd-register-wizard__meter-seg" [class.sd-register-wizard__meter-seg--on]="on"></span>
+            }
+          </div>
+          <p class="sd-register-wizard__hint-strength mb-0">{{ passwordStrengthHint() }} — simboli e lunghezza aumentano la sicurezza.</p>
+
+          <div>
+            <div class="position-relative">
+              <mdb-form-control>
+                <input
+                  mdbInput
+                  mdbValidate
+                  class="form-control pe-5 rounded-4"
+                  id="confirmPasswordInput"
+                  formControlName="confirmPassword"
+                  [type]="confirmPasswordVisible() ? 'text' : 'password'"
+                  autocomplete="new-password"
+                  aria-describedby="confirm-password-reg-hint"
+                  [class.is-invalid]="
+                    (form.controls.confirmPassword.invalid && form.controls.confirmPassword.touched) ||
+                    (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched)
+                  "
+                />
+                <label mdbLabel class="form-label" for="confirmPasswordInput">Conferma password</label>
+              </mdb-form-control>
+              <button
+                type="button"
+                class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2"
+                (click)="toggleConfirmPasswordVisible()"
+                mdbRipple
+                [attr.aria-label]="confirmPasswordVisible() ? 'Nascondi conferma password' : 'Mostra conferma password'"
+                [attr.aria-pressed]="confirmPasswordVisible()"
+              >
+                <app-sd-icon [name]="confirmPasswordVisible() ? 'eye-off' : 'eye'" [size]="20" />
+              </button>
+            </div>
+            <p id="confirm-password-reg-hint" class="sd-register-wizard__field-hint mb-0 mt-1">Ripeti la stessa password.</p>
+          </div>
+          @if (form.controls.confirmPassword.touched && (form.controls.confirmPassword.invalid || form.hasError('passwordMismatch'))) {
+            <div class="text-danger small" role="alert">{{ confirmPasswordErrorMessage() }}</div>
+          }
+          @if (form.controls.password.touched && form.controls.password.invalid) {
+            <div class="text-danger small" role="alert">{{ passwordErrorMessage() }}</div>
+          }
+
+          <div class="sd-register-wizard__actions sd-register-wizard__actions--split mt-3 pt-1">
+            <button type="button" class="btn btn-outline-secondary sd-register-wizard__btn-ghost rounded-pill" (click)="backToStep2()">Indietro</button>
+            <button class="btn btn-primary sd-register-wizard__btn-primary role-submit-btn rounded-pill" type="submit" [disabled]="loading()">
+              <span *ngIf="loading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              {{ loading() ? 'Registrazione…' : 'Crea account' }}
+            </button>
+          </div>
+        </form>
+
+        <div class="text-center mt-4">
+          <p class="mb-0 small sd-register-wizard__foot-note">Hai già un account? <a routerLink="/login" class="sd-auth-inline-link">Accedi</a></p>
+        </div>
+      }
+    </div>
+  </main>
+</section>

@@ -1,0 +1,141 @@
+<section id="contenuto-principale" class="auth-page container-fluid min-vh-100" tabindex="-1">
+  <header class="d-flex justify-content-end align-items-center px-3 py-3">
+    <a routerLink="/" class="btn btn-link text-decoration-none d-inline-flex align-items-center gap-1" aria-label="Torna alla home" mdbRipple>
+      <app-sd-icon name="home" [size]="18" />
+      <span>Home</span>
+    </a>
+  </header>
+
+  <div class="container mx-auto">
+    <div class="row g-4 g-xl-5 align-items-center min-vh-100 py-4 py-lg-5">
+      <div class="col-lg-6">
+        <p class="small text-uppercase text-muted fw-semibold mb-2">Accesso</p>
+        <h1 class="display-6 fs-2 mb-3">
+          Bentornato in <span class="text-primary">SmartDesk</span>
+        </h1>
+        <p class="lead mb-4">
+          Accedi come <strong>utente</strong> per prenotare postazioni negli uffici flessibili, oppure come <strong>host</strong> per gestire sedi, desk e richieste — un solo portale, due profili.
+        </p>
+        <div class="d-flex flex-column gap-3" aria-label="Profili supportati dall'accesso">
+          <div class="card apple-card border-0 d-flex flex-row gap-3 align-items-start p-4 mb-3">
+            <span class="text-primary bg-primary bg-opacity-10 p-2 rounded-circle" aria-hidden="true"><app-sd-icon name="calendar-check" [size]="24" /></span>
+            <div>
+              <p class="mb-1 fw-bold fs-5 text-dark">Utente</p>
+              <p class="mb-0 small text-muted">Desk, calendario ed apertura ticket desk</p>
+            </div>
+          </div>
+          <div class="card apple-card border-0 d-flex flex-row gap-3 align-items-start p-4">
+            <span class="text-primary bg-primary bg-opacity-10 p-2 rounded-circle" aria-hidden="true"><app-sd-icon name="host-venue" [size]="24" /></span>
+            <div>
+              <p class="mb-1 fw-bold fs-5 text-dark">Host</p>
+              <p class="mb-0 small text-muted">Spazi, disponibilità e approvazioni per la tua struttura.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card apple-card border-0 mx-auto" style="max-width: 28rem">
+          <div class="card-body p-4 p-lg-5">
+            <div class="text-center mb-4">
+              <h2 class="h4 mb-1">Bentornato</h2>
+              <p class="text-muted mb-0">Accedi con email e password</p>
+            </div>
+
+            @if (sessionExpiredBanner()) {
+              <div class="alert alert-warning mb-4 rounded-3" role="status">
+                Sessione scaduta o non più valida. Accedi di nuovo con email e password.
+              </div>
+            }
+
+            @if (errorMessage()) {
+              <div class="alert alert-danger mb-4 rounded-3 d-flex align-items-center gap-2" role="alert">
+                <app-sd-icon name="exclamation" [size]="20" class="flex-shrink-0 text-danger" />
+                <div>{{ errorMessage() }}</div>
+              </div>
+            }
+
+            <form [formGroup]="form" (ngSubmit)="submit()" class="vstack gap-4">
+              <div>
+                <mdb-form-control>
+                  <input
+                    mdbInput
+                    mdbValidate
+                    class="form-control form-control-lg rounded-4"
+                    [class.is-invalid]="fieldShowError('email')"
+                    id="emailInput"
+                    formControlName="email"
+                    type="email"
+                    autocomplete="email"
+                    [attr.aria-invalid]="fieldShowError('email') ? 'true' : null"
+                    [attr.aria-describedby]="emailAriaDescribedBy()"
+                  />
+                  <label mdbLabel class="form-label" for="emailInput">Email</label>
+                </mdb-form-control>
+                @if (fieldShowError('email')) {
+                  <p id="email-login-error" class="invalid-feedback d-block mb-0 mt-2 small" role="alert">
+                    @if (form.controls.email.hasError('required')) {
+                      Inserisci l'email per accedere.
+                    } @else if (form.controls.email.hasError('email')) {
+                      Inserisci un indirizzo email valido (es. nome@dominio.it).
+                    }
+                  </p>
+                } @else {
+                  <p id="email-login-hint" class="mb-0 mt-2 small text-muted">Es. nome.cognome@mail.com</p>
+                }
+              </div>
+
+              <div class="position-relative">
+                <mdb-form-control>
+                  <input
+                    mdbInput
+                    mdbValidate
+                    class="form-control form-control-lg pe-5 rounded-4"
+                    [class.is-invalid]="fieldShowError('password')"
+                    id="passwordInput"
+                    formControlName="password"
+                    [type]="passwordVisible() ? 'text' : 'password'"
+                    autocomplete="current-password"
+                    [attr.aria-invalid]="fieldShowError('password') ? 'true' : null"
+                    [attr.aria-describedby]="passwordAriaDescribedBy()"
+                  />
+                  <label mdbLabel class="form-label" for="passwordInput">Password</label>
+                </mdb-form-control>
+                @if (fieldShowError('password')) {
+                  <p id="password-login-error" class="invalid-feedback d-block mb-0 mt-2 small" role="alert">
+                    Inserisci la password.
+                  </p>
+                }
+                <button
+                  type="button"
+                  class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2"
+                  (click)="togglePasswordVisible()"
+                  mdbRipple
+                  [attr.aria-label]="passwordVisible() ? 'Nascondi password' : 'Mostra password'"
+                  [attr.aria-pressed]="passwordVisible()"
+                >
+                  <app-sd-icon [name]="passwordVisible() ? 'eye-off' : 'eye'" [size]="20" />
+                </button>
+              </div>
+
+              <button class="btn btn-primary btn-lg w-100 rounded-4 py-3 fw-semibold" type="submit" [disabled]="loading()" mdbRipple>
+                @if (loading()) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                }
+                {{ loading() ? 'Accesso in corso…' : 'Entra' }}
+                <span class="ms-1" aria-hidden="true">→</span>
+              </button>
+            </form>
+
+            <div class="text-center mt-4 pt-2">
+              <p class="mb-0 text-muted">
+                Nessun account?
+                <a routerLink="/register" class="link-primary">Crea account gratuito</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

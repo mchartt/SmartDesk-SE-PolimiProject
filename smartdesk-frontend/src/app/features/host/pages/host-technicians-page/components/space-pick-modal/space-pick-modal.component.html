@@ -1,0 +1,105 @@
+@if (isSpacePickModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-tech-space-pick-title"
+    (click)="closeSpacePickModal()"
+  >
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <app-sd-modal-header
+          title="Scegli uno spazio"
+          [subtitle]="spacePickTechnicianLabel() || null"
+          icon="building"
+          titleId="host-tech-space-pick-title"
+          (close)="closeSpacePickModal()"
+        />
+        <div class="modal-body">
+          <label class="form-label mb-2" for="host-tech-space-pick-search">Cerca spazio</label>
+          <div class="input-group mb-3">
+            <span class="input-group-text bg-transparent" aria-hidden="true">
+              <app-sd-icon name="search" [size]="18" />
+            </span>
+            <input
+              id="host-tech-space-pick-search"
+              type="search"
+              mdbInput
+              class="form-control"
+              placeholder="Nome, città, codice ufficio, indirizzo…"
+              autocomplete="off"
+              aria-label="Cerca tra gli spazi disponibili"
+              [disabled]="spacePickAssigning()"
+              [ngModel]="spacePickSearchQuery()"
+              (ngModelChange)="spacePickSearchQuery.set($event)"
+            />
+          </div>
+          <ul
+            class="list-group list-group-flush rounded-3 border mb-0"
+            role="listbox"
+            [attr.aria-label]="'Spazi disponibili per ' + spacePickTechnicianLabel()"
+          >
+            @for (sp of spacesPickFilteredList(); track sp.spaceID) {
+              <li class="list-group-item list-group-item-action p-0 border-0 border-bottom" role="presentation">
+                <button
+                  type="button"
+                  class="btn w-100 text-start d-flex align-items-start gap-3 p-3 rounded-0"
+                  role="option"
+                  [disabled]="spacePickAssigning()"
+                  [attr.aria-label]="'Assegna a ' + sp.name + ', codice ' + (sp.officeCode || '—')"
+                  (click)="assignTechnicianToSpaceFromPick(sp)"
+                  mdbRipple
+                >
+                  <span
+                    class="rounded-3 bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                    style="width: 2.25rem; height: 2.25rem"
+                    aria-hidden="true"
+                  >
+                    <app-sd-icon name="building" [size]="18" />
+                  </span>
+                  <span class="flex-grow-1 min-w-0">
+                    <span class="fw-semibold d-block">{{ sp.name }}</span>
+                    <span class="small text-muted d-block">
+                      {{ sp.officeCode || '—' }}
+                      @if (sp.city.trim()) {
+                        <span aria-hidden="true"> · </span>{{ sp.city }}
+                      }
+                    </span>
+                  </span>
+                  <app-sd-icon name="arrow-right" [size]="18" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                </button>
+              </li>
+            } @empty {
+              <p class="text-muted small mb-0 px-3 py-3 text-center">
+                {{
+                  spacePickSearchQuery().trim()
+                    ? 'Nessuno spazio corrisponde alla ricerca.'
+                    : 'Nessuno spazio disponibile da assegnare per questo tecnico.'
+                }}
+              </p>
+            }
+          </ul>
+        </div>
+        <div class="modal-footer gap-2">
+          <button
+            type="button"
+            class="btn btn-outline-secondary rounded-pill px-4"
+            [disabled]="spacePickAssigning()"
+            (click)="closeSpacePickModal()"
+            mdbRipple
+          >
+            Chiudi
+          </button>
+          @if (spacePickAssigning()) {
+            <span class="text-muted small d-inline-flex align-items-center gap-2 ms-auto">
+              <span class="spinner-border spinner-border-sm text-primary" aria-hidden="true"></span>
+              Assegnazione…
+            </span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

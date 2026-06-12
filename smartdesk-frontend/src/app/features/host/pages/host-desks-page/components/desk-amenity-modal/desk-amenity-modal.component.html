@@ -1,0 +1,284 @@
+@if (deskAmenityModalDesk(); as amDesk) {
+  <div
+    class="modal fade show d-block sd-desk-amenity-modal-overlay"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-desk-amenity-modal-title"
+    (click)="deskAmenitySubModal() == null && closeDeskAmenityModal()"
+  >
+    <div
+      class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
+      [class.opacity-50]="deskAmenitySubModal() != null"
+      role="document"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content">
+        <app-sd-modal-header
+          [title]="formatDeskTitle(amDesk.code)"
+          [subtitle]="amDesk.roomCode ? amDesk.roomCode + ' · ' + amDesk.building : amDesk.building"
+          icon="tag"
+          titleId="host-desk-amenity-modal-title"
+          closeLabel="Chiudi e torna alle postazioni"
+          (close)="closeDeskAmenityModal()"
+        />
+
+        <div class="modal-body">
+          <p class="text-muted small mb-3">Scegli un’azione oppure aggiungi una dotazione singola.</p>
+
+          <div class="d-flex flex-column gap-2 mb-4" role="group" aria-label="Azioni dotazioni">
+            <button
+              type="button"
+              class="btn btn-outline-primary w-100 d-flex align-items-center gap-3 text-start rounded-3 py-3"
+              (click)="openDeskAmenityActiveSubModal()"
+              aria-label="Visualizza dotazioni attive"
+              mdbRipple
+            >
+              <span
+                class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                style="width: 2.25rem; height: 2.25rem"
+                aria-hidden="true"
+              >
+                <app-sd-icon name="tag" [size]="22" />
+              </span>
+              <span class="flex-grow-1 min-w-0">
+                <span class="fw-semibold d-block">Dotazioni attive</span>
+                <span class="text-muted small">
+                  {{ amDesk.amenities.length }}
+                  {{ amDesk.amenities.length === 1 ? 'presente' : 'presenti' }}
+                </span>
+              </span>
+              <app-sd-icon name="arrow-right" [size]="18" class="text-muted flex-shrink-0" aria-hidden="true" />
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-outline-secondary w-100 d-flex align-items-center gap-3 text-start rounded-3 py-3"
+              (click)="openDeskAmenityApplySetSubModal()"
+              aria-label="Applica un set salvato"
+              mdbRipple
+            >
+              <span
+                class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                style="width: 2.25rem; height: 2.25rem"
+                aria-hidden="true"
+              >
+                <app-sd-icon name="layers" [size]="22" />
+              </span>
+              <span class="flex-grow-1 min-w-0">
+                <span class="fw-semibold d-block">Applica set</span>
+                <span class="text-muted small">
+                  @if (loadingPresets()) {
+                    Caricamento…
+                  } @else {
+                    {{ hostCustomPresets().length }}
+                    {{ hostCustomPresets().length === 1 ? 'set disponibile' : 'set disponibili' }}
+                  }
+                </span>
+              </span>
+              <app-sd-icon name="arrow-right" [size]="18" class="text-muted flex-shrink-0" aria-hidden="true" />
+            </button>
+          </div>
+
+          <section aria-labelledby="host-desk-amenity-add-heading">
+            <h3 id="host-desk-amenity-add-heading" class="h6 fw-bold mb-1">Aggiungi dotazione</h3>
+            <p class="text-muted small mb-3">Una voce alla volta · max {{ hostAmenityTokenMax }} caratteri · maiuscole</p>
+            <label class="form-label small fw-semibold" for="host-desk-amenity-token">Nome</label>
+            <div class="input-group">
+              <input
+                id="host-desk-amenity-token"
+                type="text"
+                mdbInput
+                class="form-control text-uppercase"
+                [ngModel]="deskAmenityDraft"
+                (ngModelChange)="setDeskAmenityDraft($event)"
+                [maxlength]="hostAmenityTokenMax"
+                placeholder="Es. WIFI"
+                autocomplete="off"
+                (keyup.enter)="addDeskAmenityFromModal()"
+              />
+              <button
+                type="button"
+                class="btn btn-primary d-inline-flex align-items-center gap-2"
+                (click)="addDeskAmenityFromModal()"
+                aria-label="Aggiungi dotazione"
+                mdbRipple
+              >
+                <app-sd-icon name="plus" [size]="18" aria-hidden="true" />
+                Aggiungi
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeDeskAmenityModal()" mdbRipple>Chiudi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+
+  @if (deskAmenitySubModal() === 'active') {
+    <div
+      class="modal fade show d-block sd-desk-amenity-sub-overlay"
+      tabindex="-1"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="host-desk-amenity-active-title"
+      (click)="closeDeskAmenitySubModal()"
+    >
+      <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+        <div class="modal-content">
+          <app-sd-modal-header
+            [title]="formatDeskTitle(amDesk.code)"
+            [subtitle]="
+              amDesk.amenities.length +
+              (amDesk.amenities.length === 1 ? ' dotazione' : ' dotazioni') +
+              ' sulla postazione'
+            "
+            icon="tag"
+            titleId="host-desk-amenity-active-title"
+            closeLabel="Torna al menu dotazioni"
+            (close)="closeDeskAmenitySubModal()"
+          />
+          <div class="modal-body">
+            @if (amDesk.amenities.length) {
+              <ul class="list-group list-group-flush rounded-3 border mb-0" role="list">
+                @for (amenity of amDesk.amenities; track amenity) {
+                  <li class="list-group-item d-flex justify-content-between align-items-center gap-3 py-3" role="listitem">
+                    <span class="fw-semibold">{{ amenity }}</span>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm rounded-pill"
+                      (click)="removeAmenity(amDesk, amenity)"
+                      [attr.aria-label]="'Rimuovi dotazione ' + amenity"
+                      mdbRipple
+                    >
+                      Rimuovi
+                    </button>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <div class="text-center py-4">
+                <p class="fw-semibold mb-1">Nessuna dotazione attiva</p>
+                <p class="text-muted small mb-0">Aggiungi una dotazione singola o applica un set dal menu precedente.</p>
+              </div>
+            }
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeDeskAmenitySubModal()" mdbRipple>Indietro</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+  }
+
+  @if (deskAmenitySubModal() === 'apply-set') {
+    <div
+      class="modal fade show d-block sd-desk-amenity-sub-overlay"
+      tabindex="-1"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="host-desk-amenity-apply-set-title"
+      (click)="closeDeskAmenitySubModal()"
+    >
+      <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+        <div class="modal-content">
+          <app-sd-modal-header
+            [title]="formatDeskTitle(amDesk.code)"
+            subtitle="Aggiunge solo le dotazioni mancanti"
+            icon="layers"
+            iconVariant="secondary"
+            titleId="host-desk-amenity-apply-set-title"
+            closeLabel="Torna al menu dotazioni"
+            (close)="closeDeskAmenitySubModal()"
+          />
+          <div class="modal-body">
+            @if (loadingPresets()) {
+              <div class="d-flex align-items-center gap-2 text-muted" aria-live="polite">
+                <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                <span>Caricamento set…</span>
+              </div>
+            } @else if (!hostCustomPresets().length) {
+              <div class="text-center py-4">
+                <div class="text-muted mb-3" aria-hidden="true">
+                  <app-sd-icon name="layers" [size]="28" />
+                </div>
+                <p class="fw-semibold mb-1">Nessun set salvato</p>
+                <p class="text-muted small mb-3">
+                  Crea un set di dotazioni da riutilizzare su tutte le postazioni di questo spazio.
+                </p>
+                <button
+                  type="button"
+                  class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-2"
+                  (click)="openHostPresetCreateFromDeskAmenityModal()"
+                  mdbRipple
+                >
+                  <app-sd-icon name="plus" [size]="18" aria-hidden="true" />
+                  Crea il primo set
+                </button>
+              </div>
+            } @else {
+              <label class="form-label small fw-semibold" [attr.for]="'preset-apply-filter-modal-' + amDesk.id">Cerca set</label>
+              <div class="input-group mb-3">
+                <span class="input-group-text bg-transparent" aria-hidden="true">
+                  <app-sd-icon name="search" [size]="18" />
+                </span>
+                <input
+                  type="search"
+                  mdbInput
+                  class="form-control"
+                  [id]="'preset-apply-filter-modal-' + amDesk.id"
+                  placeholder="Nome set o dotazione…"
+                  autocomplete="off"
+                  [ngModel]="presetApplySearchForDesk(amDesk.id)"
+                  (ngModelChange)="setPresetApplySearchForDesk(amDesk.id, $event)"
+                />
+              </div>
+              @if (!filteredPresetsForDesk(amDesk).length) {
+                <p class="text-muted small mb-0">Nessun set corrisponde alla ricerca.</p>
+              } @else {
+                <ul class="list-group list-group-flush rounded-3 border mb-0" role="list">
+                  @for (preset of filteredPresetsForDesk(amDesk); track preset.id) {
+                    <li class="list-group-item d-flex flex-wrap justify-content-between align-items-start gap-3 py-3" role="listitem">
+                      <div class="min-w-0 flex-grow-1">
+                        <span class="fw-semibold d-block">{{ preset.label }}</span>
+                        @if (preset.hint) {
+                          <span class="text-muted small d-block">{{ preset.hint }}</span>
+                        }
+                        <span class="text-muted small d-block">{{ preset.amenities.join(' · ') }}</span>
+                      </div>
+                      @if (presetFullyApplied(amDesk, preset)) {
+                        <span class="badge text-bg-success d-inline-flex align-items-center gap-1">
+                          <app-sd-icon name="check" [size]="14" aria-hidden="true" />
+                          Applicato
+                        </span>
+                      } @else {
+                        <button
+                          type="button"
+                          class="btn btn-primary btn-sm rounded-pill px-3"
+                          (click)="applyAmenityPreset(amDesk, preset)"
+                          [attr.aria-label]="'Applica set ' + preset.label"
+                          mdbRipple
+                        >
+                          Applica
+                        </button>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+            }
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeDeskAmenitySubModal()" mdbRipple>Indietro</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+  }
+}

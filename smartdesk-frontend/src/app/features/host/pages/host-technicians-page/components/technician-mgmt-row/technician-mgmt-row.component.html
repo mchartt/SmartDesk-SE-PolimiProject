@@ -1,0 +1,92 @@
+@let t = technician();
+<div class="col-12 col-xl-6" role="listitem">
+  <article class="card bg-white border-0 rounded-5 shadow-sm h-100 overflow-hidden d-flex flex-column transition-all">
+    <div class="p-4 flex-grow-1">
+      <div class="d-flex gap-3 align-items-start mb-3">
+        <div
+          class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0 fw-bold"
+          style="width: 2.75rem; height: 2.75rem; font-size: 0.85rem"
+          aria-hidden="true"
+        >
+          {{ techInitials(t.name) }}
+        </div>
+        <div class="min-w-0 flex-grow-1">
+          <h4 class="fw-bold h6 mb-1 text-truncate">{{ t.name }}</h4>
+          <span class="badge rounded-pill bg-secondary-subtle text-secondary">{{ technicianDisplayCode(t) }}</span>
+        </div>
+      </div>
+
+      <ul class="list-group list-group-flush border rounded-3 small mb-3">
+        <li class="list-group-item d-flex align-items-start gap-2 py-2 px-3 border-0 border-bottom">
+          <app-sd-icon name="envelope" [size]="16" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+          <span class="text-break">{{ t.email }}</span>
+        </li>
+        <li class="list-group-item d-flex align-items-start gap-2 py-2 px-3 border-0 border-bottom">
+          <app-sd-icon name="wrench" [size]="16" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+          <span class="text-break">{{ technicianSpecDisplay(t) || 'Specializzazione non indicata' }}</span>
+        </li>
+        <li class="list-group-item py-2 px-3 border-0">
+          <div class="d-flex align-items-start gap-2">
+            <app-sd-icon name="building" [size]="16" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+            <div class="min-w-0 flex-grow-1">
+              @if (!(t.assignedSpaces ?? []).length) {
+                <span class="text-muted">Nessuno spazio assegnato</span>
+              } @else {
+                <div class="d-flex flex-wrap gap-1 align-items-center">
+                  @for (sp of visibleAssignedSpaces(t); track sp.spaceID) {
+                    <span class="badge rounded-pill bg-primary-subtle text-primary d-inline-flex align-items-center gap-1 py-1 px-2">
+                      <span class="text-truncate" style="max-width: 10rem">{{ sp.name }}</span>
+                      @if (!hasNoApprovedSpaces) {
+                        <button
+                          type="button"
+                          class="btn btn-link btn-sm p-0 text-primary lh-1"
+                          (click)="unassignFromHostSpace(sp.spaceID, t.technicianID)"
+                          [attr.aria-label]="'Rimuovi da ' + sp.name"
+                          mdbRipple
+                        >
+                          <app-sd-icon name="x" [size]="12" aria-hidden="true" />
+                        </button>
+                      }
+                    </span>
+                  }
+                  @if (hiddenAssignedSpacesCount(t) > 0) {
+                    <button
+                      type="button"
+                      class="btn btn-link btn-sm p-0"
+                      (click)="openAssignedSpacesModal(t)"
+                      mdbRipple
+                    >
+                      +{{ hiddenAssignedSpacesCount(t) }} altri
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="bg-body-tertiary border-top d-flex flex-wrap gap-2 p-3 mt-auto">
+      @if (!hasNoApprovedSpaces) {
+        <button
+          type="button"
+          class="btn btn-outline-primary btn-sm rounded-pill d-inline-flex align-items-center gap-1 flex-fill"
+          (click)="openSpacePickModal(t)"
+          [disabled]="assignableSpaceCount(t) === 0"
+          [attr.title]="assignableSpaceCount(t) === 0 ? 'Già assegnato a tutti gli spazi.' : null"
+          mdbRipple
+        >
+          <app-sd-icon name="building" [size]="14" aria-hidden="true" />
+          Assegna spazio
+        </button>
+      }
+      <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill flex-fill" (click)="openEditModal(t)" mdbRipple>
+        Modifica
+      </button>
+      <button type="button" class="btn btn-outline-danger btn-sm rounded-pill flex-fill" (click)="confirmDeleteTechnician(t)" mdbRipple>
+        Elimina
+      </button>
+    </div>
+  </article>
+</div>

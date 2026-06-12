@@ -1,0 +1,149 @@
+.sd-ticket-chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sd-ticket-chat-panel__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sd-ticket-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+  max-height: 400px;
+  padding-right: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sd-ticket-chat-panel--relaxed .sd-ticket-chat {
+  max-height: 50vh;
+}
+
+.sd-ticket-chat__row {
+  display: flex;
+  width: 100%;
+}
+
+.sd-ticket-chat__row--me {
+  justify-content: flex-end;
+}
+
+.sd-ticket-chat__row--other {
+  justify-content: flex-start;
+}
+
+.sd-ticket-chat__bubble {
+  background: var(--bs-light);
+  border-radius: 1.25rem;
+  padding: 0.75rem 1rem;
+  max-width: 90%;
+  border: 1px solid var(--bs-border-color);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.sd-ticket-chat__row--me .sd-ticket-chat__bubble {
+  background: var(--bs-primary);
+  color: #fff;
+  border-color: var(--bs-primary);
+  border-bottom-right-radius: 0.25rem;
+}
+
+.sd-ticket-chat__row--other .sd-ticket-chat__bubble {
+  background: #fff;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.sd-ticket-chat__meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.sd-ticket-chat__author-name {
+  font-weight: 600;
+  color: var(--bs-heading-color);
+}
+
+.sd-ticket-chat__row--me .sd-ticket-chat__author-name {
+  color: #fff;
+}
+
+.sd-ticket-chat__author-role {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.25rem;
+  font-weight: 600;
+  color: var(--bs-secondary);
+  background-color: var(--bs-secondary-bg-subtle);
+}
+
+
+.sd-ticket-chat__row--worker.sd-ticket-chat__row--other .sd-ticket-chat__author-role {
+  color: var(--bs-info-text-emphasis);
+  background-color: var(--bs-info-bg-subtle);
+}
+
+
+.sd-ticket-chat__row--technician.sd-ticket-chat__row--other .sd-ticket-chat__author-role {
+  color: var(--bs-primary-text-emphasis);
+  background-color: var(--bs-primary-bg-subtle);
+}
+
+
+.sd-ticket-chat__row--host.sd-ticket-chat__row--other .sd-ticket-chat__author-role {
+  color: var(--bs-warning-text-emphasis);
+  background-color: var(--bs-warning-bg-subtle);
+}
+
+
+.sd-ticket-chat__row--me .sd-ticket-chat__author-role {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.sd-ticket-chat__time {
+  color: var(--bs-secondary-color);
+  font-size: 0.75rem;
+}
+
+.sd-ticket-chat__row--me .sd-ticket-chat__time {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.sd-ticket-chat__text {
+  font-size: 0.9375rem;
+  color: var(--bs-body-color);
+  line-height: 1.5;
+}
+
+.sd-ticket-chat__row--me .sd-ticket-chat__text {
+  color: #fff;
+}
+
+.sd-ticket-chat-composer {
+  margin-top: auto;
+  border-top: 1px solid var(--bs-border-color);
+  padding-top: 1rem;
+}
+
+.sd-ticket-chat-composer__row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.sd-ticket-chat-composer__meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+}

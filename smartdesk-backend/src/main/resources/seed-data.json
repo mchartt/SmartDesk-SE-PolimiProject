@@ -1,0 +1,2503 @@
+﻿{
+  "workers": [
+    {
+      "name": "Mario",
+      "surname": "Rossi",
+      "email": "mario.rossi@worker.com",
+      "password": "Password123!",
+      "company": "Tech Corp",
+      "active": true
+    },
+    {
+      "name": "Luigi",
+      "surname": "Bannato",
+      "email": "luigi.bannato@worker.com",
+      "password": "Password123!",
+      "company": "Bad Corp",
+      "active": false
+    },
+    {
+      "name": "Anna",
+      "surname": "Bianchi",
+      "email": "anna.bianchi@worker.com",
+      "password": "Password123!",
+      "company": "Design Studio",
+      "active": true
+    },
+    {
+      "name": "Sara",
+      "surname": "Conti",
+      "email": "sara.conti@worker.com",
+      "password": "Password123!",
+      "company": "FinTech Lab",
+      "active": true
+    },
+    {
+      "name": "Marco",
+      "surname": "Ferrari",
+      "email": "marco.ferrari@worker.com",
+      "password": "Password123!",
+      "company": "Cloud Nine",
+      "active": true
+    },
+    {
+      "name": "Elena",
+      "surname": "Galli",
+      "email": "elena.galli@worker.com",
+      "password": "Password123!",
+      "company": "UX Partners",
+      "active": true
+    },
+    {
+      "name": "Luca",
+      "surname": "Moretti",
+      "email": "luca.moretti@worker.com",
+      "password": "Password123!",
+      "company": "DataWorks",
+      "active": false
+    },
+    {
+      "name": "Giulia",
+      "surname": "Russo",
+      "email": "giulia.russo@worker.com",
+      "password": "Password123!",
+      "company": "Media House",
+      "active": true
+    },
+    {
+      "name": "Andrea",
+      "surname": "Colombo",
+      "email": "andrea.colombo@worker.com",
+      "password": "Password123!",
+      "company": "Startup Hub",
+      "active": true
+    },
+    {
+      "name": "Francesca",
+      "surname": "Marino",
+      "email": "francesca.marino@worker.com",
+      "password": "Password123!",
+      "company": "Legal Tech",
+      "active": true
+    },
+    {
+      "name": "Davide",
+      "surname": "Ricci",
+      "email": "davide.ricci@worker.com",
+      "password": "Password123!",
+      "company": "Green Energy",
+      "active": false
+    },
+    {
+      "name": "Chiara",
+      "surname": "Fontana",
+      "email": "chiara.fontana@worker.com",
+      "password": "Password123!",
+      "company": "AI Studio",
+      "active": true
+    },
+    {
+      "name": "Simone",
+      "surname": "Barbieri",
+      "email": "simone.barbieri@worker.com",
+      "password": "Password123!",
+      "company": "Game Dev",
+      "active": true
+    },
+    {
+      "name": "Valentina",
+      "surname": "Greco",
+      "email": "valentina.greco@worker.com",
+      "password": "Password123!",
+      "company": "Health Tech",
+      "active": true
+    }
+  ],
+  "hosts": [
+    {
+      "name": "Giuseppe",
+      "surname": "Verdi",
+      "email": "giuseppe.verdi@host.com",
+      "password": "Password123!",
+      "nameStructure": "Milano Central Coworking",
+      "vatNumber": "IT12345678901",
+      "approved": true,
+      "active": true
+    },
+    {
+      "name": "Chiara",
+      "surname": "InAttesa",
+      "email": "chiara.inattesa@host.com",
+      "password": "Password123!",
+      "nameStructure": "Roma Sud Hub",
+      "vatNumber": "IT98765432101",
+      "approved": false,
+      "active": true
+    },
+    {
+      "name": "Paolo",
+      "surname": "Nero",
+      "email": "paolo.nero@host.com",
+      "password": "Password123!",
+      "nameStructure": "Torino Tech Space",
+      "vatNumber": "IT55566677788",
+      "approved": true,
+      "active": true
+    },
+    {
+      "name": "Laura",
+      "surname": "Bologna",
+      "email": "laura.bologna@host.com",
+      "password": "Password123!",
+      "nameStructure": "Bologna Innovation Loft",
+      "vatNumber": "IT11223344556",
+      "approved": true,
+      "active": true
+    },
+    {
+      "name": "Marco",
+      "surname": "Firenze",
+      "email": "marco.firenze@host.com",
+      "password": "Password123!",
+      "nameStructure": "Firenze Creative Hub",
+      "vatNumber": "IT22334455667",
+      "approved": true,
+      "active": true
+    },
+    {
+      "name": "Antonio",
+      "surname": "Pending",
+      "email": "antonio.pending@host.com",
+      "password": "Password123!",
+      "nameStructure": "Napoli Bay Workspace",
+      "vatNumber": "IT33445566778",
+      "approved": false,
+      "active": true
+    }
+  ],
+  "technicians": [
+    {
+      "name": "Roberto",
+      "surname": "Gialli",
+      "email": "roberto.gialli@tech.com",
+      "password": "Password123!",
+      "specialisation": "Hardware",
+      "active": true,
+      "hostEmail": "giuseppe.verdi@host.com",
+      "assignedSpaceNames": [
+        "Milano Central Coworking"
+      ]
+    },
+    {
+      "name": "Silvia",
+      "surname": "Rete",
+      "email": "silvia.rete@tech.com",
+      "password": "Password123!",
+      "specialisation": "Network",
+      "active": true,
+      "hostEmail": "paolo.nero@host.com",
+      "assignedSpaceNames": [
+        "Torino Tech Space"
+      ]
+    },
+    {
+      "name": "Fabio",
+      "surname": "Software",
+      "email": "fabio.software@tech.com",
+      "password": "Password123!",
+      "specialisation": "Software",
+      "active": true,
+      "hostEmail": "laura.bologna@host.com",
+      "assignedSpaceNames": [
+        "Bologna Innovation Loft"
+      ]
+    },
+    {
+      "name": "Marta",
+      "surname": "Impianti",
+      "email": "marta.impianti@tech.com",
+      "password": "Password123!",
+      "specialisation": "Facilities",
+      "active": true,
+      "hostEmail": "marco.firenze@host.com",
+      "assignedSpaceNames": [
+        "Firenze Creative Hub"
+      ]
+    }
+  ],
+  "spaces": [
+    {
+      "name": "Milano Central Coworking",
+      "description": "Grande coworking in centro a Milano con torri, open space e sale riunioni.",
+      "address": "Via Roma 1",
+      "city": "Milano",
+      "hostEmail": "giuseppe.verdi@host.com",
+      "approved": true,
+      "desks": [
+        {
+          "code": "A1",
+          "building": "Torre A",
+          "roomCode": "TA",
+          "pricePerHour": 5.0,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "A2",
+          "building": "Torre A",
+          "roomCode": "TA",
+          "pricePerHour": 5.2,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "A3",
+          "building": "Torre A",
+          "roomCode": "TA",
+          "pricePerHour": 5.4,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "A4",
+          "building": "Torre A",
+          "roomCode": "TA",
+          "pricePerHour": 5.6,
+          "amenities": [
+            "WIFI",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "A5",
+          "building": "Torre A",
+          "roomCode": "TA",
+          "pricePerHour": 5.8,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "A6",
+          "building": "Torre A",
+          "roomCode": "TA",
+          "pricePerHour": 6.0,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "B1",
+          "building": "Torre B",
+          "roomCode": "TB",
+          "pricePerHour": 4.35,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "B2",
+          "building": "Torre B",
+          "roomCode": "TB",
+          "pricePerHour": 4.7,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK"
+          ]
+        },
+        {
+          "code": "B3",
+          "building": "Torre B",
+          "roomCode": "TB",
+          "pricePerHour": 5.05,
+          "amenities": [
+            "WIFI",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "B4",
+          "building": "Torre B",
+          "roomCode": "TB",
+          "pricePerHour": 5.4,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "B5",
+          "building": "Torre B",
+          "roomCode": "TB",
+          "pricePerHour": 5.75,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "B6",
+          "building": "Torre B",
+          "roomCode": "TB",
+          "pricePerHour": 6.1,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ]
+        },
+        {
+          "code": "O1",
+          "building": "Open Space",
+          "roomCode": "OS",
+          "pricePerHour": 5.65,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "O2",
+          "building": "Open Space",
+          "roomCode": "OS",
+          "pricePerHour": 5.8,
+          "amenities": [
+            "WIFI",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "O3",
+          "building": "Open Space",
+          "roomCode": "OS",
+          "pricePerHour": 5.95,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "O4",
+          "building": "Open Space",
+          "roomCode": "OS",
+          "pricePerHour": 6.1,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "O5",
+          "building": "Open Space",
+          "roomCode": "OS",
+          "pricePerHour": 6.25,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ],
+          "stateCode": "MAINTENANCE"
+        },
+        {
+          "code": "O6",
+          "building": "Open Space",
+          "roomCode": "OS",
+          "pricePerHour": 6.4,
+          "amenities": [
+            "WIFI",
+            "POWER_OUTLET"
+          ]
+        },
+        {
+          "code": "S1",
+          "building": "Sala Riunioni",
+          "roomCode": "SR",
+          "pricePerHour": 9.5,
+          "amenities": [
+            "WIFI",
+            "ULTRAWIDE_MONITOR",
+            "DOCKING_STATION"
+          ]
+        },
+        {
+          "code": "S2",
+          "building": "Sala Riunioni",
+          "roomCode": "SR",
+          "pricePerHour": 10.0,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "S3",
+          "building": "Sala Riunioni",
+          "roomCode": "SR",
+          "pricePerHour": 10.5,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "S4",
+          "building": "Sala Riunioni",
+          "roomCode": "SR",
+          "pricePerHour": 11.0,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ]
+        },
+        {
+          "code": "S5",
+          "building": "Sala Riunioni",
+          "roomCode": "SR",
+          "pricePerHour": 11.5,
+          "amenities": [
+            "WIFI",
+            "POWER_OUTLET",
+            "DOCKING_STATION"
+          ]
+        },
+        {
+          "code": "S6",
+          "building": "Sala Riunioni",
+          "roomCode": "SR",
+          "pricePerHour": 12.0,
+          "amenities": [
+            "WIFI",
+            "DOUBLE_MONITOR",
+            "ERGONOMIC_CHAIR"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Torino Tech Space",
+      "description": "Spazio innovativo per startup e creativi con tre ali operative.",
+      "address": "Via Po 50",
+      "city": "Torino",
+      "hostEmail": "paolo.nero@host.com",
+      "approved": true,
+      "desks": [
+        {
+          "code": "P1",
+          "building": "Ala Nord",
+          "roomCode": "AN",
+          "pricePerHour": 6.1,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "P2",
+          "building": "Ala Nord",
+          "roomCode": "AN",
+          "pricePerHour": 6.2,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "STANDING_DESK"
+          ],
+          "stateCode": "MAINTENANCE"
+        },
+        {
+          "code": "P3",
+          "building": "Ala Nord",
+          "roomCode": "AN",
+          "pricePerHour": 6.3,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ]
+        },
+        {
+          "code": "P4",
+          "building": "Ala Nord",
+          "roomCode": "AN",
+          "pricePerHour": 6.4,
+          "amenities": [
+            "WIFI",
+            "POWER_OUTLET"
+          ]
+        },
+        {
+          "code": "P5",
+          "building": "Ala Nord",
+          "roomCode": "AN",
+          "pricePerHour": 6.5,
+          "amenities": [
+            "WIFI",
+            "DOUBLE_MONITOR",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "P6",
+          "building": "Ala Nord",
+          "roomCode": "AN",
+          "pricePerHour": 6.6,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "E1",
+          "building": "Ala Est",
+          "roomCode": "AE",
+          "pricePerHour": 7.2,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "E2",
+          "building": "Ala Est",
+          "roomCode": "AE",
+          "pricePerHour": 7.4,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ]
+        },
+        {
+          "code": "E3",
+          "building": "Ala Est",
+          "roomCode": "AE",
+          "pricePerHour": 7.6,
+          "amenities": [
+            "WIFI",
+            "POWER_OUTLET"
+          ]
+        },
+        {
+          "code": "E4",
+          "building": "Ala Est",
+          "roomCode": "AE",
+          "pricePerHour": 7.8,
+          "amenities": [
+            "WIFI",
+            "DOUBLE_MONITOR",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "E5",
+          "building": "Ala Est",
+          "roomCode": "AE",
+          "pricePerHour": 8.0,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "E6",
+          "building": "Ala Est",
+          "roomCode": "AE",
+          "pricePerHour": 8.2,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "W1",
+          "building": "Ala Ovest",
+          "roomCode": "AO",
+          "pricePerHour": 6.65,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ]
+        },
+        {
+          "code": "W2",
+          "building": "Ala Ovest",
+          "roomCode": "AO",
+          "pricePerHour": 6.8,
+          "amenities": [
+            "WIFI",
+            "POWER_OUTLET"
+          ]
+        },
+        {
+          "code": "W3",
+          "building": "Ala Ovest",
+          "roomCode": "AO",
+          "pricePerHour": 6.95,
+          "amenities": [
+            "WIFI",
+            "DOUBLE_MONITOR",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "W4",
+          "building": "Ala Ovest",
+          "roomCode": "AO",
+          "pricePerHour": 7.1,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "W5",
+          "building": "Ala Ovest",
+          "roomCode": "AO",
+          "pricePerHour": 7.25,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "W6",
+          "building": "Ala Ovest",
+          "roomCode": "AO",
+          "pricePerHour": 7.4,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK",
+            "ERGONOMIC_CHAIR"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Roma Sud Hub",
+      "description": "Hub tecnologico a Roma in attesa di approvazione amministrativa.",
+      "address": "Via Appia 100",
+      "city": "Roma",
+      "hostEmail": "chiara.inattesa@host.com",
+      "approved": false,
+      "desks": [
+        {
+          "code": "R11",
+          "building": "Edificio Principale",
+          "roomCode": "EP",
+          "pricePerHour": 4.5,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "R12",
+          "building": "Edificio Principale",
+          "roomCode": "EP",
+          "pricePerHour": 4.75,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ],
+          "stateCode": "MAINTENANCE"
+        },
+        {
+          "code": "R13",
+          "building": "Edificio Principale",
+          "roomCode": "EP",
+          "pricePerHour": 5.0,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "R14",
+          "building": "Edificio Principale",
+          "roomCode": "EP",
+          "pricePerHour": 5.25,
+          "amenities": [
+            "WIFI",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "R15",
+          "building": "Edificio Principale",
+          "roomCode": "EP",
+          "pricePerHour": 5.5,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "R16",
+          "building": "Edificio Principale",
+          "roomCode": "EP",
+          "pricePerHour": 5.75,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "R21",
+          "building": "Piano Terra",
+          "roomCode": "PT",
+          "pricePerHour": 4.0,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ]
+        },
+        {
+          "code": "R22",
+          "building": "Piano Terra",
+          "roomCode": "PT",
+          "pricePerHour": 4.25,
+          "amenities": [
+            "WIFI",
+            "POWER_OUTLET"
+          ]
+        },
+        {
+          "code": "R23",
+          "building": "Piano Terra",
+          "roomCode": "PT",
+          "pricePerHour": 4.5,
+          "amenities": [
+            "WIFI",
+            "DOUBLE_MONITOR",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "R24",
+          "building": "Piano Terra",
+          "roomCode": "PT",
+          "pricePerHour": 4.75,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "R25",
+          "building": "Piano Terra",
+          "roomCode": "PT",
+          "pricePerHour": 5.0,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "R26",
+          "building": "Piano Terra",
+          "roomCode": "PT",
+          "pricePerHour": 5.25,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bologna Innovation Loft",
+      "description": "Loft moderno vicino alla stazione con focus su team tech.",
+      "address": "Via Indipendenza 22",
+      "city": "Bologna",
+      "hostEmail": "laura.bologna@host.com",
+      "approved": true,
+      "desks": [
+        {
+          "code": "B11",
+          "building": "Loft Nord",
+          "roomCode": "LN",
+          "pricePerHour": 5.5,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "B12",
+          "building": "Loft Nord",
+          "roomCode": "LN",
+          "pricePerHour": 5.75,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "B13",
+          "building": "Loft Nord",
+          "roomCode": "LN",
+          "pricePerHour": 6.0,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "B14",
+          "building": "Loft Nord",
+          "roomCode": "LN",
+          "pricePerHour": 6.25,
+          "amenities": [
+            "WIFI",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "B15",
+          "building": "Loft Nord",
+          "roomCode": "LN",
+          "pricePerHour": 6.5,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "B16",
+          "building": "Loft Nord",
+          "roomCode": "LN",
+          "pricePerHour": 6.75,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "B21",
+          "building": "Loft Sud",
+          "roomCode": "LS",
+          "pricePerHour": 5.0,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ]
+        },
+        {
+          "code": "B22",
+          "building": "Loft Sud",
+          "roomCode": "LS",
+          "pricePerHour": 5.25,
+          "amenities": [
+            "WIFI",
+            "POWER_OUTLET"
+          ],
+          "stateCode": "MAINTENANCE"
+        },
+        {
+          "code": "B23",
+          "building": "Loft Sud",
+          "roomCode": "LS",
+          "pricePerHour": 5.5,
+          "amenities": [
+            "WIFI",
+            "DOUBLE_MONITOR",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "B24",
+          "building": "Loft Sud",
+          "roomCode": "LS",
+          "pricePerHour": 5.75,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "B25",
+          "building": "Loft Sud",
+          "roomCode": "LS",
+          "pricePerHour": 6.0,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "B26",
+          "building": "Loft Sud",
+          "roomCode": "LS",
+          "pricePerHour": 6.25,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK"
+          ]
+        },
+        {
+          "code": "B31",
+          "building": "Studio Lab",
+          "roomCode": "SL",
+          "pricePerHour": 6.5,
+          "amenities": [
+            "WIFI",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "B32",
+          "building": "Studio Lab",
+          "roomCode": "SL",
+          "pricePerHour": 6.75,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "B33",
+          "building": "Studio Lab",
+          "roomCode": "SL",
+          "pricePerHour": 7.0,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "B34",
+          "building": "Studio Lab",
+          "roomCode": "SL",
+          "pricePerHour": 7.25,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ]
+        },
+        {
+          "code": "B35",
+          "building": "Studio Lab",
+          "roomCode": "SL",
+          "pricePerHour": 7.5,
+          "amenities": [
+            "WIFI",
+            "POWER_OUTLET"
+          ]
+        },
+        {
+          "code": "B36",
+          "building": "Studio Lab",
+          "roomCode": "SL",
+          "pricePerHour": 7.75,
+          "amenities": [
+            "WIFI",
+            "DOUBLE_MONITOR",
+            "ULTRAWIDE_MONITOR"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Firenze Creative Hub",
+      "description": "Spazio creativo nel centro storico con luce naturale e sale team.",
+      "address": "Via dei Calzaiuoli 8",
+      "city": "Firenze",
+      "hostEmail": "marco.firenze@host.com",
+      "approved": true,
+      "desks": [
+        {
+          "code": "F11",
+          "building": "Atelier A",
+          "roomCode": "AA",
+          "pricePerHour": 5.8,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "F12",
+          "building": "Atelier A",
+          "roomCode": "AA",
+          "pricePerHour": 6.05,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "F13",
+          "building": "Atelier A",
+          "roomCode": "AA",
+          "pricePerHour": 6.3,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "F14",
+          "building": "Atelier A",
+          "roomCode": "AA",
+          "pricePerHour": 6.55,
+          "amenities": [
+            "WIFI",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "F15",
+          "building": "Atelier A",
+          "roomCode": "AA",
+          "pricePerHour": 6.8,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ],
+          "stateCode": "MAINTENANCE"
+        },
+        {
+          "code": "F16",
+          "building": "Atelier A",
+          "roomCode": "AA",
+          "pricePerHour": 7.05,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "F21",
+          "building": "Atelier B",
+          "roomCode": "AB",
+          "pricePerHour": 5.5,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ]
+        },
+        {
+          "code": "F22",
+          "building": "Atelier B",
+          "roomCode": "AB",
+          "pricePerHour": 5.75,
+          "amenities": [
+            "WIFI",
+            "POWER_OUTLET"
+          ]
+        },
+        {
+          "code": "F23",
+          "building": "Atelier B",
+          "roomCode": "AB",
+          "pricePerHour": 6.0,
+          "amenities": [
+            "WIFI",
+            "DOUBLE_MONITOR",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "F24",
+          "building": "Atelier B",
+          "roomCode": "AB",
+          "pricePerHour": 6.25,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "F25",
+          "building": "Atelier B",
+          "roomCode": "AB",
+          "pricePerHour": 6.5,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "F26",
+          "building": "Atelier B",
+          "roomCode": "AB",
+          "pricePerHour": 6.75,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK"
+          ]
+        },
+        {
+          "code": "F31",
+          "building": "Terrazza",
+          "roomCode": "TR",
+          "pricePerHour": 7.5,
+          "amenities": [
+            "WIFI",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "F32",
+          "building": "Terrazza",
+          "roomCode": "TR",
+          "pricePerHour": 7.75,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "F33",
+          "building": "Terrazza",
+          "roomCode": "TR",
+          "pricePerHour": 8.0,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "F34",
+          "building": "Terrazza",
+          "roomCode": "TR",
+          "pricePerHour": 8.25,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ]
+        },
+        {
+          "code": "F35",
+          "building": "Terrazza",
+          "roomCode": "TR",
+          "pricePerHour": 8.5,
+          "amenities": [
+            "WIFI",
+            "POWER_OUTLET"
+          ]
+        },
+        {
+          "code": "F36",
+          "building": "Terrazza",
+          "roomCode": "TR",
+          "pricePerHour": 8.75,
+          "amenities": [
+            "WIFI",
+            "DOUBLE_MONITOR",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "F41",
+          "building": "Sala Focus",
+          "roomCode": "SF",
+          "pricePerHour": 6.0,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "F42",
+          "building": "Sala Focus",
+          "roomCode": "SF",
+          "pricePerHour": 6.25,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "F43",
+          "building": "Sala Focus",
+          "roomCode": "SF",
+          "pricePerHour": 6.5,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "F44",
+          "building": "Sala Focus",
+          "roomCode": "SF",
+          "pricePerHour": 6.75,
+          "amenities": [
+            "WIFI",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "F45",
+          "building": "Sala Focus",
+          "roomCode": "SF",
+          "pricePerHour": 7.0,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "F46",
+          "building": "Sala Focus",
+          "roomCode": "SF",
+          "pricePerHour": 7.25,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "SILENT_MOUSE"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Napoli Bay Workspace",
+      "description": "Workspace sul lungomare in fase di onboarding piattaforma.",
+      "address": "Via Partenope 12",
+      "city": "Napoli",
+      "hostEmail": "antonio.pending@host.com",
+      "approved": false,
+      "desks": [
+        {
+          "code": "N11",
+          "building": "Molo A",
+          "roomCode": "MA",
+          "pricePerHour": 4.8,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "N12",
+          "building": "Molo A",
+          "roomCode": "MA",
+          "pricePerHour": 5.05,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "N13",
+          "building": "Molo A",
+          "roomCode": "MA",
+          "pricePerHour": 5.3,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "N14",
+          "building": "Molo A",
+          "roomCode": "MA",
+          "pricePerHour": 5.55,
+          "amenities": [
+            "WIFI",
+            "ULTRAWIDE_MONITOR"
+          ]
+        },
+        {
+          "code": "N15",
+          "building": "Molo A",
+          "roomCode": "MA",
+          "pricePerHour": 5.8,
+          "amenities": [
+            "WIFI",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "N16",
+          "building": "Molo A",
+          "roomCode": "MA",
+          "pricePerHour": 6.05,
+          "amenities": [
+            "WIFI",
+            "DOCKING_STATION",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "N21",
+          "building": "Molo B",
+          "roomCode": "MB",
+          "pricePerHour": 4.5,
+          "amenities": [
+            "WIFI",
+            "NATURAL_LIGHT"
+          ]
+        },
+        {
+          "code": "N22",
+          "building": "Molo B",
+          "roomCode": "MB",
+          "pricePerHour": 4.75,
+          "amenities": [
+            "WIFI",
+            "POWER_OUTLET"
+          ]
+        },
+        {
+          "code": "N23",
+          "building": "Molo B",
+          "roomCode": "MB",
+          "pricePerHour": 5.0,
+          "amenities": [
+            "WIFI",
+            "DOUBLE_MONITOR",
+            "SILENT_MOUSE"
+          ]
+        },
+        {
+          "code": "N24",
+          "building": "Molo B",
+          "roomCode": "MB",
+          "pricePerHour": 5.25,
+          "amenities": [
+            "WIFI",
+            "FAST_INTERNET"
+          ]
+        },
+        {
+          "code": "N25",
+          "building": "Molo B",
+          "roomCode": "MB",
+          "pricePerHour": 5.5,
+          "amenities": [
+            "WIFI",
+            "ERGONOMIC_CHAIR"
+          ]
+        },
+        {
+          "code": "N26",
+          "building": "Molo B",
+          "roomCode": "MB",
+          "pricePerHour": 5.75,
+          "amenities": [
+            "WIFI",
+            "STANDING_DESK"
+          ]
+        }
+      ]
+    }
+  ],
+  "bookings": [
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A1",
+      "daysFromNow": 1,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "PENDING"
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A2",
+      "daysFromNow": 2,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "PENDING"
+    },
+    {
+      "workerEmail": "sara.conti@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A3",
+      "daysFromNow": 3,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "marco.ferrari@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A4",
+      "daysFromNow": 4,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "elena.galli@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A5",
+      "daysFromNow": 5,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "giulia.russo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A6",
+      "daysFromNow": 6,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "andrea.colombo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B1",
+      "daysFromNow": 7,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "francesca.marino@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B3",
+      "daysFromNow": 1,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "chiara.fontana@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B4",
+      "daysFromNow": 2,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "simone.barbieri@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B5",
+      "daysFromNow": 3,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "valentina.greco@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B6",
+      "daysFromNow": 4,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "O1",
+      "daysFromNow": 5,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "O2",
+      "daysFromNow": 6,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "sara.conti@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "O3",
+      "daysFromNow": 7,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "marco.ferrari@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "O4",
+      "daysFromNow": 1,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "elena.galli@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "O5",
+      "daysFromNow": 2,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "giulia.russo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "O6",
+      "daysFromNow": 3,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "andrea.colombo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "S1",
+      "daysFromNow": 4,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "francesca.marino@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "S2",
+      "daysFromNow": 5,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "chiara.fontana@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "S3",
+      "daysFromNow": 6,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "simone.barbieri@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "S4",
+      "daysFromNow": 7,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "valentina.greco@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "S5",
+      "daysFromNow": 1,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "S6",
+      "daysFromNow": 2,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "P2",
+      "daysFromNow": 3,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "sara.conti@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "P3",
+      "daysFromNow": 4,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "marco.ferrari@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "P4",
+      "daysFromNow": 5,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "elena.galli@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "P5",
+      "daysFromNow": 6,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "giulia.russo@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "P6",
+      "daysFromNow": 7,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "andrea.colombo@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "E1",
+      "daysFromNow": 1,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "francesca.marino@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "E2",
+      "daysFromNow": 2,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "chiara.fontana@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "E3",
+      "daysFromNow": 3,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "simone.barbieri@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "E4",
+      "daysFromNow": 4,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "valentina.greco@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "E5",
+      "daysFromNow": 5,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "E6",
+      "daysFromNow": 6,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "W1",
+      "daysFromNow": 7,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "sara.conti@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "W2",
+      "daysFromNow": 1,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "marco.ferrari@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "W3",
+      "daysFromNow": 2,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "elena.galli@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "W4",
+      "daysFromNow": 3,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "giulia.russo@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "W5",
+      "daysFromNow": 4,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "andrea.colombo@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "W6",
+      "daysFromNow": 5,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "francesca.marino@worker.com",
+      "spaceName": "Bologna Innovation Loft",
+      "deskCode": "B11",
+      "daysFromNow": 6,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "chiara.fontana@worker.com",
+      "spaceName": "Bologna Innovation Loft",
+      "deskCode": "B12",
+      "daysFromNow": 7,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A1",
+      "daysFromNow": 3,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "CONFIRMED"
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "P3",
+      "daysFromNow": 6,
+      "startHour": 9,
+      "endHour": 18,
+      "status": "PENDING"
+    }
+  ],
+  "reviews": [
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B2",
+      "daysSinceEnd": 3,
+      "rating": 5,
+      "comment": "Esperienza top a Milano: postazione ampia e molto silenziosa.",
+      
+      "seenByHost": true,
+      "likedWorkerEmails": [
+        "anna.bianchi@worker.com",
+        "sara.conti@worker.com"
+      ]
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "P1",
+      "daysSinceEnd": 2,
+      "rating": 4,
+      "comment": "Ottimo desk a Torino, monitor ultrawide fantastico.",
+      "seenByHost": false
+    },
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A1",
+      "daysSinceEnd": 2,
+      "rating": 3,
+      "comment": "Postazione comoda e silenziosa, tornerò sicuramente.",
+      
+      "seenByHost": true
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A1",
+      "daysSinceEnd": 3,
+      "rating": 4,
+      "comment": "Ottima connessione e monitor di qualità."
+      
+    },
+    {
+      "workerEmail": "sara.conti@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A1",
+      "daysSinceEnd": 5,
+      "rating": 5,
+      "comment": "Spazio luminoso ma un po' rumoroso nel pomeriggio.",
+      "likedWorkerEmails": [
+        "marco.ferrari@worker.com",
+        "elena.galli@worker.com"
+      ]
+    },
+    {
+      "workerEmail": "marco.ferrari@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A1",
+      "daysSinceEnd": 7,
+      "rating": 3,
+      "comment": "Desk ergonomico, servizi impeccabili."
+    },
+    {
+      "workerEmail": "elena.galli@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A1",
+      "daysSinceEnd": 9,
+      "rating": 4,
+      "comment": "Buona esperienza complessiva, check-in veloce.",
+      
+      "seenByHost": true
+    },
+    {
+      "workerEmail": "giulia.russo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A1",
+      "daysSinceEnd": 11,
+      "rating": 5,
+      "comment": "Climatizzazione perfetta e WiFi stabile."
+    },
+    {
+      "workerEmail": "andrea.colombo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A2",
+      "daysSinceEnd": 2,
+      "rating": 3,
+      "comment": "Sala ben attrezzata, ideale per videoconferenze."
+    },
+    {
+      "workerEmail": "francesca.marino@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A2",
+      "daysSinceEnd": 3,
+      "rating": 4,
+      "comment": "Prezzo onesto per la zona e dotazioni moderne.",
+      
+      "likedWorkerEmails": [
+        "chiara.fontana@worker.com",
+        "simone.barbieri@worker.com"
+      ]
+    },
+    {
+      "workerEmail": "chiara.fontana@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A2",
+      "daysSinceEnd": 5,
+      "rating": 5,
+      "comment": "Pulizia eccellente, ambiente professionale.",
+      
+      "seenByHost": true
+    },
+    {
+      "workerEmail": "simone.barbieri@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A2",
+      "daysSinceEnd": 7,
+      "rating": 3,
+      "comment": "Leggero disagio con la sedia, per il resto tutto ok."
+    },
+    {
+      "workerEmail": "valentina.greco@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A2",
+      "daysSinceEnd": 9,
+      "rating": 4,
+      "comment": "Location centrale e facile da raggiungere."
+    },
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A2",
+      "daysSinceEnd": 11,
+      "rating": 5,
+      "comment": "Ottimo per lavorare in focus per alcune ore."
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A3",
+      "daysSinceEnd": 2,
+      "rating": 3,
+      "comment": "Spazio condiviso vivace, adatto a team piccoli.",
+      
+      "seenByHost": true,
+      "likedWorkerEmails": [
+        "sara.conti@worker.com",
+        "marco.ferrari@worker.com"
+      ]
+    },
+    {
+      "workerEmail": "sara.conti@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A3",
+      "daysSinceEnd": 3,
+      "rating": 4,
+      "comment": "Servizio clienti reattivo e cordiale."
+      
+    },
+    {
+      "workerEmail": "marco.ferrari@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A3",
+      "daysSinceEnd": 5,
+      "rating": 5,
+      "comment": "Postazione comoda e silenziosa, tornerò sicuramente."
+    },
+    {
+      "workerEmail": "elena.galli@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A3",
+      "daysSinceEnd": 7,
+      "rating": 3,
+      "comment": "Ottima connessione e monitor di qualità."
+    },
+    {
+      "workerEmail": "giulia.russo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A3",
+      "daysSinceEnd": 9,
+      "rating": 4,
+      "comment": "Spazio luminoso ma un po' rumoroso nel pomeriggio.",
+      
+      "seenByHost": true
+    },
+    {
+      "workerEmail": "andrea.colombo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A3",
+      "daysSinceEnd": 11,
+      "rating": 5,
+      "comment": "Desk ergonomico, servizi impeccabili.",
+      "likedWorkerEmails": [
+        "francesca.marino@worker.com",
+        "chiara.fontana@worker.com"
+      ]
+    },
+    {
+      "workerEmail": "francesca.marino@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A4",
+      "daysSinceEnd": 2,
+      "rating": 3,
+      "comment": "Buona esperienza complessiva, check-in veloce."
+    },
+    {
+      "workerEmail": "chiara.fontana@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A4",
+      "daysSinceEnd": 3,
+      "rating": 4,
+      "comment": "Climatizzazione perfetta e WiFi stabile."
+      
+    },
+    {
+      "workerEmail": "simone.barbieri@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A4",
+      "daysSinceEnd": 5,
+      "rating": 5,
+      "comment": "Sala ben attrezzata, ideale per videoconferenze.",
+      
+      "seenByHost": true
+    },
+    {
+      "workerEmail": "valentina.greco@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A4",
+      "daysSinceEnd": 7,
+      "rating": 3,
+      "comment": "Prezzo onesto per la zona e dotazioni moderne."
+    },
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A4",
+      "daysSinceEnd": 9,
+      "rating": 4,
+      "comment": "Pulizia eccellente, ambiente professionale.",
+      "likedWorkerEmails": [
+        "anna.bianchi@worker.com",
+        "sara.conti@worker.com"
+      ]
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A4",
+      "daysSinceEnd": 11,
+      "rating": 5,
+      "comment": "Leggero disagio con la sedia, per il resto tutto ok."
+    },
+    {
+      "workerEmail": "sara.conti@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A5",
+      "daysSinceEnd": 2,
+      "rating": 3,
+      "comment": "Location centrale e facile da raggiungere.",
+      
+      "seenByHost": true
+    },
+    {
+      "workerEmail": "marco.ferrari@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A5",
+      "daysSinceEnd": 3,
+      "rating": 4,
+      "comment": "Ottimo per lavorare in focus per alcune ore."
+      
+    },
+    {
+      "workerEmail": "elena.galli@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A5",
+      "daysSinceEnd": 5,
+      "rating": 5,
+      "comment": "Spazio condiviso vivace, adatto a team piccoli."
+    },
+    {
+      "workerEmail": "giulia.russo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A5",
+      "daysSinceEnd": 7,
+      "rating": 3,
+      "comment": "Servizio clienti reattivo e cordiale.",
+      "likedWorkerEmails": [
+        "andrea.colombo@worker.com",
+        "francesca.marino@worker.com"
+      ]
+    },
+    {
+      "workerEmail": "andrea.colombo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A5",
+      "daysSinceEnd": 9,
+      "rating": 4,
+      "comment": "Postazione comoda e silenziosa, tornerò sicuramente.",
+      
+      "seenByHost": true
+    },
+    {
+      "workerEmail": "francesca.marino@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A5",
+      "daysSinceEnd": 11,
+      "rating": 5,
+      "comment": "Ottima connessione e monitor di qualità."
+    },
+    {
+      "workerEmail": "chiara.fontana@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A6",
+      "daysSinceEnd": 2,
+      "rating": 3,
+      "comment": "Spazio luminoso ma un po' rumoroso nel pomeriggio."
+    },
+    {
+      "workerEmail": "simone.barbieri@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A6",
+      "daysSinceEnd": 3,
+      "rating": 4,
+      "comment": "Desk ergonomico, servizi impeccabili."
+      
+    },
+    {
+      "workerEmail": "valentina.greco@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A6",
+      "daysSinceEnd": 5,
+      "rating": 5,
+      "comment": "Buona esperienza complessiva, check-in veloce.",
+      
+      "seenByHost": true,
+      "likedWorkerEmails": [
+        "mario.rossi@worker.com",
+        "anna.bianchi@worker.com"
+      ]
+    },
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A6",
+      "daysSinceEnd": 7,
+      "rating": 3,
+      "comment": "Climatizzazione perfetta e WiFi stabile."
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A6",
+      "daysSinceEnd": 9,
+      "rating": 4,
+      "comment": "Sala ben attrezzata, ideale per videoconferenze."
+    },
+    {
+      "workerEmail": "sara.conti@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A6",
+      "daysSinceEnd": 11,
+      "rating": 5,
+      "comment": "Prezzo onesto per la zona e dotazioni moderne."
+    },
+    {
+      "workerEmail": "marco.ferrari@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B1",
+      "daysSinceEnd": 2,
+      "rating": 3,
+      "comment": "Pulizia eccellente, ambiente professionale.",
+      
+      "seenByHost": true
+    },
+    {
+      "workerEmail": "elena.galli@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B1",
+      "daysSinceEnd": 3,
+      "rating": 4,
+      "comment": "Leggero disagio con la sedia, per il resto tutto ok.",
+      
+      "likedWorkerEmails": [
+        "giulia.russo@worker.com",
+        "andrea.colombo@worker.com"
+      ]
+    },
+    {
+      "workerEmail": "giulia.russo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B1",
+      "daysSinceEnd": 5,
+      "rating": 5,
+      "comment": "Location centrale e facile da raggiungere."
+    },
+    {
+      "workerEmail": "andrea.colombo@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B1",
+      "daysSinceEnd": 7,
+      "rating": 3,
+      "comment": "Ottimo per lavorare in focus per alcune ore."
+    },
+    {
+      "workerEmail": "francesca.marino@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B1",
+      "daysSinceEnd": 9,
+      "rating": 4,
+      "comment": "Spazio condiviso vivace, adatto a team piccoli.",
+      
+      "seenByHost": true
+    },
+    {
+      "workerEmail": "chiara.fontana@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B1",
+      "daysSinceEnd": 11,
+      "rating": 5,
+      "comment": "Servizio clienti reattivo e cordiale."
+    },
+    {
+      "workerEmail": "simone.barbieri@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B2",
+      "daysSinceEnd": 2,
+      "rating": 3,
+      "comment": "Postazione comoda e silenziosa, tornerò sicuramente.",
+      "likedWorkerEmails": [
+        "valentina.greco@worker.com",
+        "mario.rossi@worker.com"
+      ]
+    },
+    {
+      "workerEmail": "valentina.greco@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B2",
+      "daysSinceEnd": 3,
+      "rating": 4,
+      "comment": "Ottima connessione e monitor di qualità."
+      
+    },
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B2",
+      "daysSinceEnd": 5,
+      "rating": 5,
+      "comment": "Spazio luminoso ma un po' rumoroso nel pomeriggio.",
+      
+      "seenByHost": true
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B2",
+      "daysSinceEnd": 7,
+      "rating": 3,
+      "comment": "Desk ergonomico, servizi impeccabili."
+    },
+    {
+      "workerEmail": "sara.conti@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B2",
+      "daysSinceEnd": 9,
+      "rating": 4,
+      "comment": "Buona esperienza complessiva, check-in veloce."
+    },
+    {
+      "workerEmail": "marco.ferrari@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B2",
+      "daysSinceEnd": 11,
+      "rating": 5,
+      "comment": "Climatizzazione perfetta e WiFi stabile.",
+      "likedWorkerEmails": [
+        "elena.galli@worker.com",
+        "giulia.russo@worker.com"
+      ]
+    }
+  ],
+  "tickets": [
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B2",
+      "ticketCode": "ML-TA292",
+      "title": "Monitor destro spento",
+      "description": "Il monitor destro non si accende e il cavo sembra sfilacciato.",
+      "status": "OPEN"
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "P3",
+      "ticketCode": "TO-TB415",
+      "title": "Sedia non si alza",
+      "description": "La sedia ergonomica non si alza.",
+      "technicianEmail": "silvia.rete@tech.com",
+      "status": "IN_PROGRESS",
+      "severity": "MEDIUM",
+      "technicianNote": "Pezzi ordinati, intervento previsto entro 48h."
+    },
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A3",
+      "ticketCode": "ML-001",
+      "title": "Tastiera bloccata",
+      "description": "Segnalazione seed: Tastiera bloccata.",
+      "status": "OPEN"
+    },
+    {
+      "workerEmail": "sara.conti@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "O2",
+      "ticketCode": "ML-002",
+      "title": "Rumore ventola",
+      "description": "Segnalazione seed: Rumore ventola.",
+      "status": "OPEN"
+    },
+    {
+      "workerEmail": "marco.ferrari@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "S1",
+      "ticketCode": "ML-003",
+      "title": "Proiettore non rilevato",
+      "description": "Segnalazione seed: Proiettore non rilevato.",
+      "status": "IN_PROGRESS",
+      "severity": "HIGH",
+      "technicianEmail": "roberto.gialli@tech.com",
+      "technicianNote": "Intervento in corso (seed)."
+    },
+    {
+      "workerEmail": "elena.galli@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "W1",
+      "ticketCode": "TO-001",
+      "title": "Presa USB non funziona",
+      "description": "Segnalazione seed: Presa USB non funziona.",
+      "status": "OPEN"
+    },
+    {
+      "workerEmail": "giulia.russo@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "W4",
+      "ticketCode": "TO-002",
+      "title": "Lampada spenta",
+      "description": "Segnalazione seed: Lampada spenta.",
+      "status": "RESOLVED",
+      "severity": "LOW",
+      "technicianEmail": "silvia.rete@tech.com",
+      "technicianNote": "Intervento in corso (seed).",
+      "resolution": "Risolto durante seed demo."
+    },
+    {
+      "workerEmail": "andrea.colombo@worker.com",
+      "spaceName": "Bologna Innovation Loft",
+      "deskCode": "B11",
+      "ticketCode": "BO-001",
+      "title": "WiFi intermittente",
+      "description": "Segnalazione seed: WiFi intermittente.",
+      "status": "OPEN"
+    },
+    {
+      "workerEmail": "francesca.marino@worker.com",
+      "spaceName": "Bologna Innovation Loft",
+      "deskCode": "B23",
+      "ticketCode": "BO-002",
+      "title": "Sedia rotta",
+      "description": "Segnalazione seed: Sedia rotta.",
+      "status": "IN_PROGRESS",
+      "severity": "MEDIUM",
+      "technicianEmail": "fabio.software@tech.com",
+      "technicianNote": "Intervento in corso (seed)."
+    },
+    {
+      "workerEmail": "chiara.fontana@worker.com",
+      "spaceName": "Firenze Creative Hub",
+      "deskCode": "F12",
+      "ticketCode": "FI-001",
+      "title": "Finestra non chiude",
+      "description": "Segnalazione seed: Finestra non chiude.",
+      "status": "OPEN"
+    },
+    {
+      "workerEmail": "simone.barbieri@worker.com",
+      "spaceName": "Firenze Creative Hub",
+      "deskCode": "F31",
+      "ticketCode": "FI-002",
+      "title": "Condizionatore rumoroso",
+      "description": "Segnalazione seed: Condizionatore rumoroso.",
+      "status": "IN_PROGRESS",
+      "severity": "HIGH",
+      "technicianEmail": "marta.impianti@tech.com",
+      "technicianNote": "Intervento in corso (seed)."
+    },
+    {
+      "workerEmail": "valentina.greco@worker.com",
+      "spaceName": "Firenze Creative Hub",
+      "deskCode": "F42",
+      "ticketCode": "FI-003",
+      "title": "Cavo HDMI danneggiato",
+      "description": "Segnalazione seed: Cavo HDMI danneggiato.",
+      "status": "RESOLVED",
+      "severity": "LOW",
+      "technicianEmail": "marta.impianti@tech.com",
+      "technicianNote": "Intervento in corso (seed).",
+      "resolution": "Risolto durante seed demo."
+    },
+    {
+      "workerEmail": "mario.rossi@worker.com",
+      "spaceName": "Bologna Innovation Loft",
+      "deskCode": "B14",
+      "ticketCode": "BO-003",
+      "title": "Docking station instabile",
+      "description": "Segnalazione seed: Docking station instabile.",
+      "status": "OPEN"
+    },
+    {
+      "workerEmail": "anna.bianchi@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "A5",
+      "ticketCode": "ML-004",
+      "title": "Monitor flickering",
+      "description": "Segnalazione seed: Monitor flickering.",
+      "status": "IN_PROGRESS",
+      "severity": "MEDIUM",
+      "technicianEmail": "roberto.gialli@tech.com",
+      "technicianNote": "Intervento in corso (seed)."
+    },
+    {
+      "workerEmail": "marco.ferrari@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "P4",
+      "ticketCode": "TO-003",
+      "title": "Desk in manutenzione bloccato",
+      "description": "Segnalazione seed: Desk in manutenzione bloccato.",
+      "status": "OPEN"
+    },
+    {
+      "workerEmail": "elena.galli@worker.com",
+      "spaceName": "Bologna Innovation Loft",
+      "deskCode": "B21",
+      "ticketCode": "BO-004",
+      "title": "Router sostituito",
+      "description": "Segnalazione seed: Router sostituito.",
+      "status": "RESOLVED",
+      "severity": "MEDIUM",
+      "technicianEmail": "fabio.software@tech.com",
+      "technicianNote": "Intervento in corso (seed).",
+      "resolution": "Risolto durante seed demo."
+    },
+    {
+      "workerEmail": "sara.conti@worker.com",
+      "spaceName": "Firenze Creative Hub",
+      "deskCode": "F21",
+      "ticketCode": "FI-004",
+      "title": "Pennarello lavagna secco",
+      "description": "Segnalazione seed: Pennarello lavagna secco.",
+      "status": "OPEN"
+    },
+    {
+      "workerEmail": "luca.moretti@worker.com",
+      "spaceName": "Milano Central Coworking",
+      "deskCode": "B6",
+      "ticketCode": "ML-005",
+      "title": "Interruttore scattato",
+      "description": "Segnalazione seed: Interruttore scattato.",
+      "status": "RESOLVED",
+      "severity": "HIGH",
+      "technicianEmail": "roberto.gialli@tech.com",
+      "technicianNote": "Intervento in corso (seed).",
+      "resolution": "Risolto durante seed demo."
+    },
+    {
+      "workerEmail": "giulia.russo@worker.com",
+      "spaceName": "Torino Tech Space",
+      "deskCode": "E1",
+      "ticketCode": "TO-004",
+      "title": "Sedia ruote usurate",
+      "description": "Segnalazione seed: Sedia ruote usurate.",
+      "status": "OPEN"
+    },
+    {
+      "workerEmail": "davide.ricci@worker.com",
+      "spaceName": "Bologna Innovation Loft",
+      "deskCode": "B33",
+      "ticketCode": "BO-005",
+      "title": "Luce intermittente",
+      "description": "Segnalazione seed: Luce intermittente.",
+      "status": "IN_PROGRESS",
+      "severity": "LOW",
+      "technicianEmail": "fabio.software@tech.com",
+      "technicianNote": "Intervento in corso (seed)."
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+<div class="min-vh-100 d-flex flex-column apple-surface-bg">
+  
+  <div class="container pt-4 position-relative z-3">
+    <header class="apple-glass rounded-pill px-4 py-3 d-flex flex-row align-items-center justify-content-between apple-shadow" role="banner">
+      <a routerLink="/" class="d-flex align-items-center gap-2 text-decoration-none text-dark fw-bold fs-5" aria-current="page">
+        <span class="rounded-circle bg-primary bg-gradient text-white d-inline-flex align-items-center justify-content-center p-2 shadow-sm" aria-hidden="true">
+          <app-sd-brand-mark [size]="20" />
+        </span>
+        <span style="letter-spacing: -0.02em;">SmartDesk</span>
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <span class="badge rounded-pill apple-surface-bg text-dark border d-none d-md-inline-flex align-items-center gap-2 fw-medium py-2 px-3">
+          <span class="rounded-circle bg-success" style="width: 8px; height: 8px" aria-hidden="true"></span>
+          Spazi Flessibili
+        </span>
+        <a routerLink="/login" class="text-decoration-none text-muted fw-medium px-3 d-none d-sm-block hover-primary">Accedi</a>
+        <a routerLink="/register" class="btn btn-dark apple-button border-0 px-4 py-2 d-inline-flex align-items-center m-0" mdbRipple>
+          Inizia ora
+        </a>
+      </div>
+    </header>
+  </div>
+
+  <main id="contenuto-principale" tabindex="-1" class="flex-grow-1">
+    
+    <section class="container py-5 mt-4" aria-labelledby="landing-hero-title">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6 pe-lg-5">
+          <p class="text-uppercase text-primary fw-bold small mb-3" style="letter-spacing: 0.1em;">Il nuovo standard</p>
+          <h1 id="landing-hero-title" class="display-3 fw-bolder text-dark mb-4" style="letter-spacing: -0.04em; line-height: 1.1;">
+            Prenota il desk.<br/>
+            Gestisci il <span class="apple-text-gradient">coworking.</span>
+          </h1>
+          <p class="lead text-muted mb-5 fw-normal" style="font-size: 1.25rem;">
+            SmartDesk mette in connessione chi cerca uno spazio e chi lo offre. Tutto live, in un'unica piattaforma fluida e immediata.
+          </p>
+          <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-items-center gap-3 apple-card p-3">
+              <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-inline-flex">
+                <app-sd-icon name="calendar-check" [size]="20" />
+              </div>
+              <span class="fw-medium text-dark">Prenotazioni desk per fasce orarie</span>
+            </div>
+            <div class="d-flex align-items-center gap-3 apple-card p-3">
+              <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-inline-flex">
+                <app-sd-icon name="building" [size]="20" />
+              </div>
+              <span class="fw-medium text-dark">Sedi gestite da host con orari live</span>
+            </div>
+            <div class="d-flex align-items-center gap-3 apple-card p-3">
+              <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-inline-flex">
+                <app-sd-icon name="wrench" [size]="20" />
+              </div>
+              <span class="fw-medium text-dark">Ticket rapidi per manutenzioni</span>
+            </div>
+          </div>
+        </div>
+        
+        
+        <div class="col-lg-6 hero-visual-container"
+             (mousemove)="onMouseMove($event)"
+             (mouseenter)="onMouseEnter()"
+             (mouseleave)="onMouseLeave()">
+          <div class="floating-wrapper">
+            <div class="tilt-wrapper" [style.transform]="transformStyle" [class.resetting]="!isHovered">
+              <div class="position-relative">
+                
+                <div class="position-absolute top-50 start-50 translate-middle rounded-circle bg-primary opacity-20" style="width: 300px; height: 300px; filter: blur(60px); z-index: 0;"></div>
+                
+                <div class="apple-glass rounded-5 overflow-hidden position-relative z-1 mb-4 apple-shadow">
+                  <div class="apple-surface-bg border-bottom border-light py-3 px-4 d-flex align-items-center gap-2">
+                    <span class="rounded-circle" style="width: 12px; height: 12px; background: #ff5f56"></span>
+                    <span class="rounded-circle" style="width: 12px; height: 12px; background: #ffbd2e"></span>
+                    <span class="rounded-circle" style="width: 12px; height: 12px; background: #27c93f"></span>
+                    <span class="ms-3 small text-muted fw-medium font-monospace">app.smartdesk.it</span>
+                  </div>
+                  <div class="card-body p-4 p-md-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                      <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary fw-bold px-3 py-2">Coworking</span>
+                      <span class="badge rounded-pill bg-success bg-opacity-10 text-success fw-bold px-3 py-2">Confermata</span>
+                    </div>
+                    <h2 class="h4 fw-bold text-dark mb-2">Desk D12 · Spazio condiviso</h2>
+                    <p class="text-muted mb-4 d-flex align-items-center gap-2 fw-medium">
+                      <app-sd-icon name="calendar" [size]="16" />
+                      Mercoledì 21 mag · 09:00 – 13:00
+                    </p>
+                    <div class="d-flex flex-column gap-2">
+                      <div class="bg-light text-dark rounded-4 px-4 py-3 fw-medium d-flex align-items-center gap-3">
+                        <app-sd-icon name="desktop" [size]="18" class="text-primary"/>
+                        Monitor 27" · Sedia Ergonomica
+                      </div>
+                      <div class="bg-light text-dark rounded-4 px-4 py-3 fw-medium d-flex align-items-center gap-3">
+                        <app-sd-icon name="user-circle" [size]="18" class="text-primary"/>
+                        Check-in abilitato
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                
+                <div class="apple-glass rounded-4 position-absolute z-2 apple-shadow ticket-float" style="bottom: -20px; left: -20px; max-width: 280px;">
+                  <div class="p-3 d-flex gap-3 align-items-center">
+                    <div class="rounded-circle bg-warning bg-opacity-10 text-warning p-2">
+                      <app-sd-icon name="wrench" [size]="20" />
+                    </div>
+                    <div>
+                      <p class="mb-0 fw-bold text-dark small">Ticket #TKT-0481</p>
+                      <p class="mb-0 text-muted" style="font-size: 0.8rem;">Monitor D12 in lavorazione</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+    <section class="container py-5 mt-5" aria-labelledby="landing-flow-title">
+      <div class="text-center mb-5">
+        <p class="text-uppercase text-primary fw-bold small mb-2" style="letter-spacing: 0.1em;">Il Flusso</p>
+        <h2 id="landing-flow-title" class="display-5 fw-bolder mb-3" style="letter-spacing: -0.03em;">Tre semplici passi.</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <article class="h-100 apple-card">
+            <div class="card-body p-5">
+              <div class="text-primary mb-4 bg-primary bg-opacity-10 d-inline-flex p-3 rounded-circle"><app-sd-icon name="search" [size]="28" /></div>
+              <h3 class="h5 fw-bold mb-3">1. Scegli sede</h3>
+              <p class="text-muted fw-normal">
+                Indica città, sede e fascia oraria. Vedi solo gli spazi disponibili live.
+              </p>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="h-100 apple-card">
+            <div class="card-body p-5">
+              <div class="text-primary mb-4 bg-primary bg-opacity-10 d-inline-flex p-3 rounded-circle"><app-sd-icon name="calendar" [size]="28" /></div>
+              <h3 class="h5 fw-bold mb-3">2. Prenota</h3>
+              <p class="text-muted fw-normal">
+                Confronta le dotazioni e conferma la postazione con un tocco.
+              </p>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="h-100 apple-card">
+            <div class="card-body p-5">
+              <div class="text-primary mb-4 bg-primary bg-opacity-10 d-inline-flex p-3 rounded-circle"><app-sd-icon name="circle-check" [size]="28" /></div>
+              <h3 class="h5 fw-bold mb-3">3. Check-in</h3>
+              <p class="text-muted fw-normal">
+                Gestisci la tua prenotazione, fai check-in e segnala eventuali ticket.
+              </p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  
+  <footer class="bg-white border-top border-light mt-5">
+    <div class="container py-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <span class="rounded-circle bg-primary bg-gradient text-white d-inline-flex align-items-center justify-content-center p-2" aria-hidden="true">
+          <app-sd-brand-mark [size]="16" />
+        </span>
+        <span class="fw-bold text-dark">SmartDesk <span class="text-muted fw-normal">· App coworking</span></span>
+      </div>
+      <p class="mb-0 small text-muted fw-medium">© {{ currentYear }}</p>
+    </div>
+  </footer>
+</div>

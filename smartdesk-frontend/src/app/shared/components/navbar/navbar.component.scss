@@ -1,0 +1,188 @@
+.sd-navbar {
+  position: relative;
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+  z-index: 1030;
+  
+  background-color: rgba(var(--bs-body-bg-rgb, 255, 255, 255), 0.85) !important;
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(var(--bs-border-color-rgb, 0, 0, 0), 0.1) !important;
+}
+
+.sd-navbar--scrolled {
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+.sd-navbar__context {
+  min-width: 0;
+}
+
+.sd-navbar__page-title {
+  line-height: 1.2;
+}
+
+.sd-navbar__skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0.5rem;
+  z-index: 1100;
+  padding: 0.5rem 1rem;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  text-decoration: none;
+  color: var(--bs-body-color);
+}
+
+.sd-navbar__skip-link:focus {
+  left: 0.75rem;
+}
+
+.sd-navbar__mobile-nav .nav-link {
+  font-size: 0.9375rem;
+}
+
+.sd-navbar__quick-link {
+  font-size: 0.875rem;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.sd-navbar__quick-link:hover {
+  background-color: rgba(var(--bs-body-color-rgb, 0, 0, 0), 0.05);
+}
+
+
+.sd-navbar .navbar-collapse {
+  overflow: visible;
+}
+
+.sd-navbar__actions {
+  overflow: visible;
+}
+
+.sd-navbar__account-dropdown {
+  position: relative;
+}
+
+.sd-navbar__account-menu {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0.5rem;
+  left: auto;
+  display: block;
+  min-width: 16rem;
+  z-index: 1050;
+  margin: 0;
+  
+  
+  border-radius: 1.25rem;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12) !important;
+  background-color: rgba(var(--bs-body-bg-rgb, 255, 255, 255), 0.95);
+  backdrop-filter: saturate(200%) blur(30px);
+  -webkit-backdrop-filter: saturate(200%) blur(30px);
+  padding: 0;
+  overflow: hidden;
+}
+
+.custom-role-badge {
+  display: inline-block;
+  background-color: #f3f4f6;
+  color: #6c757d;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.custom-dropdown-item {
+  padding: 0.65rem 1rem;
+  margin: 0.2rem 0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #495057;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.custom-dropdown-icon {
+  color: #6c757d;
+  transition: color 0.2s ease;
+  opacity: 0.85;
+}
+
+.custom-dropdown-item:hover,
+.custom-dropdown-item:focus {
+  background-color: #e8effa;
+  color: #2b579a;
+  
+  .custom-dropdown-icon {
+    color: #2b579a;
+    opacity: 1;
+  }
+}
+
+.custom-dropdown-item.logout-item:hover,
+.custom-dropdown-item.logout-item:focus {
+  background-color: #fee2e2;
+  color: #dc2626 !important;
+  
+  .custom-dropdown-icon {
+    color: #dc2626 !important;
+    opacity: 1;
+  }
+}
+
+.custom-nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+}
+
+.sd-navbar__account-menu .dropdown-divider {
+  margin: 0;
+  opacity: 0.08;
+  border-color: #000;
+}
+
+.sd-navbar__account-btn {
+  border-radius: 2rem !important;
+  padding-left: 0.25rem;
+  padding-right: 0.75rem;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(var(--bs-border-color-rgb, 0, 0, 0), 0.15) !important;
+  background-color: transparent !important;
+}
+
+.sd-navbar__account-btn:hover {
+  background-color: rgba(var(--bs-body-color-rgb, 0, 0, 0), 0.05) !important;
+}
+
+.sd-navbar__account-btn .rounded-circle {
+  margin-right: 0.25rem;
+}
+
+.sd-navbar__account-btn.dropdown-toggle::after {
+  margin-left: 0.15rem;
+}
+
+@media (max-width: 991.98px) {
+  .sd-navbar__mobile-border {
+    border-top: 1px solid var(--bs-border-color) !important;
+  }
+}
+
+.sd-navbar__brand-text {
+  color: var(--bs-primary) !important;
+  font-weight: 700;
+}

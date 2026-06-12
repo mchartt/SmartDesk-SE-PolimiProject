@@ -1,0 +1,217 @@
+@if (hostPresetLibraryModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-preset-library-title"
+    (click)="closeHostPresetLibraryModal()"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          title="I tuoi set"
+          subtitle="Cerca, modifica o elimina i profili salvati per questo spazio."
+          icon="layers"
+          titleId="host-preset-library-title"
+          (close)="closeHostPresetLibraryModal()"
+        />
+        <div class="modal-body">
+          @if (editingHostPresetId() !== null) {
+            <div class="card bg-light border-0 rounded-3 mb-3">
+              <div class="card-body p-3">
+                <p class="small fw-semibold mb-2 text-uppercase text-muted">Modifica set</p>
+                @if (editHostPresetFormError) {
+                  <div class="alert alert-danger py-2 small rounded-3 mb-3" role="alert">{{ editHostPresetFormError }}</div>
+                }
+                <div class="row g-2 g-md-3">
+                  <div class="col-12 col-md-6">
+                    <label class="form-label small fw-semibold mb-1" for="host-edit-preset-label">
+                      Nome set <span class="text-muted fw-normal">(obbligatorio)</span>
+                    </label>
+                    <input
+                      id="host-edit-preset-label"
+                      mdbInput
+                      class="form-control form-control-sm"
+                      [(ngModel)]="editHostPresetLabel"
+                      [maxlength]="48"
+                      autocomplete="off"
+                      required
+                    />
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label small fw-semibold mb-1" for="host-edit-preset-hint">
+                      Descrizione breve <span class="text-muted fw-normal">(obbligatoria)</span>
+                    </label>
+                    <input
+                      id="host-edit-preset-hint"
+                      mdbInput
+                      class="form-control form-control-sm"
+                      [(ngModel)]="editHostPresetHint"
+                      [maxlength]="120"
+                      autocomplete="off"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="mt-3">
+                  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                    <span class="small fw-semibold">Dotazioni nel set</span>
+                    <span class="text-muted small">Max {{ hostAmenityTokenMax }} caratteri · maiuscole</span>
+                  </div>
+                  @if (editPresetAmenities().length) {
+                    <div class="d-flex flex-wrap gap-2 mb-3" role="list" aria-label="Dotazioni del set">
+                      @for (am of editPresetAmenities(); track am) {
+                        <span class="badge bg-white text-dark border d-inline-flex align-items-center gap-1 py-2 px-2" role="listitem">
+                          <span>{{ am }}</span>
+                          <button
+                            type="button"
+                            class="btn btn-link btn-sm p-0 text-danger"
+                            (click)="removeAmenityFromEditPresetForm(am)"
+                            [attr.aria-label]="'Rimuovi dotazione ' + am"
+                          >
+                            <span class="visually-hidden">Rimuovi {{ am }}</span>
+                            <app-sd-icon name="x" [size]="14" aria-hidden="true" />
+                          </button>
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <p class="text-muted small mb-3">Aggiungi almeno una dotazione.</p>
+                  }
+                  <label class="visually-hidden" for="host-edit-preset-amenity">Nuova dotazione</label>
+                  <div class="input-group input-group-sm mb-3">
+                    <input
+                      id="host-edit-preset-amenity"
+                      type="text"
+                      mdbInput
+                      class="form-control text-uppercase"
+                      [ngModel]="editPresetAmenityDraft"
+                      (ngModelChange)="setEditPresetAmenityDraft($event)"
+                      [maxlength]="hostAmenityTokenMax"
+                      placeholder="ES. MONITOR"
+                      autocomplete="off"
+                      (keyup.enter)="addAmenityToEditPresetForm()"
+                    />
+                    <button type="button" class="btn btn-outline-primary" (click)="addAmenityToEditPresetForm()" mdbRipple>
+                      Aggiungi dotazione
+                    </button>
+                  </div>
+                  <div class="d-flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-sm rounded-pill px-4"
+                      (click)="saveEditHostPreset()"
+                      [disabled]="presetsMutating() || !isEditHostPresetFormValid()"
+                      mdbRipple
+                    >
+                      Salva modifiche
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-4" (click)="cancelEditHostPreset()" mdbRipple>
+                      Annulla
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold mb-1" for="host-preset-lib-filter-modal">Cerca nei tuoi set</label>
+            <p id="host-preset-lib-search-hint-modal" class="text-muted small mb-2">
+              Filtra per nome del set, descrizione o dotazione (anche parziale).
+            </p>
+            <div class="input-group">
+              <span class="input-group-text bg-transparent" aria-hidden="true">
+                <app-sd-icon name="search" [size]="18" />
+              </span>
+              <input
+                id="host-preset-lib-filter-modal"
+                type="search"
+                mdbInput
+                class="form-control"
+                placeholder="Digita per filtrare…"
+                [ngModel]="hostPresetLibraryFilter()"
+                (ngModelChange)="hostPresetLibraryFilter.set($event)"
+                autocomplete="off"
+                spellcheck="false"
+                aria-describedby="host-preset-lib-search-hint-modal"
+              />
+            </div>
+          </div>
+
+          @if (!filteredHostCustomPresets().length) {
+            <div class="text-center py-4" role="status">
+              <p class="text-muted small mb-0">
+                {{ hostCustomPresets().length ? 'Nessun set corrisponde alla ricerca.' : 'Non hai ancora creato set personalizzati.' }}
+              </p>
+              @if (!hostCustomPresets().length) {
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm rounded-pill px-4 mt-3 d-inline-flex align-items-center gap-2"
+                  (click)="openHostPresetCreateFromLibrary()"
+                  [disabled]="presetsMutating() || loadingPresets()"
+                  mdbRipple
+                >
+                  <app-sd-icon name="plus" [size]="16" aria-hidden="true" />
+                  Crea il primo set
+                </button>
+              }
+            </div>
+          } @else {
+            <ul class="list-group list-group-flush rounded-3 border mb-0" role="list">
+              @for (p of filteredHostCustomPresets(); track p.id) {
+                @if (editingHostPresetId() !== p.id) {
+                  <li class="list-group-item d-flex flex-wrap justify-content-between align-items-start gap-3 py-3" role="listitem">
+                    <div class="min-w-0 flex-grow-1">
+                      <span class="fw-semibold d-block">{{ p.label }}</span>
+                      @if (p.hint) {
+                        <span class="text-muted small d-block">{{ p.hint }}</span>
+                      }
+                      <span class="text-muted small d-block">{{ p.amenities.join(' · ') }}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                        (click)="startEditHostPreset(p)"
+                        [disabled]="presetsMutating()"
+                        mdbRipple
+                      >
+                        Modifica
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-link text-danger p-0"
+                        (click)="deleteHostCustomPreset(p)"
+                        [disabled]="presetsMutating()"
+                        aria-label="Elimina set"
+                      >
+                        <span class="visually-hidden">Elimina set {{ p.label }}</span>
+                        <app-sd-icon name="x" [size]="18" aria-hidden="true" />
+                      </button>
+                    </div>
+                  </li>
+                }
+              }
+            </ul>
+          }
+        </div>
+        <div class="modal-footer gap-2">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeHostPresetLibraryModal()" mdbRipple>Chiudi</button>
+          <button
+            type="button"
+            class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-2"
+            (click)="openHostPresetCreateFromLibrary()"
+            [disabled]="presetsMutating() || loadingPresets()"
+            mdbRipple
+          >
+            <app-sd-icon name="plus" [size]="16" aria-hidden="true" />
+            Crea set
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

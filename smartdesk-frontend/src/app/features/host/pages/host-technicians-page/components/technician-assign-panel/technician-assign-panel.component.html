@@ -1,0 +1,169 @@
+<section
+  class="card bg-white border-0 rounded-5 shadow-sm mb-4"
+  [class.opacity-50]="dimmed()"
+  aria-labelledby="host-tech-assign-heading"
+>
+  <div class="card-body p-4 p-md-5 bg-transparent border-0 pt-4 pb-0 px-4 d-flex align-items-start gap-3">
+    <div
+      class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+      style="width: 2.75rem; height: 2.75rem"
+      aria-hidden="true"
+    >
+      <app-sd-icon name="user-plus" [size]="22" />
+    </div>
+    <div class="min-w-0">
+      <h3 id="host-tech-assign-heading" class="fw-bold h5 mb-1">Assegnazione rapida</h3>
+      <p class="text-muted small mb-0">Collega un tecnico a uno spazio approvato.</p>
+    </div>
+  </div>
+  <div class="p-4 min-w-0 overflow-hidden">
+    @if (hasNoSpaces()) {
+      <div class="alert alert-danger py-2 mb-0 small rounded-3 d-flex align-items-center gap-2">
+        <app-sd-icon name="circle-xmark" [size]="16" aria-hidden="true" />
+        Nessuno spazio. Vai su <a routerLink="/host/spaces" class="alert-link">Spazi</a>.
+      </div>
+    } @else if (hasNoApprovedSpaces()) {
+      <div class="alert alert-warning py-2 mb-0 small rounded-3 d-flex align-items-center gap-2">
+        <app-sd-icon name="clock" [size]="16" aria-hidden="true" />
+        Nessuno spazio approvato.
+      </div>
+    } @else {
+      @if (assignmentTicketContext(); as ac) {
+        <div class="alert alert-info rounded-4 d-flex gap-2 justify-content-between align-items-start mb-4" role="status">
+          <div class="min-w-0">
+            <div class="fw-semibold mb-1">Ticket collegato</div>
+            <p class="small mb-0 text-break">
+              {{ ac.ticketCode ?? '#' + ac.ticketId }}
+              @if (ac.deskCode) {
+                <span> · {{ ac.deskCode }}</span>
+              }
+            </p>
+            <p class="small mb-0 mt-2 text-muted">
+              Scegli tecnico e spazio, poi conferma con «Assegna alla segnalazione».
+            </p>
+          </div>
+          <button
+            type="button"
+            class="btn-close ms-2 flex-shrink-0"
+            aria-label="Nascondi avviso"
+            mdbRipple
+            (click)="clearAssignmentTicketContext()"
+          ></button>
+        </div>
+      }
+
+      <div class="host-tech-assign-flow">
+        <div class="row g-3 mb-3 host-tech-assign-pickers">
+          <div class="col-12 col-md-6 min-w-0 d-flex flex-column">
+            <label class="form-label small fw-bold text-uppercase text-muted mb-2 d-flex align-items-center gap-2" for="host-tech-assign-space-trigger">
+              <app-sd-icon name="building" [size]="14" aria-hidden="true" /> Spazio
+            </label>
+            <button
+              id="host-tech-assign-space-trigger"
+              type="button"
+              class="host-tech-assign-picker w-100 flex-grow-1"
+              (click)="openAssignSpaceModal()"
+              aria-haspopup="dialog"
+              [attr.aria-expanded]="assignPickSpaceModalOpen()"
+              mdbRipple
+            >
+              <span class="card host-tech-assign-picker__surface rounded-4 h-100 w-100 text-body">
+                <span class="card-body p-3 p-md-4 d-flex align-items-center gap-3">
+                  <span
+                    class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                    style="width: 2.75rem; height: 2.75rem"
+                    aria-hidden="true"
+                  >
+                    <app-sd-icon name="building" [size]="18" />
+                  </span>
+                  <span class="min-w-0 flex-grow-1">
+                    <span class="fw-bold d-block text-break mb-1">{{ assignSpacePickerPrimary() }}</span>
+                    @if (assignSpacePickerSecondary()) {
+                      <span class="small text-muted d-block text-break">{{ assignSpacePickerSecondary() }}</span>
+                    }
+                  </span>
+                  <app-sd-icon name="chevron-right" [size]="18" class="text-primary flex-shrink-0" aria-hidden="true" />
+                </span>
+              </span>
+            </button>
+          </div>
+          <div class="col-12 col-md-6 min-w-0 d-flex flex-column">
+            <label class="form-label small fw-bold text-uppercase text-muted mb-2 d-flex align-items-center gap-2" for="host-tech-assign-tech-trigger">
+              <app-sd-icon name="user-tie" [size]="14" aria-hidden="true" /> Tecnico
+            </label>
+            <button
+              id="host-tech-assign-tech-trigger"
+              type="button"
+              class="host-tech-assign-picker w-100 flex-grow-1"
+              [disabled]="selectedSpaceId() == null"
+              (click)="openAssignTechModal()"
+              aria-haspopup="dialog"
+              [attr.aria-expanded]="assignPickTechModalOpen()"
+              mdbRipple
+            >
+              <span class="card host-tech-assign-picker__surface rounded-4 h-100 w-100 text-body" [class.opacity-50]="selectedSpaceId() == null">
+                <span class="card-body p-3 p-md-4 d-flex align-items-center gap-3">
+                  <span
+                    class="rounded-circle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                    [class.bg-success]="selectedSpaceId() != null"
+                    [class.bg-secondary]="selectedSpaceId() == null"
+                    style="width: 2.75rem; height: 2.75rem"
+                    aria-hidden="true"
+                  >
+                    <app-sd-icon name="user-tie" [size]="18" />
+                  </span>
+                  <span class="min-w-0 flex-grow-1">
+                    <span class="fw-bold d-block text-break mb-1">{{ assignTechPickerPrimary() }}</span>
+                    @if (assignTechPickerSecondary()) {
+                      <span class="small text-muted d-block text-break">{{ assignTechPickerSecondary() }}</span>
+                    }
+                  </span>
+                  <app-sd-icon
+                    name="chevron-right"
+                    [size]="18"
+                    [class.text-success]="selectedSpaceId() != null"
+                    [class.text-muted]="selectedSpaceId() == null"
+                    class="flex-shrink-0"
+                    aria-hidden="true"
+                  />
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        @if (selectedSpace(); as sp) {
+          <div class="host-tech-assign-summary rounded-4 p-3 p-md-4 mb-3 d-flex gap-3 align-items-center min-w-0">
+            <div class="bg-white border rounded-circle d-flex align-items-center justify-content-center p-2 flex-shrink-0" style="width: 2.75rem; height: 2.75rem" aria-hidden="true">
+              <app-sd-icon name="location-pin" [size]="18" class="text-primary" />
+            </div>
+            <div class="min-w-0 flex-grow-1">
+              <div class="small fw-bold text-uppercase text-muted mb-1">Spazio selezionato</div>
+              <p class="fw-semibold text-break mb-0">{{ sp.name }} <span class="fw-normal text-muted">· {{ sp.address }}</span></p>
+            </div>
+          </div>
+        }
+
+        <button
+          class="btn btn-primary rounded-pill w-100 d-inline-flex align-items-center justify-content-center gap-2 py-2 py-md-3 fw-semibold shadow-sm host-tech-assign-submit"
+          type="button"
+          (click)="assignTechnician()"
+          [disabled]="selectedSpaceId() == null || technicianIdToAssign() == null || assignFlowBusy()"
+          [attr.aria-busy]="assignFlowBusy()"
+          mdbRipple
+        >
+          @if (assignFlowBusy()) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            Assegnazione in corso…
+          } @else if (assignmentTicketContext()) {
+            <app-sd-icon name="user-plus" [size]="18" aria-hidden="true" />
+            Assegna alla segnalazione
+          } @else {
+            <app-sd-icon name="user-plus" [size]="18" aria-hidden="true" />
+            Assegna allo spazio
+          }
+        </button>
+      </div>
+    }
+  </div>
+</section>

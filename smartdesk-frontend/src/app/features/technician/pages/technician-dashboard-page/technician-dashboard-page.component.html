@@ -1,0 +1,131 @@
+<header class="mb-5 bg-white border-0 rounded-4 shadow-sm p-4 p-md-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4" style="background: linear-gradient(to right, #ffffff, #fcfcfc);">
+  <div class="d-flex align-items-center gap-4">
+    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 4.5rem; height: 4.5rem">
+      <app-sd-icon name="user-gear" [size]="32" />
+    </div>
+    <div>
+      <p class="text-primary fw-bold small text-uppercase mb-1" style="letter-spacing: 1px;">Pannello Tecnico</p>
+      <h2 class="mb-0 fw-bolder text-dark" style="letter-spacing: -0.5px;">{{ dashboardTitle() }}</h2>
+    </div>
+  </div>
+</header>
+
+@if (activeTickets().length > 0) {
+  <section class="card bg-white border-0 rounded-5 shadow-sm mb-5 overflow-hidden" aria-label="Ticket attivi in gestione">
+    <div class="card-header bg-transparent border-0 px-4 py-4 px-md-5 d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <h3 class="h4 fw-bold mb-0 text-dark">Ticket attivi in gestione</h3>
+      <span class="badge rounded-pill bg-primary px-4 py-2 shadow-sm fs-6">{{ activeTickets().length }}</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="list-group list-group-flush">
+        @for (ticket of activeTickets(); track ticket.ticketID; let last = $last) {
+          <a class="list-group-item list-group-item-action border-0 px-4 py-4 px-md-5 transition-all hover-bg-light" 
+             [class.border-bottom]="!last"
+             [class.border-light]="!last"
+             style="cursor: pointer;"
+             routerLink="/technician/tickets"
+             [attr.aria-label]="'Ticket ' + ticket.title">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-4">
+              <div class="d-flex gap-4 min-w-0 flex-grow-1 align-items-center">
+                <div
+                  class="rounded-circle bg-light text-muted d-flex align-items-center justify-content-center flex-shrink-0"
+                  style="width: 4rem; height: 4rem"
+                  aria-hidden="true"
+                >
+                  <app-sd-icon name="wrench" [size]="24" />
+                </div>
+                <div class="min-w-0 flex-grow-1">
+                  <h4 class="text-truncate fw-bold text-dark mb-2 h5" [title]="ticket.title">{{ ticket.title }}</h4>
+                  <div class="d-flex flex-wrap gap-2 small text-secondary align-items-center bg-white border border-light shadow-sm rounded-pill px-3 py-1 d-inline-flex mt-1">
+                    <app-sd-icon name="calendar" [size]="14" class="opacity-50" />
+                    <span class="fw-medium">Creato il {{ ticket.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-shrink-0 mt-2 mt-lg-0">
+                <app-ticket-status-badge [status]="ticket.status" [compact]="false" />
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+} @else {
+  <div class="card bg-white border-0 rounded-4 shadow-sm mb-5 p-5 text-center transition-all hover-shadow">
+    <div class="mb-4 text-muted">
+      <app-sd-icon name="circle-check" [size]="48" />
+    </div>
+    <h3 class="h5 fw-bold text-dark mb-3">Nessun ticket in carico</h3>
+    <p class="text-muted mb-4">Ottimo lavoro! Non ci sono ticket attivi assegnati a te al momento.</p>
+    <a class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm" routerLink="/technician/tickets" mdbRipple>
+      Controlla i ticket in coda
+    </a>
+  </div>
+}
+
+<div class="row g-4 mb-5">
+  <div class="col-12 col-sm-6 col-lg-3">
+    <a class="card bg-white border-0 rounded-4 shadow-sm h-100 text-center p-4 text-decoration-none d-block transition-all bento-card" routerLink="/technician/tickets" mdbRipple>
+      <div class="mb-3">
+        <div class="bg-warning-subtle text-warning rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 4rem; height: 4rem">
+          <app-sd-icon name="exclamation" [size]="28" />
+        </div>
+      </div>
+      <h5 class="fw-bold mb-2 text-dark">Ticket in coda</h5>
+      @if (pendingCount() > 0) {
+        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2 fw-bold mt-2 shadow-sm">{{ pendingCount() }} in attesa</span>
+      } @else {
+        <span class="badge bg-light text-muted rounded-pill px-3 py-2 mt-2 shadow-sm">Nessuno</span>
+      }
+    </a>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-3">
+    <a class="card bg-white border-0 rounded-4 shadow-sm h-100 text-center p-4 text-decoration-none d-block transition-all bento-card" routerLink="/technician/assigned" mdbRipple>
+      <div class="mb-3">
+        <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 4rem; height: 4rem">
+          <app-sd-icon name="calendar-check" [size]="28" />
+        </div>
+      </div>
+      <h5 class="fw-bold mb-2 text-dark">I tuoi ticket</h5>
+      @if (assignedActiveCount() > 0) {
+        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-bold mt-2 shadow-sm">{{ assignedActiveCount() }} attivi</span>
+      } @else {
+        <span class="badge bg-light text-muted rounded-pill px-3 py-2 mt-2 shadow-sm">Nessuno</span>
+      }
+    </a>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-3">
+    <a class="card bg-white border-0 rounded-4 shadow-sm h-100 text-center p-4 text-decoration-none d-block transition-all bento-card" routerLink="/technician/maintenance" mdbRipple>
+      <div class="mb-3">
+        <div class="bg-success-subtle text-success rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 4rem; height: 4rem">
+          <app-sd-icon name="chair" [size]="28" />
+        </div>
+      </div>
+      <h5 class="fw-bold mb-2 text-dark">Manutenzione desk</h5>
+      @if (assignedSpacesCount() > 0) {
+        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 fw-bold mt-2 shadow-sm">{{ assignedSpacesCount() }} uffici</span>
+      } @else {
+        <span class="badge bg-light text-muted rounded-pill px-3 py-2 mt-2 shadow-sm">Nessuno</span>
+      }
+    </a>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-3">
+    <a class="card bg-white border-0 rounded-4 shadow-sm h-100 text-center p-4 text-decoration-none d-block transition-all bento-card" routerLink="/technician/notifications" mdbRipple>
+      <div class="mb-3">
+        <div class="bg-info-subtle text-info rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 4rem; height: 4rem">
+          <app-sd-icon name="bell" [size]="28" />
+        </div>
+      </div>
+      <h5 class="fw-bold mb-2 text-dark">Notifiche</h5>
+      @if (unreadCount() > 0) {
+        <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2 fw-bold mt-2 shadow-sm">{{ unreadCount() }} nuove</span>
+      } @else {
+        <span class="badge bg-light text-muted rounded-pill px-3 py-2 mt-2 shadow-sm">Nessuna</span>
+      }
+    </a>
+  </div>
+</div>

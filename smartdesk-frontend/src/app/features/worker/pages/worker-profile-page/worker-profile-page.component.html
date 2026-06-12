@@ -1,0 +1,138 @@
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 px-2">
+  <div>
+    <h1 class="display-6 fw-bold mb-0 tracking-tight">Il Mio Profilo</h1>
+  </div>
+</div>
+
+@if (errorMsg) {
+  <div class="alert alert-danger rounded-4 border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+    <app-sd-icon name="exclamation" [size]="20" class="me-3 flex-shrink-0" aria-hidden="true" />
+    <div class="fw-medium">{{ errorMsg }}</div>
+  </div>
+}
+
+@if (successMsg) {
+  <div class="alert alert-success rounded-4 border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+    <app-sd-icon name="circle-check" [size]="20" class="me-3 flex-shrink-0" aria-hidden="true" />
+    <div class="fw-medium">{{ successMsg }}</div>
+  </div>
+}
+
+@if (loading()) {
+  <div class="d-flex justify-content-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Caricamento profilo...</span>
+    </div>
+  </div>
+} @else {
+  <div class="row g-4 justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+      
+      
+      <h2 class="fs-6 text-uppercase text-muted fw-semibold mb-2 ms-4 tracking-wide">Informazioni Personali</h2>
+      <div class="card border-0 rounded-5 mb-5 shadow-sm overflow-hidden bg-white">
+        <div class="card-body p-4 p-md-5">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="rounded-circle bg-primary bg-opacity-25 text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+              <app-sd-icon name="user-circle" [size]="28" />
+            </div>
+            <div>
+              <p class="text-muted small fw-medium mb-0">Aggiorna nome, cognome ed email. Riceverai una notifica in caso di modifiche.</p>
+            </div>
+          </div>
+
+          <form (submit)="updateProfile(); $event.preventDefault()">
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <mdb-form-control>
+                  <input mdbInput class="form-control form-control-lg bg-light border-0 rounded-4" type="text" [(ngModel)]="name" name="name" required />
+                  <label mdbLabel class="form-label">Nome</label>
+                </mdb-form-control>
+              </div>
+              <div class="col-md-6">
+                <mdb-form-control>
+                  <input mdbInput class="form-control form-control-lg bg-light border-0 rounded-4" type="text" [(ngModel)]="surname" name="surname" required />
+                  <label mdbLabel class="form-label">Cognome</label>
+                </mdb-form-control>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <mdb-form-control>
+                <input mdbInput class="form-control form-control-lg bg-light border-0 rounded-4" type="email" [(ngModel)]="email" name="email" required />
+                <label mdbLabel class="form-label">Email</label>
+              </mdb-form-control>
+            </div>
+
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-0" type="submit" mdbRipple>
+                Salva Modifiche
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      
+      <h2 class="fs-6 text-uppercase text-muted fw-semibold mb-2 ms-4 tracking-wide">Sicurezza</h2>
+      <div class="card border-0 rounded-5 mb-5 shadow-sm overflow-hidden bg-white">
+        <div class="card-body p-4 p-md-5">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="rounded-circle bg-warning bg-opacity-25 text-warning-emphasis d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+              <app-sd-icon name="shield" [size]="28" />
+            </div>
+            <div>
+              <p class="text-muted small fw-medium mb-0">Gestisci la tua password e la sicurezza dell'account.</p>
+            </div>
+          </div>
+
+          <form (submit)="changePassword(); $event.preventDefault()">
+            <div class="mb-4">
+              <mdb-form-control>
+                <input mdbInput class="form-control form-control-lg bg-light border-0 rounded-4" type="password" [(ngModel)]="currentPassword" name="currentPassword" required />
+                <label mdbLabel class="form-label">Password Attuale</label>
+              </mdb-form-control>
+            </div>
+            
+            <div class="mb-4">
+              <mdb-form-control>
+                <input mdbInput class="form-control form-control-lg bg-light border-0 rounded-4" type="password" [(ngModel)]="newPassword" name="newPassword" required />
+                <label mdbLabel class="form-label">Nuova Password</label>
+              </mdb-form-control>
+            </div>
+            
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-warning rounded-pill px-5 py-2 fw-bold shadow-0 text-dark" type="submit" mdbRipple>
+                Aggiorna Password
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      
+      <h2 class="fs-6 text-uppercase text-danger fw-semibold mb-2 ms-4 tracking-wide">Zona Pericolo</h2>
+      <div class="card border-0 rounded-5 mb-5 shadow-sm overflow-hidden bg-white">
+        <div class="list-group list-group-flush">
+          <div class="list-group-item p-4 p-md-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
+            <div class="d-flex align-items-start gap-3">
+              <div class="rounded-circle bg-danger bg-opacity-25 text-danger d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+                <app-sd-icon name="exclamation" [size]="28" />
+              </div>
+              <div>
+                <h5 class="fw-bold text-danger mb-1">Elimina account</h5>
+                <p class="text-muted small mb-0 fw-medium">L'operazione è irreversibile: tutti i dati associati verranno rimossi.</p>
+              </div>
+            </div>
+            <div class="flex-shrink-0">
+              <button class="btn btn-outline-danger rounded-pill px-4 py-2 fw-bold shadow-0 w-100" type="button" (click)="deleteAccount()" mdbRipple>
+                Elimina account
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+}

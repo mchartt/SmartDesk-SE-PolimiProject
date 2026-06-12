@@ -1,0 +1,121 @@
+<section aria-labelledby="host-space-section-hours">
+  <h3 id="host-space-section-hours" class="fs-6 text-uppercase text-muted fw-semibold mb-3 tracking-wide">Orari di apertura</h3>
+  <div class="card border-0 bg-light rounded-4 overflow-hidden">
+    <div class="card-body p-4 p-md-5">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <p id="host-space-hours-hint" class="small fw-medium text-muted mb-0 max-w-lg">
+          Seleziona gli orari per ogni giorno. Usa i preset rapidi per configurazioni comuni.
+        </p>
+        <div class="d-flex flex-wrap gap-2" role="toolbar" aria-label="Azioni rapide orari">
+          <button
+            type="button"
+            class="btn btn-white text-dark btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold border-0"
+            [class.bg-primary]="hoursQuickAction() === 'weekdays'"
+            [class.text-white]="hoursQuickAction() === 'weekdays'"
+            [class.bg-opacity-25]="hoursQuickAction() === 'weekdays' && false"
+            [attr.aria-pressed]="hoursQuickAction() === 'weekdays'"
+            (click)="toggleWeekdaysPreset()"
+            mdbRipple
+          >
+            Lun-Ven 9-18
+          </button>
+          <button
+            type="button"
+            class="btn btn-white text-dark btn-sm rounded-pill px-3 py-2 shadow-sm fw-bold border-0"
+            [class.bg-primary]="hoursQuickAction() === 'allDays'"
+            [class.text-white]="hoursQuickAction() === 'allDays'"
+            [attr.aria-pressed]="hoursQuickAction() === 'allDays'"
+            (click)="toggleAllDaysPreset()"
+            mdbRipple
+          >
+            Tutti i giorni
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-4 shadow-sm p-2" role="group" aria-describedby="host-space-hours-hint">
+        <div class="list-group list-group-flush">
+          @for (row of openingHoursRows(); track row.dayKey) {
+            <div
+              class="list-group-item border-bottom border-light px-3 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 transition-hover"
+              [class.bg-light]="row.closed"
+              [class.bg-opacity-50]="row.closed"
+            >
+              <div class="d-flex align-items-center gap-4 min-w-0" style="width: 12rem;">
+                <div class="form-check form-switch m-0">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    role="switch"
+                    [id]="'host-space-switch-' + row.dayKey"
+                    [attr.aria-label]="row.closed ? 'Apri ' + row.label : 'Chiudi ' + row.label"
+                    [ngModel]="!row.closed"
+                    (ngModelChange)="onDayToggle(row, $event)"
+                    [ngModelOptions]="{ standalone: true }"
+                  />
+                </div>
+                <label class="form-check-label fw-bold mb-0" [attr.for]="'host-space-switch-' + row.dayKey" [class.text-muted]="row.closed">{{ row.label }}</label>
+              </div>
+
+              <div class="d-flex align-items-center justify-content-end gap-2 flex-grow-1">
+                @if (!row.closed) {
+                  <div class="d-flex align-items-center gap-2 bg-light rounded-pill p-1 border border-light">
+                    <div class="position-relative">
+                      <button
+                        [id]="'host-space-open-' + row.dayKey"
+                        type="button"
+                        class="btn btn-white btn-sm rounded-pill fw-bold shadow-sm px-3 sd-hours-time-button"
+                        [attr.aria-label]="'Orario apertura ' + row.label"
+                        [attr.aria-expanded]="isHoursTimePickerOpen(row, 'open')"
+                        aria-haspopup="listbox"
+                        (click)="toggleHoursTimePicker(row, 'open')"
+                        mdbRipple
+                      >
+                        {{ row.open }}
+                      </button>
+                      @if (isHoursTimePickerOpen(row, 'open')) {
+                        <div class="position-absolute top-100 start-50 translate-middle-x mt-2 bg-white rounded-4 shadow-sm border border-light p-2 z-index-dropdown sd-hours-time-popover" role="group" [attr.aria-label]="'Selettore apertura ' + row.label">
+                          <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-light btn-sm rounded-circle p-2" aria-label="Orario precedente" [disabled]="!canNudgeHoursTimePicker(-1)" (click)="nudgeHoursTimePicker(-1)"><app-sd-icon name="chevron-left" [size]="14"/></button>
+                            <div class="fw-bold fs-5 tabular-nums px-2" aria-live="polite">{{ hoursPickerHour() }}:{{ hoursPickerMinute() }}</div>
+                            <button type="button" class="btn btn-light btn-sm rounded-circle p-2" aria-label="Orario successivo" [disabled]="!canNudgeHoursTimePicker(1)" (click)="nudgeHoursTimePicker(1)"><app-sd-icon name="chevron-right" [size]="14"/></button>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                    <span class="text-muted small fw-bold px-1" aria-hidden="true">al</span>
+                    <div class="position-relative">
+                      <button
+                        [id]="'host-space-close-' + row.dayKey"
+                        type="button"
+                        class="btn btn-white btn-sm rounded-pill fw-bold shadow-sm px-3 sd-hours-time-button"
+                        [attr.aria-label]="'Orario chiusura ' + row.label"
+                        [attr.aria-expanded]="isHoursTimePickerOpen(row, 'close')"
+                        aria-haspopup="listbox"
+                        (click)="toggleHoursTimePicker(row, 'close')"
+                        mdbRipple
+                      >
+                        {{ row.close }}
+                      </button>
+                      @if (isHoursTimePickerOpen(row, 'close')) {
+                        <div class="position-absolute top-100 start-50 translate-middle-x mt-2 bg-white rounded-4 shadow-sm border border-light p-2 z-index-dropdown sd-hours-time-popover" role="group" [attr.aria-label]="'Selettore chiusura ' + row.label">
+                          <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-light btn-sm rounded-circle p-2" aria-label="Orario precedente" [disabled]="!canNudgeHoursTimePicker(-1)" (click)="nudgeHoursTimePicker(-1)"><app-sd-icon name="chevron-left" [size]="14"/></button>
+                            <div class="fw-bold fs-5 tabular-nums px-2" aria-live="polite">{{ hoursPickerHour() }}:{{ hoursPickerMinute() }}</div>
+                            <button type="button" class="btn btn-light btn-sm rounded-circle p-2" aria-label="Orario successivo" [disabled]="!canNudgeHoursTimePicker(1)" (click)="nudgeHoursTimePicker(1)"><app-sd-icon name="chevron-right" [size]="14"/></button>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                } @else {
+                  <span class="badge bg-secondary bg-opacity-25 text-secondary rounded-pill px-3 py-2 fw-bold text-uppercase" style="font-size: 0.7rem;">Chiuso</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,33 @@
+# IDEs e Editor
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# Build output
+target/
+dist/
+build/
+out/
+*.class
+
+# Angular cache
+.angular/
+
+# Node
+node_modules/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

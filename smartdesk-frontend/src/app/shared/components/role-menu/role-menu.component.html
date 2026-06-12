@@ -1,0 +1,14 @@
+<nav class="nav nav-pills flex-column custom-nav" aria-label="Sezioni area riservata">
+  @for (item of items(); track item.path) {
+    <a
+      [routerLink]="item.path"
+      routerLinkActive="active"
+      class="nav-link custom-nav-item d-flex align-items-center"
+      [routerLinkActiveOptions]="{ exact: false }"
+      mdbRipple
+    >
+      <app-sd-icon [name]="item.icon" [size]="22" class="nav-icon" />
+      <span class="nav-text">{{ item.label }}</span>
+    </a>
+  }
+</nav>

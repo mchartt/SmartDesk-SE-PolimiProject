@@ -1,0 +1,158 @@
+@if (isHostPresetFormOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-preset-create-title"
+    (click)="closeHostPresetCreateModal()"
+  >
+    <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          title="Crea un nuovo set"
+          eyebrow="Set dotazioni"
+          subtitle="Raggruppa le dotazioni da applicare in un tap su ogni postazione."
+          titleId="host-preset-create-title"
+          (close)="closeHostPresetCreateModal()"
+        />
+
+        <div class="modal-body">
+          @if (hostPresetFormError) {
+            <div class="alert alert-danger py-2 small rounded-3 mb-3" role="alert">{{ hostPresetFormError }}</div>
+          }
+
+          <section class="mb-4" aria-labelledby="host-preset-create-info-heading">
+            <h3 id="host-preset-create-info-heading" class="h6 fw-bold mb-3">Informazioni</h3>
+            <div class="row g-3">
+              <div class="col-12 col-sm-6">
+                <label class="form-label small fw-semibold" for="host-new-preset-label">
+                  Nome set <span class="text-muted fw-normal">obbligatorio</span>
+                </label>
+                <input
+                  id="host-new-preset-label"
+                  mdbInput
+                  class="form-control"
+                  [(ngModel)]="newHostPresetLabel"
+                  [maxlength]="48"
+                  placeholder="es. Postazione standard"
+                  autocomplete="off"
+                  required
+                />
+              </div>
+              <div class="col-12 col-sm-6">
+                <label class="form-label small fw-semibold" for="host-new-preset-hint">
+                  Descrizione breve <span class="text-muted fw-normal">obbligatoria</span>
+                </label>
+                <input
+                  id="host-new-preset-hint"
+                  mdbInput
+                  class="form-control"
+                  [(ngModel)]="newHostPresetHint"
+                  [maxlength]="120"
+                  placeholder="es. Per open space silenziosi"
+                  autocomplete="off"
+                  required
+                />
+              </div>
+            </div>
+          </section>
+
+          <section aria-labelledby="host-preset-create-amenities-heading">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+              <div>
+                <h3 id="host-preset-create-amenities-heading" class="h6 fw-bold mb-1">Dotazioni nel set</h3>
+                <p class="text-muted small mb-0">
+                  Aggiungi una voce alla volta. Max {{ hostAmenityTokenMax }} caratteri, maiuscole.
+                </p>
+              </div>
+              @if (newPresetAmenities().length) {
+                <span class="badge bg-primary rounded-pill" aria-live="polite">{{ newPresetAmenities().length }}</span>
+              }
+            </div>
+
+            <div class="card bg-light border-0 rounded-3 mb-3">
+              <div class="card-body p-3">
+                @if (newPresetAmenities().length) {
+                  <div class="d-flex flex-wrap gap-2" role="list" aria-label="Dotazioni del nuovo set">
+                    @for (am of newPresetAmenities(); track am) {
+                      <span class="badge bg-white text-dark border d-inline-flex align-items-center gap-1 py-2 px-2" role="listitem">
+                        <span>{{ am }}</span>
+                        <button
+                          type="button"
+                          class="btn btn-link btn-sm p-0 text-danger"
+                          (click)="removeAmenityFromNewPresetForm(am)"
+                          [attr.aria-label]="'Rimuovi dotazione ' + am"
+                        >
+                          <span class="visually-hidden">Rimuovi {{ am }}</span>
+                          <app-sd-icon name="x" [size]="14" aria-hidden="true" />
+                        </button>
+                      </span>
+                    }
+                  </div>
+                } @else {
+                  <p class="text-muted small mb-0">
+                    Nessuna dotazione ancora. Usa il campo sotto per iniziare.
+                  </p>
+                }
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label class="visually-hidden" for="host-new-preset-amenity">Nuova dotazione</label>
+              <input
+                id="host-new-preset-amenity"
+                type="text"
+                mdbInput
+                class="form-control text-uppercase"
+                [ngModel]="newPresetAmenityDraft"
+                (ngModelChange)="setNewPresetAmenityDraft($event)"
+                [maxlength]="hostAmenityTokenMax"
+                placeholder="ES. MONITOR"
+                autocomplete="off"
+                (keyup.enter)="addAmenityToNewPresetForm()"
+              />
+              <button
+                type="button"
+                class="btn btn-primary d-inline-flex align-items-center gap-2"
+                (click)="addAmenityToNewPresetForm()"
+                aria-label="Aggiungi dotazione"
+                mdbRipple
+              >
+                <app-sd-icon name="plus" [size]="18" aria-hidden="true" />
+                Aggiungi
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div class="modal-footer gap-2">
+          <button
+            type="button"
+            class="btn btn-outline-secondary rounded-pill px-4"
+            (click)="closeHostPresetCreateModal()"
+            [disabled]="presetsMutating()"
+            mdbRipple
+          >
+            Annulla
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary rounded-pill px-4"
+            (click)="saveNewHostPreset()"
+            [disabled]="presetsMutating() || loadingPresets() || !isNewHostPresetFormValid()"
+            mdbRipple
+          >
+            @if (presetsMutating()) {
+              <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+              <span>Salvataggio…</span>
+            } @else {
+              Salva set
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

@@ -1,0 +1,48 @@
+.sd-notification-bell {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  margin-top: 0.2rem;
+  margin-right: 0.35rem;
+}
+
+.sd-notification-bell__btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50% !important;
+  line-height: 1;
+}
+
+.sd-notification-bell__badge {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.45rem;
+  z-index: 2;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #fff;
+  background: linear-gradient(180deg, #f87171 0%, var(--bs-danger) 55%, #b91c1c 100%);
+  border: 2px solid var(--bs-body-bg);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.18),
+    0 0 0 1px rgb(220 53 69 / 0.45);
+  pointer-events: none;
+}

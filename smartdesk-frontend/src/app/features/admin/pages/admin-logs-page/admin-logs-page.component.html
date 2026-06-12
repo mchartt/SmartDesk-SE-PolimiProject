@@ -1,0 +1,118 @@
+<div class="d-flex justify-content-between align-items-end border-bottom pb-3 mb-4">
+  <div>
+    <p class="text-uppercase text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">Amministrazione</p>
+    <h2 class="mb-0 fw-bolder" style="letter-spacing: -0.03em;">{{ title() }}</h2>
+  </div>
+</div>
+
+@if (errorMsg) {
+  <div class="alert alert-danger rounded-4 shadow-sm d-flex align-items-center mb-4 border-0" role="alert">
+    <app-sd-icon name="circle-exclamation" [size]="20" class="me-3 flex-shrink-0" aria-hidden="true" />
+    <div class="fw-medium">{{ errorMsg }}</div>
+  </div>
+}
+
+<div class="card bg-white border-0 rounded-5 shadow-sm mb-4">
+  <div class="card-body p-4">
+    <div class="row g-4 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small fw-bold text-muted text-uppercase mb-2" for="admin-logs-severity">Severità</label>
+        <select
+          id="admin-logs-severity"
+          class="form-select border-0 shadow-none apple-surface-bg rounded-pill px-3"
+          [ngModel]="filterSeverity()"
+          (ngModelChange)="filterSeverity.set($event)"
+        >
+          <option value="ALL">Tutte le severità</option>
+          <option value="CRITICAL">CRITICAL</option>
+          <option value="ERROR">ERROR</option>
+          <option value="WARN">WARN</option>
+          <option value="INFO">INFO</option>
+          <option value="DEBUG">DEBUG</option>
+          <option value="AUDIT">AUDIT</option>
+        </select>
+      </div>
+      <div class="col-md-5">
+        <label class="form-label small fw-bold text-muted text-uppercase mb-2" for="admin-logs-action">Azione</label>
+        <div class="input-group">
+          <span class="input-group-text apple-surface-bg border-0 text-muted rounded-start-pill ps-4"><app-sd-icon name="search" [size]="16" /></span>
+          <input
+            id="admin-logs-action"
+            class="form-control border-0 shadow-none apple-surface-bg rounded-end-pill px-3"
+            type="text"
+            placeholder="Cerca per azione, id o utente..."
+            [ngModel]="filterAction()"
+            (ngModelChange)="filterAction.set($event)"
+          />
+        </div>
+      </div>
+      <div class="col-md-3 d-flex align-items-end justify-content-md-end">
+        <span class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-medium">
+          {{ filteredLogs().length }} / {{ logs().length }} log
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (!filteredLogs().length && !errorMsg) {
+  <app-empty-state message="Nessun log disponibile con i filtri attuali." />
+} @else {
+  <div class="card bg-white border-0 rounded-5 shadow-sm overflow-hidden mb-5">
+    <ul class="list-group list-group-flush" role="list">
+      @for (log of filteredLogs(); track log.logID) {
+        <li class="list-group-item p-4 border-bottom border-light" role="listitem">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
+            <div class="d-flex align-items-center min-w-0 gap-3">
+              <span
+                class="rounded-circle flex-shrink-0"
+                style="width: 12px; height: 12px;"
+                [class.bg-danger]="log.severity === 'CRITICAL' || log.severity === 'ERROR'"
+                [class.bg-warning]="log.severity === 'WARN'"
+                [class.bg-info]="log.severity === 'INFO'"
+                [class.bg-secondary]="log.severity === 'DEBUG' || log.severity === 'AUDIT'"
+                aria-hidden="true"
+              ></span>
+              <div class="min-w-0">
+                <h6 class="fw-bold mb-2 text-dark text-break">{{ log.action }}</h6>
+                <div class="text-muted small d-flex flex-wrap align-items-center gap-3 fw-medium">
+                  <span class="d-inline-flex align-items-center gap-2">
+                    <app-sd-icon name="clock" [size]="14" class="opacity-50 text-primary" aria-hidden="true" />
+                    <span class="font-monospace">{{ log.timestamp | date: 'medium' }}</span>
+                  </span>
+                  <span class="badge rounded-pill bg-light text-dark border d-inline-flex align-items-center gap-1">
+                    <app-sd-icon name="layers" [size]="12" class="opacity-50 text-primary" aria-hidden="true" />
+                    <span class="font-monospace">{{ log.ipAddress }}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex gap-3 align-items-center flex-shrink-0">
+              <span class="badge rounded-pill bg-light text-dark border fw-medium d-inline-flex align-items-center gap-2 px-3 py-2">
+                <app-sd-icon name="shield" [size]="14" class="opacity-50" aria-hidden="true" />
+                {{ log.actorRole }}
+              </span>
+              <span
+                class="badge rounded-pill fw-bold px-3 py-2 d-inline-flex align-items-center gap-2"
+                [class.bg-danger]="log.severity === 'CRITICAL' || log.severity === 'ERROR'" [class.bg-opacity-25]="log.severity === 'CRITICAL' || log.severity === 'ERROR'" [class.text-danger]="log.severity === 'CRITICAL' || log.severity === 'ERROR'"
+                [class.bg-warning]="log.severity === 'WARN'" [class.bg-opacity-25]="log.severity === 'WARN'" [class.text-warning]="log.severity === 'WARN'"
+                [class.bg-info]="log.severity === 'INFO'" [class.bg-opacity-25]="log.severity === 'INFO'" [class.text-info]="log.severity === 'INFO'"
+                [class.bg-secondary]="log.severity === 'DEBUG' || log.severity === 'AUDIT'" [class.bg-opacity-25]="log.severity === 'DEBUG' || log.severity === 'AUDIT'" [class.text-secondary]="log.severity === 'DEBUG' || log.severity === 'AUDIT'"
+              >
+                <span>{{ log.severity }}</span>
+                @switch (log.severity) {
+                  @case ('CRITICAL') { <app-sd-icon name="circle-xmark" [size]="14" /> }
+                  @case ('ERROR') { <app-sd-icon name="circle-exclamation" [size]="14" /> }
+                  @case ('WARN') { <app-sd-icon name="exclamation" [size]="14" /> }
+                  @case ('INFO') { <app-sd-icon name="circle-info" [size]="14" /> }
+                  @case ('DEBUG') { <app-sd-icon name="wrench" [size]="14" /> }
+                  @case ('AUDIT') { <app-sd-icon name="shield" [size]="14" /> }
+                }
+              </span>
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+}

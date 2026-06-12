@@ -1,0 +1,77 @@
+<header class="mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 px-2">
+  <div class="d-flex align-items-center gap-3">
+    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+      <app-sd-icon name="users" [size]="24" />
+    </div>
+    <div>
+      <h2 class="mb-0 fw-bold">{{ title() }}</h2>
+      <p class="text-muted small mb-0 mt-1">Crea account tecnici, assegnali agli spazi approvati e gestisci il team.</p>
+    </div>
+  </div>
+  <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-pill px-4 shadow-sm flex-shrink-0" (click)="openModal()" mdbRipple>
+    <app-sd-icon name="plus" [size]="16" aria-hidden="true" />
+    <span class="fw-semibold">Aggiungi tecnico</span>
+  </button>
+</header>
+
+@if (errorMsg) {
+  <div class="alert alert-danger rounded-3 shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+    <app-sd-icon name="circle-exclamation" [size]="20" aria-hidden="true" />
+    <div>{{ errorMsg }}</div>
+  </div>
+}
+
+@if (assignSuccessMsg()) {
+  <div class="alert alert-success rounded-3 shadow-sm d-flex align-items-center gap-2 mb-4" role="status">
+    <app-sd-icon name="circle-check" [size]="20" aria-hidden="true" />
+    <div>{{ assignSuccessMsg() }}</div>
+  </div>
+}
+
+<app-create-technician-modal />
+<app-edit-technician-modal />
+<app-assigned-spaces-modal />
+<app-technician-search-modal />
+<app-space-pick-modal />
+<app-assign-space-pick-modal />
+<app-assign-tech-pick-modal />
+<app-space-technicians-modal />
+
+@if (loading()) {
+  <div class="d-flex flex-column align-items-center justify-content-center p-5 gap-3" role="status">
+    <div class="spinner-border text-primary" aria-hidden="true">
+      <span class="visually-hidden">Caricamento in corso...</span>
+    </div>
+    <p class="text-muted mb-0">Caricamento dei tecnici in corso...</p>
+  </div>
+} @else {
+  @if (hasNoSpaces) {
+    <div class="alert alert-danger rounded-3 shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+      <app-sd-icon name="exclamation" [size]="20" aria-hidden="true" />
+      <div>
+        <strong>Nessuno spazio.</strong>
+        Crea uno spazio in <a routerLink="/host/spaces" class="alert-link">Spazi</a>, poi torna qui.
+      </div>
+    </div>
+  } @else if (hasNoApprovedSpaces) {
+    <div class="alert alert-warning rounded-3 shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+      <app-sd-icon name="clock" [size]="20" aria-hidden="true" />
+      <div>
+        <strong>In approvazione.</strong>
+        Quando l'amministratore approva, potrai assegnare i tecnici.
+      </div>
+    </div>
+  }
+
+  <app-technician-assign-panel
+    [hasNoSpaces]="hasNoSpaces"
+    [hasNoApprovedSpaces]="hasNoApprovedSpaces"
+    [dimmed]="hasNoSpaces || hasNoApprovedSpaces"
+  />
+
+  <app-technician-mgmt-dashboard />
+
+  @if (!hasNoSpaces && !hasNoApprovedSpaces) {
+    <app-technician-spaces-list [approvedSpaces]="approvedSpaces" />
+  }
+}

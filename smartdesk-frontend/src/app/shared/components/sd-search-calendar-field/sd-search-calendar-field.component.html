@@ -1,0 +1,30 @@
+<div class="w-100">
+  @if (label()) {
+    <label class="form-label small fw-semibold mb-1" [for]="inputId()">{{ label() }}</label>
+  }
+  <div class="position-relative">
+    <input
+      type="date"
+      class="form-control form-control-sm"
+      [id]="inputId()"
+      [placeholder]="placeholder()"
+      [ngModel]="selectedIso()"
+      (ngModelChange)="selectedIso.set($event)"
+    />
+    
+    @if (hasSelection()) {
+      <span
+        role="button"
+        tabindex="0"
+        class="position-absolute d-inline-flex align-items-center justify-content-center text-muted"
+        style="right: 2.25rem; top: 50%; transform: translateY(-50%); z-index: 4; cursor: pointer; padding: 0.25rem;"
+        aria-label="Rimuovi data"
+        (click)="clearDate($event)"
+        (keydown.enter)="clearDate($event)"
+        (keydown.space)="clearDate($event)"
+      >
+        <app-sd-icon name="x" [size]="14" aria-hidden="true" />
+      </span>
+    }
+  </div>
+</div>

@@ -1,0 +1,425 @@
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 px-2">
+  <div>
+    <h1 class="display-6 fw-bold mb-0 tracking-tight">{{ title() }}</h1>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="d-flex flex-column align-items-center justify-content-center py-5 gap-3" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" aria-hidden="true"></div>
+    <p class="text-muted small mb-0 fw-medium">Caricamento ticket…</p>
+  </div>
+} @else {
+
+  <div class="row g-3 mb-5">
+    <div class="col-md-4">
+      <div class="card border-0 rounded-5 h-100 shadow-sm bg-white overflow-hidden transition-hover" style="transition: transform 0.2s">
+        <div class="card-body p-4 d-flex flex-column justify-content-between">
+          <p class="small text-uppercase text-muted fw-semibold mb-3 tracking-wide">Aperti</p>
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-primary bg-opacity-25 text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3rem; height: 3rem" aria-hidden="true">
+              <app-sd-icon name="ticket" [size]="20" />
+            </div>
+            <p class="display-6 fw-bold mb-0 text-primary">{{ openCount() }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 rounded-5 h-100 shadow-sm bg-white overflow-hidden transition-hover" style="transition: transform 0.2s">
+        <div class="card-body p-4 d-flex flex-column justify-content-between">
+          <p class="small text-uppercase text-muted fw-semibold mb-3 tracking-wide">In lavorazione</p>
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-info bg-opacity-25 text-info d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3rem; height: 3rem" aria-hidden="true">
+              <app-sd-icon name="wrench" [size]="20" />
+            </div>
+            <p class="display-6 fw-bold mb-0 text-info">{{ inProgressCount() }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 rounded-5 h-100 shadow-sm bg-white overflow-hidden transition-hover" style="transition: transform 0.2s">
+        <div class="card-body p-4 d-flex flex-column justify-content-between">
+          <p class="small text-uppercase text-muted fw-semibold mb-3 tracking-wide">Risolti</p>
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-success bg-opacity-25 text-success d-flex align-items-center justify-content-center flex-shrink-0" style="width: 3rem; height: 3rem" aria-hidden="true">
+              <app-sd-icon name="circle-check" [size]="20" />
+            </div>
+            <p class="display-6 fw-bold mb-0 text-success">{{ resolvedCount() }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="fs-6 text-uppercase text-muted fw-semibold mb-2 ms-4 tracking-wide">Prenotazione di oggi</h2>
+  <div class="card border-0 rounded-5 mb-5 shadow-sm overflow-hidden bg-white">
+    <div class="card-body p-4 p-md-5">
+      @if (!todayBookings().length) {
+        <div class="d-flex align-items-center gap-4">
+          <div class="rounded-circle bg-light text-muted d-flex align-items-center justify-content-center flex-shrink-0" style="width: 4rem; height: 4rem">
+            <app-sd-icon name="calendar" [size]="24" />
+          </div>
+          <div>
+            <p class="text-muted fw-medium mb-2">
+              Nessuna prenotazione attiva per oggi. Puoi aprire un ticket solo per la postazione che hai prenotato nella giornata corrente.
+            </p>
+            <a class="btn btn-primary rounded-pill shadow-0 fw-bold px-4 py-2" routerLink="/worker/desks">Trova postazione</a>
+          </div>
+        </div>
+      } @else {
+        <div class="list-group list-group-flush">
+          @for (b of todayBookings(); track b.bookingID) {
+            <div class="list-group-item p-4 border rounded-4 mb-3 bg-light bg-opacity-50 border-light d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+              <div class="d-flex align-items-center gap-3 min-w-0 flex-grow-1">
+                <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 3.5rem; height: 3.5rem">
+                  <app-sd-icon name="desktop" [size]="20" />
+                </div>
+                <div class="min-w-0">
+                  <div class="fw-bold fs-5 mb-1">Prenotazione #{{ bookingPublicRef(b) }}</div>
+                  <div class="small text-muted fw-medium d-flex align-items-center gap-2">
+                    <span class="badge bg-white text-dark border border-light rounded-pill px-3 py-1 shadow-sm">Desk ID {{ b.deskID }}</span>
+                    <span>{{ b.startTime | date:'HH:mm' }} – {{ b.endTime | date:'HH:mm' }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-shrink-0">
+                <button
+                  class="btn btn-outline-primary rounded-pill shadow-0 fw-bold px-4 py-2 w-100"
+                  type="button"
+                  mdbRipple
+                  (click)="startOpenTicket(b.bookingID)"
+                >
+                  Apri ticket
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (errorMsg) {
+    <div class="alert alert-danger rounded-4 border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+      <app-sd-icon name="exclamation" [size]="20" class="me-3 flex-shrink-0" aria-hidden="true" />
+      <div class="fw-medium">{{ errorMsg }}</div>
+    </div>
+  }
+
+  <h2 class="fs-6 text-uppercase text-muted fw-semibold mb-2 ms-4 tracking-wide">I tuoi ticket</h2>
+  <div class="card border-0 rounded-5 shadow-sm overflow-hidden bg-white mb-5">
+    <div class="card-header bg-transparent border-bottom border-light p-0">
+      <div class="d-flex justify-content-center px-3 pt-3 pb-2">
+        <mdb-tabs pills class="apple-tabs bg-white rounded-pill shadow-sm p-1" (activeTabChange)="onMdbTabChange($event)">
+          <mdb-tab title="Tutti"></mdb-tab>
+          <mdb-tab title="In corso"></mdb-tab>
+          <mdb-tab title="Risolti"></mdb-tab>
+        </mdb-tabs>
+      </div>
+    </div>
+    
+    <div class="list-group list-group-flush">
+      @if (!tickets().length && !errorMsg) {
+        <div class="p-5 text-center">
+          <div class="mb-4 text-muted">
+            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 5rem; height: 5rem">
+              <app-sd-icon name="ticket" [size]="32" class="opacity-50" />
+            </div>
+          </div>
+          <h3 class="fw-bold mb-2">Nessun ticket</h3>
+          <p class="text-muted mb-0 fw-medium">Non hai aperto ancora nessun ticket.</p>
+        </div>
+      } @else if (tickets().length && !filteredTickets().length) {
+        <div class="p-5 text-center">
+          <p class="text-muted mb-0 fw-medium" role="status">Nessun ticket per il filtro selezionato.</p>
+        </div>
+      } @else if (filteredTickets().length) {
+        @for (ticket of filteredTickets(); track ticket.ticketID) {
+          <div class="list-group-item p-4 p-md-5 border-bottom border-light d-flex flex-column flex-lg-row align-items-lg-center gap-4">
+            <div class="d-flex align-items-start gap-4 flex-grow-1 min-w-0">
+              <div
+                class="rounded-circle bg-primary bg-opacity-25 text-primary d-flex align-items-center justify-content-center flex-shrink-0"
+                style="width: 3.5rem; height: 3.5rem;"
+                aria-hidden="true"
+              >
+                <app-sd-icon name="ticket" [size]="20" />
+              </div>
+
+              <div class="min-w-0 flex-grow-1">
+                <h3 class="h5 fw-bold mb-1 text-truncate" [attr.title]="(ticket.title ?? '').trim() || null">
+                  {{ ticket.title ? ticket.title : ticket.displayTicketLabel }}
+                </h3>
+                @if (ticket.title) {
+                  <p class="small text-muted fw-medium mb-2">{{ ticket.displayTicketLabel }}</p>
+                }
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                  <span class="badge bg-light text-dark border border-light rounded-pill px-3 py-1 shadow-sm d-inline-flex align-items-center gap-2">
+                    <app-sd-icon name="desktop" [size]="14" class="text-muted" />
+                    {{ ticket.displayDeskLabel }}
+                  </span>
+                  <span class="small text-muted fw-medium d-inline-flex align-items-center gap-1">
+                    <app-sd-icon name="clock" [size]="14" />
+                    {{ formatTicketWhen(ticket.createdAt) }}
+                  </span>
+                </div>
+                @if (ticketDescriptionText(ticket); as desc) {
+                  <p class="small mb-0 text-muted text-truncate" [attr.title]="desc">{{ desc }}</p>
+                }
+              </div>
+            </div>
+
+            <div class="d-flex flex-column align-items-lg-end gap-3 flex-shrink-0">
+              <div class="d-flex align-items-center gap-3">
+                <app-ticket-status-badge [status]="ticket.status" [compact]="true" />
+                <app-ticket-status-progress [status]="ticket.status" [compact]="true" [cardSide]="true" />
+              </div>
+
+              <div class="d-flex flex-wrap gap-2 justify-content-lg-end" role="group" [attr.aria-label]="'Azioni ticket ' + ticket.displayTicketLabel">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm rounded-pill px-4 py-2 fw-semibold apple-button d-inline-flex align-items-center gap-2 shadow-0"
+                  mdbRipple
+                  [class.border-danger]="hasUnseenStaffMessages(ticket)"
+                  [class.text-danger]="hasUnseenStaffMessages(ticket)"
+                  [attr.aria-label]="
+                    hasUnseenStaffMessages(ticket)
+                      ? 'Visualizza dettagli, ' + ticketUnseenIncomingCount(ticket) + ' nuovi messaggi'
+                      : 'Visualizza dettagli'
+                  "
+                  (click)="openTicketDetail(ticket)"
+                >
+                  <app-sd-icon name="eye" [size]="16" aria-hidden="true" />
+                  Dettagli
+                  @if (hasUnseenStaffMessages(ticket)) {
+                    <span class="badge bg-danger rounded-pill">{{ ticketUnseenIncomingCount(ticket) }}</span>
+                  }
+                </button>
+                
+                @if (canDeleteTicket(ticket.status)) {
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger rounded-pill px-3 py-2 shadow-0"
+                    mdbRipple
+                    (click)="deleteTicket(ticket.ticketID)"
+                    aria-label="Elimina segnalazione"
+                  >
+                    <app-sd-icon name="trash" [size]="16" />
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    class="btn btn-white border border-light rounded-pill px-3 py-2 shadow-0 text-muted"
+                    disabled
+                    title="La segnalazione è in carico al tecnico e non può essere eliminata finché non viene risolta."
+                    aria-label="Eliminazione bloccata"
+                  >
+                    <app-sd-icon name="shield" [size]="16" />
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+}
+
+<ng-template #openTicketModal>
+  @if (openingBooking(); as booking) {
+    <div
+      class="modal-content border-0 rounded-5 shadow-lg overflow-hidden"
+      role="dialog"
+      aria-labelledby="worker-ticket-open-title"
+    >
+      <app-sd-modal-header
+        title="Apri segnalazione"
+        subtitle="Segnala un problema sulla postazione"
+        icon="ticket"
+        titleId="worker-ticket-open-title"
+        (close)="cancelOpenTicket()"
+      />
+
+      <div class="modal-body p-4 p-md-5">
+        <div class="d-flex align-items-center gap-3 bg-light rounded-4 p-3 mb-4">
+          <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 3rem; height: 3rem">
+            <app-sd-icon name="calendar-check" [size]="18" />
+          </div>
+          <div class="min-w-0">
+            <div class="fw-bold mb-1">Prenotazione #{{ bookingPublicRef(booking) }}</div>
+            <div class="small text-muted fw-medium d-flex align-items-center gap-2">
+              <span class="badge bg-white text-dark border border-light rounded-pill px-2 shadow-sm">Desk {{ booking.deskID }}</span>
+              <span>{{ booking.startTime | date:'HH:mm' }} – {{ booking.endTime | date:'HH:mm' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <form (ngSubmit)="submitTicketForBooking()" novalidate>
+          @if (ticketModalError) {
+            <div class="alert alert-danger py-3 px-4 mb-4 rounded-4 border-0 shadow-sm fw-medium small" role="alert">
+              {{ ticketModalError }}
+            </div>
+          }
+
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="form-label small text-uppercase text-muted fw-semibold mb-0" for="ticket-draft-title">Titolo</label>
+              <span
+                class="small fw-semibold"
+                [class.text-danger]="titleTooLong"
+                [class.text-muted]="!titleTooLong"
+                aria-live="polite"
+              >
+                {{ titleTrimLength }}/{{ titleMax }}
+              </span>
+            </div>
+            <input
+              type="text"
+              mdbInput
+              class="form-control form-control-lg bg-light border-0 rounded-4"
+              [(ngModel)]="draftTitle"
+              name="ticketTitle"
+              [maxlength]="titleMax"
+              required
+              autocomplete="off"
+              placeholder="es. Monitor spento"
+              [attr.aria-required]="true"
+              [attr.aria-invalid]="titleFieldInvalid ? 'true' : null"
+              id="ticket-draft-title"
+            />
+          </div>
+
+          <div class="mb-0">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="form-label small text-uppercase text-muted fw-semibold mb-0" for="ticket-draft-desc">Descrizione</label>
+              <span class="small text-muted fw-semibold" aria-live="polite">
+                {{ descriptionLength }}/{{ descriptionMax }}
+              </span>
+            </div>
+            <textarea
+              mdbInput
+              class="form-control bg-light border-0 rounded-4 p-3"
+              [(ngModel)]="draftDescription"
+              name="ticketDescription"
+              [maxlength]="descriptionMax"
+              rows="4"
+              [placeholder]="ticketDraftPlaceholder(booking)"
+              [attr.aria-required]="true"
+              id="ticket-draft-desc"
+            ></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer bg-light border-0 p-4 gap-2">
+        <button
+          class="btn btn-white rounded-pill px-4 fw-bold shadow-sm"
+          type="button"
+          mdbRipple
+          (click)="cancelOpenTicket()"
+        >
+          Annulla
+        </button>
+        <button
+          class="btn btn-primary rounded-pill px-5 fw-bold shadow-0"
+          type="button"
+          mdbRipple
+          [disabled]="!canSubmitTicket"
+          (click)="submitTicketForBooking()"
+        >
+          Invia ticket
+        </button>
+      </div>
+    </div>
+  }
+</ng-template>
+
+<ng-template #ticketDetailModal>
+  @if (detailTicket(); as ticket) {
+    <div
+      class="modal-content border-0 rounded-5 shadow-lg overflow-hidden"
+      role="dialog"
+      aria-labelledby="worker-ticket-detail-title"
+    >
+      <app-sd-modal-header
+        [title]="ticket.title ? ticket.title : ticket.displayTicketLabel"
+        [subtitle]="ticket.displayTicketLabel + ' · ' + ticket.displayDeskLabel"
+        icon="ticket"
+        titleId="worker-ticket-detail-title"
+        (close)="closeTicketDetail()"
+      />
+
+      <div class="modal-body p-4 p-md-5">
+        <section class="mb-5" aria-labelledby="worker-ticket-detail-desc-label">
+          <h3 id="worker-ticket-detail-desc-label" class="fs-6 text-uppercase text-muted fw-semibold mb-3 tracking-wide">Descrizione</h3>
+          <div class="border-0 rounded-4 p-4 bg-light">
+            <p class="mb-0 text-break fw-medium">
+              {{ ticketDescriptionText(ticket) || 'Nessuna descrizione fornita.' }}
+            </p>
+          </div>
+        </section>
+
+        <section class="mb-5" aria-label="Stato ticket">
+          <h3 class="fs-6 text-uppercase text-muted fw-semibold mb-3 tracking-wide">Stato attuale</h3>
+          <div class="border border-light rounded-4 p-4">
+            <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+              <app-ticket-status-badge [status]="ticket.status" />
+            </div>
+            <div class="mb-4">
+              <app-ticket-status-progress [status]="ticket.status" [detail]="true" />
+            </div>
+            <p class="text-dark fw-medium mb-4">{{ technicalStatusLine(ticket.status) }}</p>
+            
+            <div class="d-flex flex-column gap-3 bg-light rounded-4 p-3">
+              @if (ticket.severity) {
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="small fw-semibold text-muted text-uppercase">Gravità</span>
+                  <span
+                    class="badge rounded-pill fw-bold px-3 py-2"
+                    [ngClass]="{
+                      'bg-danger': severityUpper(ticket.severity) === 'CRITICAL',
+                      'bg-warning text-dark': severityUpper(ticket.severity) === 'HIGH',
+                      'bg-info': severityUpper(ticket.severity) === 'MEDIUM',
+                      'bg-secondary': severityUpper(ticket.severity) === 'LOW'
+                    }"
+                  >{{ severityLabel(ticket.severity) }}</span>
+                </div>
+              }
+              @if (ticket.estimatedResolutionAt) {
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="small fw-semibold text-muted text-uppercase">Risoluzione stimata</span>
+                  <span class="small fw-bold d-flex align-items-center gap-2">
+                    <app-sd-icon name="clock" [size]="14" class="text-muted" aria-hidden="true" />
+                    {{ formatTicketWhen(ticket.estimatedResolutionAt) }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+
+        <section aria-label="Conversazione ticket">
+          <h3 class="fs-6 text-uppercase text-muted fw-semibold mb-3 tracking-wide">Conversazione</h3>
+          <div class="border border-light rounded-4 overflow-hidden">
+            <app-ticket-chat-panel
+              [ticket]="ticket"
+              viewer="worker"
+              [relaxed]="true"
+              [canComment]="canAddDetailComment(ticket)"
+              [sending]="detailCommentSending()"
+              [commentError]="detailCommentError"
+              [(commentDraft)]="detailCommentDraft"
+              (submitComment)="submitDetailComment()"
+              commentPlaceholder="Scrivi un aggiornamento per il tecnico…"
+              emptyHint="Nessun messaggio ancora. Scrivi un aggiornamento o attendi la risposta del tecnico."
+              closedHint="Segnalazione chiusa: non è possibile aggiungere altri commenti."
+            />
+          </div>
+        </section>
+      </div>
+    </div>
+  }
+</ng-template>

@@ -1,0 +1,48 @@
+.host-tech-assign-flow {
+  min-width: 0;
+}
+
+.host-tech-assign-pickers {
+  margin-inline: 0;
+}
+
+.host-tech-assign-picker {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: inherit;
+  transition: transform 0.2s ease;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.host-tech-assign-picker__surface {
+  border: 1px solid var(--bs-border-color) !important;
+  background: var(--bs-body-bg);
+  box-shadow: none !important;
+  transform: none !important;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+.host-tech-assign-summary {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid var(--bs-border-color);
+  background: var(--bs-tertiary-bg);
+}
+
+.host-tech-assign-submit {
+  width: 100%;
+  max-width: 100%;
+}

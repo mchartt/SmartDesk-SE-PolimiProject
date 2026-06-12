@@ -1,0 +1,80 @@
+@if (isDeskModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'host-desk-modal-title'"
+    (click)="closeDeskModal()"
+  >
+    <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          [title]="editingDeskId === null ? 'Aggiungi una postazione' : 'Aggiorna la postazione'"
+          [eyebrow]="editingDeskId === null ? 'Nuova postazione' : 'Modifica postazione'"
+          titleId="host-desk-modal-title"
+          (close)="closeDeskModal()"
+        />
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold" for="host-desk-room">Stanza</label>
+              <select id="host-desk-room" mdbInput class="form-select" [(ngModel)]="deskRoomId">
+                @for (r of rooms(); track r.roomID) {
+                  <option [ngValue]="r.roomID">{{ r.name }} · {{ r.code }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold" for="host-desk-code">
+                Codice postazione
+                <span class="text-muted fw-normal">da codice stanza</span>
+              </label>
+              @if (editingDeskId === null) {
+                <input
+                  id="host-desk-code"
+                  mdbInput
+                  class="form-control"
+                  [value]="previewDeskCode()"
+                  readonly
+                  tabindex="-1"
+                  aria-readonly="true"
+                />
+              } @else {
+                <input
+                  id="host-desk-code"
+                  mdbInput
+                  class="form-control"
+                  [value]="deskCode"
+                  readonly
+                  tabindex="-1"
+                  aria-readonly="true"
+                />
+              }
+            </div>
+          </div>
+          <p class="small text-muted mt-2 mb-0">
+            @if (editingDeskId === null) {
+              Il codice viene assegnato automaticamente: codice stanza + numero progressivo (es. SR1, SR2, SR3).
+            } @else {
+              Il codice segue la stanza selezionata; se sposti la postazione in un’altra stanza, riceverà il prossimo codice libero in quella stanza.
+            }
+          </p>
+          @if (errorMsg) {
+            <div class="alert alert-danger mt-3 mb-0 py-2 rounded-3 d-flex align-items-center gap-2" role="alert">
+              <app-sd-icon name="exclamation" [size]="16" aria-hidden="true" />
+              <span>{{ errorMsg }}</span>
+            </div>
+          }
+        </div>
+        <div class="modal-footer gap-2">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeDeskModal()" mdbRipple>Annulla</button>
+          <button type="button" class="btn btn-primary rounded-pill px-4" (click)="saveDesk()" mdbRipple>
+            {{ editingDeskId === null ? 'Crea postazione' : 'Salva modifiche' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

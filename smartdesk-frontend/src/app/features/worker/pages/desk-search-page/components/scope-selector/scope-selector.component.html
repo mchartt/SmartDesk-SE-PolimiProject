@@ -1,0 +1,269 @@
+<h2 class="fs-6 text-uppercase text-muted fw-semibold mb-2 ms-4 tracking-wide">1. Dove vuoi lavorare?</h2>
+<div class="card border-0 rounded-5 mb-5 shadow-sm overflow-hidden sd-section-card"
+     [class.sd-section-completed]="step2Done()">
+  <div class="list-group list-group-flush">
+
+    <button
+      class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-4 border-bottom border-light"
+      (click)="openCityModal()"
+      mdbRipple
+    >
+      <div class="d-flex align-items-center gap-3">
+        <div class="rounded-circle bg-primary bg-opacity-25 text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 2.5rem; height: 2.5rem">
+          <app-sd-icon name="location-pin" [size]="20" />
+        </div>
+        <div class="text-start min-w-0">
+          <span class="d-block small text-muted text-uppercase fw-semibold mb-1">Città</span>
+          <span class="d-block fw-bold text-truncate" [class.text-muted]="!selectedCity()">{{ selectedCity() || 'Scegli una città' }}</span>
+        </div>
+      </div>
+      <app-sd-icon name="arrow-right" [size]="18" class="text-muted opacity-50" />
+    </button>
+
+
+    <button
+      class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-4 border-bottom border-light"
+      [disabled]="!step1Done()"
+      (click)="openOfficeModal()"
+      mdbRipple
+    >
+      <div class="d-flex align-items-center gap-3 min-w-0">
+        <div class="rounded-circle bg-info bg-opacity-25 text-info d-flex align-items-center justify-content-center flex-shrink-0" style="width: 2.5rem; height: 2.5rem">
+          <app-sd-icon name="building" [size]="20" />
+        </div>
+        <div class="text-start min-w-0">
+          <span class="d-block small text-muted text-uppercase fw-semibold mb-1">Ufficio</span>
+          <span class="d-block fw-bold text-truncate" [class.text-muted]="selectedSpaceId() === null">
+            {{ selectedSpaceId() ? (spaces().find(s => s.spaceID === selectedSpaceId())?.name) : 'Scegli un ufficio' }}
+          </span>
+          @if (selectedSpaceId() !== null) {
+            @let r = getSpaceRating(selectedSpaceId());
+            @if (hasSpaceReviewAverage(r)) {
+              <span class="small fw-semibold text-warning d-block mt-1">
+                <app-sd-icon name="star" [size]="12" class="me-1" aria-hidden="true" />
+                {{ spaceReviewRatingCaption(r!) }}
+              </span>
+            }
+          }
+        </div>
+      </div>
+      <app-sd-icon name="arrow-right" [size]="18" class="text-muted opacity-50 flex-shrink-0" />
+    </button>
+
+
+    <button
+      class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-4"
+      [disabled]="!step2Done()"
+      (click)="openRoomModal()"
+      mdbRipple
+    >
+      <div class="d-flex align-items-center gap-3">
+        <div class="rounded-circle bg-secondary bg-opacity-25 text-secondary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 2.5rem; height: 2.5rem">
+          <app-sd-icon name="workspace" [size]="20" />
+        </div>
+        <div class="text-start min-w-0">
+          <span class="d-block small text-muted text-uppercase fw-semibold mb-1">Sala (Opzionale)</span>
+          <span class="d-block fw-bold text-truncate">{{ selectedRoomLabel }}</span>
+        </div>
+      </div>
+      <app-sd-icon name="arrow-right" [size]="18" class="text-muted opacity-50" />
+    </button>
+  </div>
+</div>
+
+<ng-template #cityModal>
+  <div class="modal-content">
+    <app-sd-modal-header
+      title="Scegli la città"
+      [subtitle]="filteredCities.length + ' città disponibili'"
+      icon="location-pin"
+      (close)="closeCityModal()"
+    />
+    <div class="modal-body">
+      <label class="form-label small fw-semibold" for="desk-search-city-filter">Cerca città</label>
+      <div class="input-group mb-4">
+        <span class="input-group-text bg-transparent" aria-hidden="true">
+          <app-sd-icon name="search" [size]="18" />
+        </span>
+        <input
+          id="desk-search-city-filter"
+          type="search"
+          mdbInput
+          class="form-control"
+          placeholder="Cerca una città…"
+          [(ngModel)]="citySearch"
+          autocomplete="off"
+        />
+      </div>
+      @if (isLoading() && !cities().length) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted">Caricamento città...</p>
+        </div>
+      } @else {
+        <ul class="list-group list-group-flush rounded-3 border mb-0" role="listbox">
+          @for (city of filteredCities; track city) {
+            <li class="list-group-item list-group-item-action p-0 border-0 border-bottom" role="presentation">
+              <button
+                type="button"
+                class="btn w-100 text-start d-flex align-items-center justify-content-between gap-3 p-3 rounded-0"
+                role="option"
+                (click)="chooseCity(city)"
+                mdbRipple
+              >
+                <span class="fw-semibold">{{ city }}</span>
+                <app-sd-icon name="arrow-right" [size]="18" class="text-muted flex-shrink-0" aria-hidden="true" />
+              </button>
+            </li>
+          }
+          @if (!filteredCities.length && citySearch) {
+            <div class="text-center py-4 text-muted">Nessuna città trovata per "{{ citySearch }}"</div>
+          } @else if (!cities().length && !isLoading()) {
+            <div class="text-center py-4 text-muted">Nessuna sede disponibile al momento.</div>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #officeModal>
+  <div class="modal-content">
+    <app-sd-modal-header
+      title="Scegli l'ufficio"
+      subtitle="Sede, codice o valutazione"
+      icon="building"
+      (close)="closeOfficeModal()"
+    />
+    <div class="modal-body">
+      <label class="form-label small fw-semibold" for="desk-search-office-filter">Cerca ufficio</label>
+      <div class="input-group mb-4">
+        <span class="input-group-text bg-transparent" aria-hidden="true">
+          <app-sd-icon name="search" [size]="18" />
+        </span>
+        <input
+          id="desk-search-office-filter"
+          type="search"
+          mdbInput
+          class="form-control"
+          placeholder="Cerca sede o codice…"
+          [(ngModel)]="officeSearch"
+          autocomplete="off"
+        />
+      </div>
+      @if (isLoading() && !filteredSpaces.length) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted">Caricamento uffici...</p>
+        </div>
+      } @else {
+        <ul class="list-group list-group-flush rounded-3 border mb-0" role="listbox">
+          @for (space of filteredOfficesForModal; track space.spaceID) {
+            <li class="list-group-item list-group-item-action p-0 border-0 border-bottom" role="presentation">
+              <button
+                type="button"
+                class="btn w-100 text-start d-flex align-items-start gap-3 p-3 rounded-0"
+                role="option"
+                [class.text-muted]="space.deskCount === 0"
+                [disabled]="space.deskCount === 0"
+                (click)="chooseOffice(space.spaceID)"
+                mdbRipple
+              >
+                <span
+                  class="rounded-circle bg-light text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                  style="width: 2.25rem; height: 2.25rem"
+                  aria-hidden="true"
+                >
+                  <app-sd-icon name="building" [size]="20" />
+                </span>
+                <span class="flex-grow-1 min-w-0">
+                  <span class="fw-semibold d-block">{{ space.name }}</span>
+                  <span class="small text-muted d-block">{{ space.city }} · {{ space.deskCount }} postazioni{{ space.officeCode ? ' · ' + space.officeCode : '' }}</span>
+                  @if (hasSpaceReviewAverage(space.averageReviewRating)) {
+                    <span
+                      class="d-inline-flex align-items-center gap-1 mt-1 small fw-semibold text-warning"
+                      [attr.aria-label]="spaceReviewRatingCaption(space.averageReviewRating!)"
+                    >
+                      <app-sd-icon name="star" [size]="14" aria-hidden="true" />
+                      {{ spaceReviewRatingCaption(space.averageReviewRating!) }}
+                    </span>
+                  } @else {
+                    <span class="small text-muted d-block mt-1">Ancora nessuna recensione</span>
+                  }
+                  @if (space.deskCount === 0) {
+                    <span class="small text-danger d-block mt-1">Nessuna postazione disponibile</span>
+                  }
+                </span>
+                <app-sd-icon name="arrow-right" [size]="18" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+              </button>
+            </li>
+          }
+          @if (!filteredOfficesForModal.length && officeSearch) {
+            <div class="text-center py-4 text-muted">Nessun ufficio trovato per "{{ officeSearch }}"</div>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #roomModal>
+  <div class="modal-content">
+    <app-sd-modal-header title="Scegli la sala" subtitle="Filtra o seleziona tutte le sale" icon="layers" (close)="closeRoomModal()" />
+    <div class="modal-body">
+      <label class="form-label small fw-semibold" for="desk-search-room-filter">Cerca sala</label>
+      <div class="input-group mb-4">
+        <span class="input-group-text bg-transparent" aria-hidden="true">
+          <app-sd-icon name="search" [size]="18" />
+        </span>
+        <input
+          id="desk-search-room-filter"
+          type="search"
+          mdbInput
+          class="form-control"
+          placeholder="Cerca sala…"
+          [(ngModel)]="roomSearch"
+          autocomplete="off"
+        />
+      </div>
+      @if (slotsLoading() && !roomsInOffice.length) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted">Caricamento sale...</p>
+        </div>
+      } @else {
+        <ul class="list-group list-group-flush rounded-3 border mb-0" role="listbox">
+          <li class="list-group-item list-group-item-action p-0 border-0 border-bottom" role="presentation">
+            <button
+              type="button"
+              class="btn w-100 text-start d-flex align-items-center justify-content-between gap-3 p-3 rounded-0"
+              role="option"
+              (click)="chooseRoom(null)"
+              mdbRipple
+            >
+              <span class="fw-semibold">Tutte le sale</span>
+              <app-sd-icon name="arrow-right" [size]="18" class="text-muted flex-shrink-0" aria-hidden="true" />
+            </button>
+          </li>
+          @for (room of filteredRoomsForModal; track room.roomKey) {
+            <li class="list-group-item list-group-item-action p-0 border-0 border-bottom" role="presentation">
+              <button
+                type="button"
+                class="btn w-100 text-start d-flex align-items-start gap-3 p-3 rounded-0"
+                role="option"
+                (click)="chooseRoom(room.roomKey)"
+                mdbRipple
+              >
+                <span class="flex-grow-1 min-w-0">
+                  <span class="fw-semibold d-block">{{ room.label }}</span>
+                  <span class="small text-muted">{{ room.deskCount }} postazioni</span>
+                </span>
+                <app-sd-icon name="arrow-right" [size]="18" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+</ng-template>

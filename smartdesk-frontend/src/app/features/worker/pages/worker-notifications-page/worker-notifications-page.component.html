@@ -1,0 +1,314 @@
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 px-2">
+  <div>
+    <h1 class="display-6 fw-bold mb-0 tracking-tight text-balance">{{ title() }}</h1>
+  </div>
+</div>
+
+@if (errorMsg()) {
+  <div class="alert alert-danger border-0 rounded-4 shadow-sm d-flex align-items-center mb-4 fw-medium small" role="alert">
+    <app-sd-icon class="me-3 flex-shrink-0" name="exclamation" [size]="20" />
+    <div>{{ errorMsg() }}</div>
+  </div>
+}
+
+@if (bulkSuccess()) {
+  <div class="alert alert-success border-0 rounded-4 shadow-sm d-flex align-items-center mb-4 fw-medium small" role="status">
+    <app-sd-icon class="me-3 flex-shrink-0" name="circle-check" [size]="20" />
+    <div>{{ bulkSuccess() }}</div>
+  </div>
+}
+
+@if (loading()) {
+  <div class="d-flex flex-column align-items-center justify-content-center py-5 gap-3" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" aria-hidden="true"></div>
+    <p class="text-muted small mb-0 fw-medium">Caricamento notifiche…</p>
+  </div>
+} @else if (!errorMsg()) {
+  
+  <div class="row g-3 mb-5">
+    <div class="col-lg-8">
+      <div class="card border-0 rounded-5 h-100 shadow-sm bg-white overflow-hidden transition-hover" style="transition: transform 0.2s">
+        <div class="card-body p-4 p-md-5 d-flex flex-column justify-content-between">
+          <p class="small text-uppercase text-muted fw-semibold mb-3 tracking-wide">Messaggi nel centro</p>
+          <div class="d-flex align-items-center gap-4">
+            <div class="rounded-circle bg-primary bg-opacity-25 text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 4rem; height: 4rem" aria-hidden="true">
+              <app-sd-icon name="inbox" [size]="24" />
+            </div>
+            <div>
+              <p class="display-4 fw-bold mb-0 text-dark">{{ messagesTotal() }}</p>
+              <p class="small text-muted fw-medium mb-0 mt-1">Totale notifiche ricevute</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="d-flex flex-column gap-3 h-100">
+        <div class="card border-0 rounded-5 flex-grow-1 shadow-sm bg-white overflow-hidden transition-hover" style="transition: transform 0.2s">
+          <div class="card-body p-4 d-flex align-items-center justify-content-between">
+            <div>
+              <p class="small text-uppercase text-muted fw-semibold mb-1 tracking-wide">Non lette</p>
+              <p class="small text-muted fw-medium mb-0">Da leggere o confermare</p>
+            </div>
+            <p class="h2 fw-bold mb-0 text-primary">{{ messagesUnread() }}</p>
+          </div>
+        </div>
+        <div class="card border-0 rounded-5 flex-grow-1 shadow-sm bg-white overflow-hidden transition-hover" style="transition: transform 0.2s">
+          <div class="card-body p-4 d-flex align-items-center justify-content-between">
+            <div>
+              <p class="small text-uppercase text-muted fw-semibold mb-1 tracking-wide">Lette</p>
+              <p class="small text-muted fw-medium mb-0">Già consultate</p>
+            </div>
+            <p class="h2 fw-bold mb-0 text-secondary">{{ messagesRead() }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (routeRole() === 'SYS_ADMIN') {
+    <div class="card border-0 rounded-5 shadow-sm bg-white overflow-hidden mb-5">
+      <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row flex-wrap gap-4 justify-content-between align-items-center bg-warning bg-opacity-25">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle bg-white text-warning d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+            <app-sd-icon name="inbox" [size]="20" />
+          </div>
+          <h3 class="h5 fw-bold mb-0 text-warning-emphasis">Riepilogo approvazioni</h3>
+        </div>
+        <div class="d-flex flex-wrap gap-4 bg-white rounded-4 p-3 shadow-sm border border-light">
+          <div class="text-center px-3">
+            <span class="small text-muted text-uppercase fw-semibold d-block mb-1" style="font-size: 0.7rem;">Host</span>
+            <span class="fs-4 fw-bold text-dark">{{ pendingHostsQueue() }}</span>
+          </div>
+          <div class="border-start border-light"></div>
+          <div class="text-center px-3">
+            <span class="small text-muted text-uppercase fw-semibold d-block mb-1" style="font-size: 0.7rem;">Spazi</span>
+            <span class="fs-4 fw-bold text-dark">{{ pendingSpacesQueue() }}</span>
+          </div>
+          <div class="border-start border-light"></div>
+          <div class="text-center px-3">
+            <span class="small text-muted text-uppercase fw-semibold d-block mb-1" style="font-size: 0.7rem;">Totale</span>
+            <span class="fs-4 fw-bold text-warning">{{ approvalQueueTotal() }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (routeRole() === 'HOST') {
+    <div class="card border-0 rounded-5 shadow-sm bg-white overflow-hidden mb-5">
+      <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 bg-primary bg-opacity-25">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+            <app-sd-icon name="building" [size]="20" />
+          </div>
+          <h3 class="h5 fw-bold mb-0 text-primary">Spazi in attesa di approvazione</h3>
+        </div>
+        <div class="text-md-end bg-white rounded-4 px-4 py-2 shadow-sm border border-light">
+          <span class="small text-muted text-uppercase fw-semibold d-block mb-1" style="font-size: 0.7rem;">In approvazione</span>
+          <span class="display-6 fw-bold text-primary">{{ pendingOwnSpaces() }}</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (!notifications().length) {
+    <div class="p-5 text-center">
+      <div class="mb-4 text-muted">
+        <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 5rem; height: 5rem">
+          <app-sd-icon name="circle-check" [size]="32" class="opacity-50" />
+        </div>
+      </div>
+      <h3 class="fw-bold mb-2">Tutto in regola</h3>
+      <p class="text-muted fw-medium mb-0">Non hai ancora notifiche.</p>
+    </div>
+  } @else {
+    <section aria-label="Centro notifiche">
+      <div class="bg-light rounded-4 p-3 mb-4 d-flex flex-column flex-lg-row flex-wrap gap-3 align-items-lg-center justify-content-between border border-light">
+        <div class="input-group" style="max-width: 20rem">
+          <span class="input-group-text bg-white border-0 shadow-sm rounded-start-pill ps-4 pe-2" aria-hidden="true">
+            <app-sd-icon name="search" [size]="16" class="text-muted" />
+          </span>
+          <input
+            id="notifications-text-filter"
+            type="search"
+            class="form-control bg-white border-0 shadow-sm rounded-end-pill"
+            placeholder="Cerca notifica..."
+            autocomplete="off"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            aria-label="Cerca nel testo delle notifiche"
+          />
+        </div>
+        
+        <div class="d-flex align-items-center justify-content-center flex-grow-1">
+          <mdb-tabs pills class="apple-tabs bg-white rounded-pill shadow-sm p-1" (activeTabChange)="onMdbTabChange($event)">
+            <mdb-tab title="Tutte"></mdb-tab>
+            <mdb-tab title="Non lette"></mdb-tab>
+            <mdb-tab title="Lette"></mdb-tab>
+          </mdb-tabs>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 align-items-center justify-content-end">
+          @if (messagesUnread() > 0) {
+            <button
+              type="button"
+              class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm"
+              mdbRipple
+              [disabled]="markingAllRead() || markingReadId() !== null"
+              (click)="markAllAsRead()"
+            >
+              @if (markingAllRead()) {
+                <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+              }
+              Leggi tutte
+            </button>
+          }
+          @if (messagesRead() > 0) {
+            <button
+              type="button"
+              class="btn btn-white rounded-pill px-4 fw-bold text-muted shadow-sm"
+              mdbRipple
+              [disabled]="clearingHistory() || markingAllRead() || markingReadId() !== null"
+              (click)="clearHistory()"
+            >
+              @if (clearingHistory()) {
+                <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+              }
+              Pulisci storico
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (!filteredNotifications().length) {
+        <div class="p-5 text-center bg-white rounded-5 shadow-sm">
+          <p class="text-muted fw-medium mb-0">{{ filteredEmptyMessage() }}</p>
+        </div>
+      } @else {
+        <div class="card border-0 rounded-5 shadow-sm overflow-hidden bg-white mb-5">
+          <div class="list-group list-group-flush gap-3 p-3">
+            @for (n of filteredNotifications(); track n.id) {
+              <div class="list-group-item p-4 border-0 rounded-4 shadow-sm position-relative transition-hover" 
+                   [class.bg-white]="n.read" 
+                   [class.bg-primary]="!n.read" 
+                   [class.bg-opacity-25]="!n.read"
+                   style="transition: transform 0.2s, box-shadow 0.2s;">
+                
+                <div class="d-flex flex-column flex-md-row gap-4 align-items-md-center">
+                  <div class="d-flex gap-4 min-w-0 flex-grow-1 align-items-start align-items-md-center">
+                    <div
+                      class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm"
+                      style="width: 3.5rem; height: 3.5rem"
+                      [ngClass]="n.read ? 'bg-light text-muted border border-white' : 'bg-white text-primary'"
+                      aria-hidden="true"
+                    >
+                      <app-sd-icon [name]="notificationIcon(n)" [size]="20" />
+                    </div>
+                    
+                    <div class="min-w-0 flex-grow-1">
+                      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-1">
+                        <h6 class="fw-bold fs-6 mb-0 text-dark d-flex align-items-center gap-2">
+                          @if (!n.read) {
+                            <span class="badge rounded-circle bg-primary p-1 flex-shrink-0 shadow-sm" style="width: 0.5rem; height: 0.5rem;" aria-hidden="true"></span>
+                          }
+                          <span class="text-break lh-sm">{{ notificationDisplayTitle(n) }}</span>
+                        </h6>
+                        @if (n.createdAt) {
+                          <span class="small text-muted fw-medium d-flex align-items-center gap-1 flex-shrink-0 bg-white px-2 py-1 rounded-pill border border-light">
+                            <app-sd-icon name="calendar" [size]="12" aria-hidden="true" />
+                            {{ formatNotificationWhen(n.createdAt) }}
+                          </span>
+                        }
+                      </div>
+
+                      @if (usesCompactActorLayout(n)) {
+                        <div class="mt-3 small bg-white bg-opacity-75 border border-light rounded-4 p-3 shadow-sm">
+                          @if (n.kind === 'TICKET_NOTE_UPDATED') {
+                            <div class="d-flex flex-wrap gap-4">
+                              <div><span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Nome</span><span class="fw-semibold text-dark">{{ actorFirstName(n) }} {{ actorLastName(n) }}</span></div>
+                              <div>
+                                <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Email</span>
+                                @if (n.actorEmail?.trim()) {
+                                  <a class="text-decoration-none fw-semibold text-primary text-break" [href]="'mailto:' + n.actorEmail!.trim()">{{ n.actorEmail!.trim() }}</a>
+                                } @else {
+                                  <span class="text-muted">—</span>
+                                }
+                              </div>
+                            </div>
+                          } @else if (n.kind === 'HOST_TICKET_OPENED') {
+                            <div class="mb-2">
+                              <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Problema</span>
+                              <span class="fw-semibold text-dark">{{ hostTicketProblemLine(n) }}</span>
+                            </div>
+                            <div>
+                              <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Email</span>
+                              @if (n.actorEmail?.trim()) {
+                                <a class="text-decoration-none fw-semibold text-primary text-break" [href]="'mailto:' + n.actorEmail!.trim()">{{ n.actorEmail!.trim() }}</a>
+                              } @else {
+                                <span class="text-muted">—</span>
+                              }
+                            </div>
+                          } @else {
+                            <p class="mb-2 text-break fw-semibold text-dark lh-sm">
+                              {{ notificationActivityDetail(n) }}
+                            </p>
+                            <div class="d-flex flex-wrap gap-4 align-items-center">
+                              @if (n.kind === 'HOST_REVIEW_LEFT' && n.actorRating != null && n.actorRating >= 1) {
+                                <div class="d-flex align-items-center gap-1" [attr.aria-label]="'Punteggio ' + n.actorRating + ' su 5'">
+                                  <span class="text-uppercase text-muted fw-bold mb-0 me-2" style="font-size: 0.65rem; letter-spacing: 0.5px;">Punteggio</span>
+                                  @for (s of stars; track s) {
+                                    <app-sd-icon
+                                      name="star"
+                                      [size]="14"
+                                      [class.text-warning]="s <= n.actorRating"
+                                      [class.text-muted]="s > n.actorRating"
+                                      [class.opacity-25]="s > n.actorRating"
+                                      aria-hidden="true"
+                                    />
+                                  }
+                                </div>
+                              }
+                              <div>
+                                <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Email</span>
+                                @if (n.actorEmail?.trim()) {
+                                  <a class="text-decoration-none fw-semibold text-primary text-break" [href]="'mailto:' + n.actorEmail!.trim()">{{ n.actorEmail!.trim() }}</a>
+                                } @else {
+                                  <span class="text-muted">—</span>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  @if (!n.read) {
+                    <div class="flex-shrink-0 ms-md-auto mt-3 mt-md-0 d-grid d-md-block border-start-md border-light ps-md-4">
+                      <button
+                        class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 transition-all"
+                        type="button"
+                        mdbRipple
+                        [disabled]="markingReadId() !== null || markingAllRead()"
+                        (click)="markAsRead(n.id)"
+                        aria-label="Segna come letta"
+                      >
+                        @if (markingReadId() === n.id) {
+                          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                        } @else {
+                          <app-sd-icon name="check" [size]="16" />
+                          <span class="text-nowrap">Segna letta</span>
+                        }
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </section>
+  }
+}

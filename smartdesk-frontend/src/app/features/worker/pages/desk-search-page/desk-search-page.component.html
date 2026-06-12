@@ -1,0 +1,419 @@
+<div class="bg-light min-vh-100 pt-4 pb-5">
+  <div class="container" style="max-width: 900px;">
+    <header class="mb-4 px-3 px-md-4">
+      <h1 class="display-6 fw-bold mb-2 tracking-tight">Prenota la tua postazione</h1>
+      <p class="text-muted mb-0">Trova lo spazio ideale per il tuo lavoro in pochi semplici passi.</p>
+    </header>
+
+    <app-scope-selector
+      [spaces]="spaces"
+      [cities]="cities"
+      [officeDesks]="officeDesks"
+      [selectedCity]="selectedCity()"
+      [selectedSpaceId]="selectedSpaceId()"
+      [selectedRoomKey]="selectedRoomKey()"
+      [step1Done]="step1Done()"
+      [step2Done]="step2Done()"
+      [isLoading]="isLoading"
+      [slotsLoading]="slotsLoading()"
+      (cityChosen)="onScopeCityChosen($event)"
+      (officeChosen)="onScopeOfficeChosen($event)"
+      (roomChosen)="onScopeRoomChosen($event)"
+    />
+
+          
+          <h2 class="fs-6 text-uppercase text-muted fw-semibold mb-2 ms-4 tracking-wide" [class.opacity-50]="!step2Done()">2. Quando vuoi venire?</h2>
+          <div class="card border-0 rounded-5 mb-5 shadow-sm overflow-visible sd-section-card" 
+               [class.opacity-50]="!step2Done()" 
+               [class.pe-none]="!step2Done()"
+               [class.sd-section-completed]="availabilityShown()">
+            <div class="card-body p-4 p-md-5">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Scegli la data</h3>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary rounded-pill d-inline-flex align-items-center gap-2"
+                  [disabled]="!step2Done()"
+                  (click)="amenityFilter.toggleCollapse()"
+                  mdbRipple
+                >
+                  <app-sd-icon name="filter" [size]="16" />
+                  Filtri e Dotazioni
+                </button>
+              </div>
+
+              <div class="d-flex gap-2 overflow-auto pb-3 mb-2">
+                @for (day of calendarDays; track day.isoString) {
+                  <button
+                    type="button"
+                    class="btn flex-shrink-0 text-center sd-calendar-day rounded-4 border-0 shadow-0"
+                    [disabled]="!day.selectable || !step2Done()"
+                    [ngClass]="dayButtonClasses(day)"
+                    (click)="selectDate(day)"
+                    mdbRipple
+                    style="min-width: 4.5rem; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
+                  >
+                    <span class="small d-block mb-1 opacity-75">{{ day.dowIt }}</span>
+                    <span class="fw-bold d-block fs-5">{{ day.dayNum }}</span>
+                  </button>
+                }
+              </div>
+
+              
+              <hr class="text-black-50 my-5" />
+              <h3 class="fw-bold mb-4">Scegli la fascia oraria</h3>
+              <div>
+                @let ohBanner = officeHoursBanner();
+                @if (ohBanner.show) {
+                  <div
+                    class="alert mb-4 d-flex align-items-start gap-3 rounded-4 border-0"
+                    [class.alert-warning]="ohBanner.variant === 'closed'"
+                    [class.alert-info]="ohBanner.variant !== 'closed'"
+                    role="status"
+                    [attr.aria-label]="ohBanner.kicker + (ohBanner.range ? ', ' + ohBanner.range : '') + (ohBanner.sub ? '. ' + ohBanner.sub : '')"
+                  >
+                    <app-sd-icon name="clock" [size]="22" class="flex-shrink-0 mt-1" aria-hidden="true" />
+                    <div>
+                      <div class="d-flex flex-wrap align-items-baseline gap-2">
+                        <span class="fw-bold">{{ ohBanner.kicker }}</span>
+                        @if (ohBanner.range) {
+                          <span class="fw-medium">{{ ohBanner.range }}</span>
+                        }
+                      </div>
+                      @if (ohBanner.sub) {
+                        <span class="small d-block mt-1 opacity-75">{{ ohBanner.sub }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+                <div class="row g-3 align-items-end">
+                  <div class="col-lg-8">
+                    <app-time-range-picker
+                      [slotStart]="slotStart"
+                      [slotEnd]="slotEnd"
+                      [bookingHoursAvailable]="bookingHoursAvailable()"
+                      [selectionIncludesPastSlot]="selectionIncludesPastSlot()"
+                      [step2Done]="step2Done()"
+                      [targetDate]="targetDate"
+                      [bookingBounds]="bookingBoundsForTimePicker()"
+                      (slotRangeChange)="onTimeRangePickerChange($event)"
+                    />
+                    @if (selectionIncludesPastSlot()) {
+                      <div
+                        id="sd-past-slot-warning"
+                        class="alert alert-warning d-flex align-items-center gap-3 mt-3 mb-0 rounded-4 border-0"
+                        role="status"
+                        aria-live="polite"
+                      >
+                        <app-sd-icon name="exclamation" [size]="22" class="flex-shrink-0" aria-hidden="true" />
+                        <p class="mb-0 fw-medium">Inserire un orario futuro</p>
+                      </div>
+                    }
+                  </div>
+                  <div class="col-lg-4">
+                    <button
+                      type="button"
+                      class="btn btn-primary w-100 rounded-pill px-4 py-3 fw-bold shadow-0"
+                      [disabled]="slotsLoading() || !bookingHoursAvailable() || !hasCompleteSlotRange() || selectionIncludesPastSlot()"
+                      (click)="showAvailabilityResults()"
+                      mdbRipple
+                    >
+                      @if (slotsLoading()) {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                      }
+                      Cerca disponibilità
+                    </button>
+                  </div>
+                </div>
+                @let blockedNotice = bookingHoursBlockedNotice();
+                @if (blockedNotice.show) {
+                  <div
+                    id="sd-office-hours-blocked"
+                    class="alert alert-warning d-flex align-items-start gap-3 mt-4 mb-0 rounded-4 border-0"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    <app-sd-icon name="exclamation" [size]="22" class="flex-shrink-0 mt-1" aria-hidden="true" />
+                    <div>
+                      <p class="fw-bold mb-1">{{ blockedNotice.title }}</p>
+                      <p class="mb-0 small">{{ blockedNotice.detail }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+
+            <app-amenity-filter
+              #amenityFilter
+              [officeDesks]="officeDesks"
+              [step2Done]="step2Done()"
+              [hasCompleteSlotRange]="hasCompleteSlotRange()"
+              [includeMaintenance]="includeMaintenance"
+              [selectedTags]="selectedTags"
+              [isLoading]="isLoading"
+              (tagToggle)="toggleAmenityTag($event)"
+              (clearFilters)="clearFilters()"
+            />
+          </div>
+
+    
+    @if (availabilityShown()) {
+      <div class="mt-5">
+        <h2 class="fs-6 text-uppercase text-muted fw-semibold mb-3 ms-4 tracking-wide">3. Postazioni disponibili</h2>
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 ms-4">
+          <div class="d-flex align-items-center gap-3">
+            <button
+              type="button"
+              class="btn btn-sm rounded-pill fw-bold shadow-0"
+              [class.btn-white]="!includeMaintenance"
+              [class.btn-primary]="includeMaintenance"
+              (click)="toggleMaintenanceFilter()"
+              mdbRipple
+            >
+              <app-sd-icon name="wrench" [size]="14" class="me-2" />
+              In manutenzione
+            </button>
+          </div>
+        </div>
+
+        @if (searchOutdated()) {
+          <div class="alert alert-info rounded-4 border-0 shadow-sm d-flex gap-3 mb-4 p-4" role="status">
+            <app-sd-icon name="exclamation" [size]="24" class="text-primary" />
+            <p class="mb-0">Orario modificato. Premi <strong>Cerca disponibilità</strong> per aggiornare le postazioni.</p>
+          </div>
+        } @else {
+        @if (warningMsg) {
+          <div class="alert alert-warning rounded-4 border-0 shadow-sm d-flex gap-3 mb-4 p-4">
+            <app-sd-icon name="exclamation" [size]="24" class="text-warning" />
+            <p class="mb-0">{{ warningMsg }}</p>
+          </div>
+        }
+
+        @if (selectedClosure) {
+          <div class="card text-center p-5 border-0 shadow-sm rounded-5 mb-5">
+            <div class="mb-4">
+              <app-sd-icon name="calendar" [size]="64" class="text-warning opacity-50" />
+            </div>
+            <h3 class="fw-bold mb-2">Questo spazio è chiuso</h3>
+            <p class="text-muted mb-2">{{ selectedClosure.closedDate | date: 'longDate':'':'it' }}</p>
+            <p class="text-muted mb-4">Motivo: {{ selectedClosure.reason }}</p>
+            <button class="btn btn-light fw-bold btn-lg rounded-pill px-5 shadow-0" (click)="resetSlotSelection(true); availabilityShown.set(false)" mdbRipple>
+              Cambia giorno
+            </button>
+          </div>
+        } @else if (
+          deskResultsLoading() ||
+          (slotsLoading() && desks.length === 0) ||
+          (officeDesks.length > 0 && !deskSlotMasksReady() && desks.length === 0)
+        ) {
+          <div class="card text-center p-5 border-0 shadow-sm rounded-5 mb-5 bg-white bg-opacity-75" style="backdrop-filter: blur(10px)">
+            <span class="spinner-border text-primary mb-3 mx-auto" role="status" aria-label="Caricamento disponibilità postazioni"></span>
+            <p class="text-muted mb-0 fw-medium">Verifica disponibilità postazioni in corso…</p>
+          </div>
+        } @else if (outcomeKind() === 'none' && !hasCompleteSlotRange()) {
+          <div class="card text-center p-5 border-0 shadow-sm rounded-5 mb-5 bg-white bg-opacity-75" style="backdrop-filter: blur(10px)">
+            <span class="spinner-border text-primary mb-3 mx-auto" role="status" aria-label="Aggiornamento ricerca"></span>
+            <p class="text-muted mb-0 fw-medium">Aggiornamento ricerca per il giorno selezionato…</p>
+          </div>
+        } @else if (outcomeKind() === 'D') {
+          <div class="card text-center p-5 border-0 shadow-sm rounded-5 mb-5">
+            <div class="mb-4">
+              <app-sd-icon name="clock" [size]="64" class="text-danger opacity-25" />
+            </div>
+            <h3 class="fw-bold mb-2">Orario fuori servizio</h3>
+            <p class="text-muted mb-4">L'intervallo scelto è al di fuori dell'orario di apertura e chiusura dell'ufficio.</p>
+            <div class="d-flex justify-content-center">
+              <button class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-0" (click)="resetSlotSelection(true); availabilityShown.set(false)" mdbRipple>
+                Scegli un altro orario
+              </button>
+            </div>
+          </div>
+        } @else if (selectedSpaceHasNoDesks()) {
+          <div class="card text-center p-5 border-0 shadow-sm rounded-5 mb-5">
+            <div class="mb-4">
+              <app-sd-icon name="search" [size]="64" class="text-muted opacity-25" />
+            </div>
+            <h3 class="fw-bold mb-2">Nessuna postazione trovata</h3>
+            <p class="text-muted mb-4">Riprova più tardi o scegli un altro spazio disponibile.</p>
+            <button class="btn btn-light fw-bold btn-lg rounded-pill px-5 shadow-0" (click)="availabilityShown.set(false)" mdbRipple>
+              Cambia spazio
+            </button>
+          </div>
+        } @else if (outcomeKind() === 'C' && !searchOutdated()) {
+          <div class="card text-center p-5 border-0 shadow-sm rounded-5 mb-5">
+            <div class="mb-4">
+              <app-sd-icon name="search" [size]="64" class="text-muted opacity-25" />
+            </div>
+            <h3 class="fw-bold mb-2">Tutto occupato</h3>
+            @if (workerOwnsOfficeSlotInSearchRange()) {
+              <p class="text-muted mb-4">
+                Hai già una prenotazione attiva in questo spazio per la fascia selezionata.
+              </p>
+              <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-0" routerLink="/worker/bookings" mdbRipple>
+                  Le mie prenotazioni
+                </a>
+                <button class="btn btn-light fw-bold btn-lg rounded-pill px-5 shadow-0" (click)="resetSlotSelection(true); availabilityShown.set(false)" mdbRipple>
+                  Cambia orario
+                </button>
+              </div>
+            } @else {
+              <p class="text-muted mb-4">Tutte le postazioni sono occupate per l'orario richiesto.</p>
+              <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <button
+                  class="btn btn-danger btn-lg rounded-pill px-5 py-3 fw-bold shadow-0"
+                  [disabled]="queueJoined() || !shouldOfferOfficeWaitlist()"
+                  (click)="joinOfficeWaitlist()"
+                  mdbRipple
+                >
+                  @if (queueJoined()) {
+                    <app-sd-icon name="check" class="me-2" /> In coda
+                  } @else {
+                    Mettimi in coda
+                  }
+                </button>
+                <button class="btn btn-light fw-bold btn-lg rounded-pill px-5 shadow-0" (click)="resetSlotSelection(true); availabilityShown.set(false)" mdbRipple>
+                  Cambia orario
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="row g-4 align-items-stretch">
+            @for (desk of desksFilteredByRoom(); track desk.id) {
+              <div class="col-md-6 d-flex flex-column">
+                <div class="card border-0 shadow-sm rounded-5 desk-search-result-card h-100 d-flex flex-column overflow-hidden transition-hover" style="transition: transform 0.2s; transform-origin: center;">
+                  <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                      <span class="badge bg-light text-dark rounded-pill fw-bold fs-6">Postazione {{ desk.code || desk.id }}</span>
+                      @let status = deskCard.resolveStatus(desk, desk.availabilityKind, desk.isCooldown);
+                      @let statusSub = deskCard.statusLabelSubline(status);
+                      <span [class]="deskCard.statusBadgeClass(status) + ' rounded-pill'">
+                        @if (statusSub) {
+                          <span class="fw-bold">{{ deskCard.statusLabel(status) }}</span>
+                        } @else {
+                          {{ deskCard.statusLabel(status) }}
+                        }
+                      </span>
+                    </div>
+                    
+                    <div class="d-flex gap-4 flex-grow-1 align-items-start">
+                      <div class="rounded-4 bg-light d-flex justify-content-center align-items-center flex-shrink-0" style="width: 4.5rem; height: 4.5rem">
+                        <app-sd-icon name="desktop" [size]="32" class="text-primary opacity-75" />
+                      </div>
+                      <div class="min-w-0">
+                        <h4 class="fw-bold mb-1">{{ deskResultsHeading(desk) }}</h4>
+                        <p class="small text-muted mb-2 d-flex align-items-center gap-2">
+                          <app-sd-icon name="building" [size]="14" class="flex-shrink-0" />
+                          <span class="text-truncate">{{ desk.building || 'Sede principale' }}</span>
+                        </p>
+                        @if (hasSpaceReviewAverage(desk.spaceAverageRating)) {
+                          <div class="d-flex align-items-center gap-1 small fw-bold text-warning mb-3">
+                            <app-sd-icon name="star" [size]="14" aria-hidden="true" />
+                            <span>{{ spaceReviewRatingCaption(desk.spaceAverageRating!) }}</span>
+                          </div>
+                        }
+                        
+                        <div role="list" class="d-flex flex-wrap gap-1">
+                          @for (tag of amenityPreviewTagsLimited(desk.amenities); track tag) {
+                            <span role="listitem" class="badge bg-light text-secondary rounded-pill fw-medium border border-light">{{ formatTag(tag) }}</span>
+                          }
+                          @if (hasHiddenTags(desk.amenities)) {
+                            <button
+                              type="button"
+                              class="badge bg-light text-primary rounded-pill fw-medium border border-light text-decoration-none border-0"
+                              (click)="openAmenitiesModal(desk)"
+                            >
+                              +{{ desk.amenities.length - amenityPreviewTagsLimited(desk.amenities).length }}
+                            </button>
+                          }
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top border-light">
+                      <button
+                        type="button"
+                        class="btn w-100 rounded-pill py-2 fw-bold shadow-0"
+                        [class.btn-primary]="
+                          (desk.availabilityKind === 'available' || desk.availabilityKind === 'partial') &&
+                          !isMaintenanceDesk(desk) &&
+                          !isDeskOccupied(desk)
+                        "
+                        [class.btn-light]="isDeskOccupied(desk) || isMaintenanceDesk(desk)"
+                        [disabled]="isMaintenanceDesk(desk) || isDeskOccupied(desk) || bookingInProgressId() === desk.id"
+                        (click)="openDeskAvailability(desk)"
+                        mdbRipple
+                      >
+                        @if (bookingInProgressId() === desk.id) {
+                          <span class="spinner-border spinner-border-sm me-2"></span>
+                        }
+                        Vedi disponibilità
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+        }
+      </div>
+    }
+  </div>
+
+  <ng-template #availabilityModal>
+    <div class="modal-content">
+      <app-sd-modal-header
+        title="Agenda disponibilità"
+        [subtitle]="(selectedDeskForTimeline ? deskCard.displayCode(selectedDeskForTimeline) : '') + ' · ' + (targetDate | date:'longDate':'':'it')"
+        icon="calendar-check"
+        (close)="closeModal()"
+      />
+      <div class="modal-body">
+        @if (selectedDeskForTimeline) {
+          <app-desk-availability-timeline
+            [deskId]="selectedDeskForTimeline.id"
+            [date]="targetDate"
+            [closedMask]="officeClosedSlotMask"
+            [slotLabels]="slotLabels"
+            [refreshTrigger]="availabilityRefreshCounter"
+            [initialRange]="{ start: targetDate + 'T' + slotStart + ':00', end: targetDate + 'T' + slotEnd + ':00' }"
+            (onBook)="bookFromTimeline($event)"
+          />
+
+          @if (timelineSelfOverlapHint) {
+            <div class="alert alert-warning rounded-4 border-0 shadow-sm p-4 mt-4" role="alert">
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <app-sd-icon name="exclamation" [size]="24" />
+                <h5 class="fw-bold mb-0">Conflitto con le tue prenotazioni</h5>
+              </div>
+              <p class="mb-0 small">{{ timelineSelfOverlapHint }}</p>
+            </div>
+          }
+          @if (timelineGenericBookError) {
+            <div class="alert alert-danger rounded-4 border-0 shadow-sm p-4 mt-4" role="alert">
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <app-sd-icon name="exclamation" [size]="24" />
+                <h5 class="fw-bold mb-0">Prenotazione non riuscita</h5>
+              </div>
+              <p class="mb-0 small">{{ timelineGenericBookError }}</p>
+            </div>
+          }
+          @if (showWaitlistInline) {
+            <div class="alert alert-danger rounded-4 border-0 shadow-sm p-4 mt-4">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <app-sd-icon name="exclamation" [size]="24" />
+                <h5 class="fw-bold mb-0">Slot non disponibile</h5>
+              </div>
+              <p class="mb-3">La postazione risulta occupata in questa fascia. Vuoi essere avvisato se si libera?</p>
+              <button class="btn btn-danger w-100 rounded-pill py-2 fw-bold" (click)="subscribeInlineWaitlist()" mdbRipple>
+                Mettimi in lista d'attesa
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </ng-template>

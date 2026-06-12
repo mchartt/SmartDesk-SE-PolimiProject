@@ -1,0 +1,612 @@
+<header class="mb-4 text-start card bg-white border-0 rounded-5 shadow-sm p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+  <div class="d-flex align-items-center gap-3">
+    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 3.5rem; height: 3.5rem">
+      <app-sd-icon name="clipboard-check" [size]="24" />
+    </div>
+    <div>
+      <p class="text-muted text-uppercase small fw-bold mb-1" style="letter-spacing: 0.5px">I tuoi ticket</p>
+      <h2 class="mb-0 fw-bold">{{ title() }}</h2>
+    </div>
+  </div>
+  <button
+    class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-2"
+    type="button"
+    (click)="load()"
+    [disabled]="loading()"
+    aria-label="Aggiorna elenco ticket"
+    mdbRipple
+  >
+    @if (loading()) {
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    } @else {
+      <app-sd-icon name="rotate-left" [size]="16" aria-hidden="true" />
+    }
+    <span>Aggiorna</span>
+  </button>
+</header>
+
+@if (errorMsg) {
+  <div class="alert alert-danger rounded-3 shadow-sm d-flex align-items-center mb-3" role="alert">
+    <app-sd-icon name="circle-xmark" [size]="20" class="me-2 flex-shrink-0" aria-hidden="true" />
+    <div>{{ errorMsg }}</div>
+  </div>
+}
+
+@if (loading()) {
+  <div class="d-flex flex-column align-items-center justify-content-center py-5 gap-3" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" aria-hidden="true"></div>
+    <p class="text-muted small mb-0">Caricamento ticket assegnati…</p>
+  </div>
+} @else if (!ticketsAll().length && !errorMsg) {
+  <app-empty-state message="Nessun ticket assegnato a te al momento." />
+} @else {
+  <app-technician-space-filter-cards
+    [spaces]="assignedSpaces()"
+    [tickets]="workingTicketsAll()"
+    [selectedFilter]="spaceFilter()"
+    (selectedFilterChange)="onSpaceFilterChange($event)"
+  />
+
+  <div class="row g-3 mb-4" role="group" aria-label="Riepilogo segnalazioni">
+    <div class="col-md-4">
+      <div class="card bg-white border-0 rounded-5 shadow-sm h-100 border-start border-primary border-3 transition-all hover-shadow">
+        <div class="p-4">
+          <p class="small text-uppercase text-muted fw-semibold mb-2">In lavorazione</p>
+          <p class="mb-0 kpi-value text-primary">{{ inProgressTicketsAll().length }}</p>
+        </div>
+        <div class="bg-transparent border-0 pt-0 pb-4 px-4">
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-sm rounded-pill w-100"
+            [disabled]="!statusListModalHasTickets('in_progress')"
+            (click)="openStatusListModal('in_progress')"
+            mdbRipple
+          >
+            Visualizza
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-white border-0 rounded-5 shadow-sm h-100 border-start border-warning border-3 transition-all hover-shadow">
+        <div class="p-4">
+          <p class="small text-uppercase text-muted fw-semibold mb-2">Attesa host</p>
+          <p class="mb-0 kpi-value text-warning">{{ verifyingTicketsAll().length }}</p>
+        </div>
+        <div class="bg-transparent border-0 pt-0 pb-4 px-4">
+          <button
+            type="button"
+            class="btn btn-outline-warning btn-sm rounded-pill w-100"
+            [disabled]="!statusListModalHasTickets('verifying')"
+            (click)="openStatusListModal('verifying')"
+            mdbRipple
+          >
+            Visualizza
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-white border-0 rounded-5 shadow-sm h-100 border-start border-success border-3 transition-all hover-shadow">
+        <div class="p-4">
+          <p class="small text-uppercase text-muted fw-semibold mb-2">Risoluzione confermata</p>
+          <p class="mb-0 kpi-value text-success">{{ resolvedTicketsAll().length }}</p>
+        </div>
+        <div class="bg-transparent border-0 pt-0 pb-4 px-4">
+          <button
+            type="button"
+            class="btn btn-outline-success btn-sm rounded-pill w-100"
+            [disabled]="!statusListModalHasTickets('resolved')"
+            (click)="openStatusListModal('resolved')"
+            mdbRipple
+          >
+            Visualizza
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (visibleInProgressTickets().length) {
+    <section class="card bg-white border-0 rounded-5 shadow-sm mb-4" aria-labelledby="tech-in-progress-title">
+      <div class="bg-transparent border-0 pt-4 pb-0 px-4">
+        <h3 id="tech-in-progress-title" class="h5 fw-bold mb-0">In lavorazione</h3>
+      </div>
+      <div class="p-4 d-flex flex-column gap-3">
+        @for (ticket of visibleInProgressTickets(); track ticket.ticketID) {
+          <ng-container *ngTemplateOutlet="assignTicketCard; context: { $implicit: ticket }" />
+        }
+      </div>
+    </section>
+  } @else if (listEmptyAfterFilter() && inProgressTicketsAll().length > 0) {
+    <div class="rounded-4 border border-dashed bg-light text-center py-4 px-3 mb-4" role="status">
+      <p class="fw-semibold mb-0">Nessun ticket in lavorazione per questo filtro</p>
+    </div>
+  }
+
+  @if (hasVerifyingTickets()) {
+    <section
+      class="card bg-white border-0 rounded-5 shadow-sm mb-4 border-start border-warning border-3"
+      aria-labelledby="tech-verifying-title"
+    >
+      <div class="bg-transparent border-0 pt-4 pb-0 px-4">
+        <h3 id="tech-verifying-title" class="h5 fw-bold mb-1">In attesa di conferma host</h3>
+        <p class="text-muted small mb-0">
+          Hai segnato la riparazione come completata: l'host deve confermare prima della chiusura definitiva.
+        </p>
+      </div>
+      <div class="p-4 d-flex flex-column gap-3">
+        @for (ticket of visibleVerifyingTickets(); track ticket.ticketID) {
+          <ng-container *ngTemplateOutlet="assignTicketCard; context: { $implicit: ticket }" />
+        }
+      </div>
+    </section>
+  }
+
+  @if (onlyArchivedVisible() && !visibleInProgressTickets().length && !visibleVerifyingTickets().length) {
+    <div class="rounded-4 border border-dashed bg-light text-center py-4 px-3 mb-3" role="status">
+      <p class="fw-semibold mb-1">Nessuna segnalazione attiva</p>
+      <p class="text-muted small mb-0">Consulta le sezioni sotto per ticket in verifica o archivio.</p>
+    </div>
+  }
+
+  @if (hasResolvedTickets()) {
+    <section
+      class="card bg-white border-0 rounded-5 shadow-sm mb-4 border-start border-success border-3"
+      aria-labelledby="technician-resolved-history-title"
+    >
+      <div class="bg-transparent border-0 d-flex flex-wrap align-items-start justify-content-between gap-3 pt-4 pb-0 px-4">
+        <div class="min-w-0">
+          <span class="small text-uppercase text-muted fw-semibold">Archivio</span>
+          <h3 id="technician-resolved-history-title" class="h5 fw-bold mb-1 mt-1">Completamente risolte</h3>
+          <p class="text-muted small mb-0">Segnalazioni con risoluzione confermata dall'host.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+          @if (resolvedTicketsAll().length) {
+            <span class="badge rounded-pill text-bg-success" aria-hidden="true">
+              {{ visibleResolvedTickets().length }}
+            </span>
+          }
+          <button
+            type="button"
+            class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1 rounded-pill"
+            [disabled]="resolvedHistoryClearing() || !resolvedTicketsAll().length"
+            (click)="requestClearResolvedHistory()"
+            aria-label="Svuota storico segnalazioni"
+            mdbRipple
+          >
+            @if (resolvedHistoryClearing()) {
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            } @else {
+              <app-sd-icon name="trash" [size]="14" aria-hidden="true" />
+            }
+            <span>Svuota storico</span>
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-success d-inline-flex align-items-center gap-2 rounded-pill px-3"
+            (click)="toggleResolvedSection()"
+            [attr.aria-expanded]="resolvedSectionOpen()"
+            mdbRipple
+          >
+            <span>{{ resolvedSectionOpen() ? 'Nascondi' : 'Mostra elenco' }}</span>
+            <app-sd-icon
+              [name]="resolvedSectionOpen() ? 'chevron-up' : 'chevron-down'"
+              [size]="14"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+      </div>
+
+      <div class="p-4">
+        @if (!resolvedSectionOpen()) {
+          <p class="text-muted small mb-0">
+            <strong>{{ resolvedTicketsAll().length }}</strong>
+            {{
+              resolvedTicketsAll().length === 1
+                ? 'segnalazione archiviata.'
+                : 'segnalazioni archiviate.'
+            }}
+            Apri l'elenco per consultare i dettagli.
+          </p>
+        } @else {
+          <div class="d-flex flex-column gap-3">
+            @for (ticket of visibleResolvedTickets(); track ticket.ticketID) {
+              <ng-container *ngTemplateOutlet="assignTicketCard; context: { $implicit: ticket }" />
+            }
+          </div>
+        }
+      </div>
+    </section>
+  }
+}
+
+@if (statusListModal(); as listKind) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="tech-status-list-title"
+    (click)="closeStatusListModal()"
+  >
+    <div
+      class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
+      role="document"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          [title]="statusListModalTitle()"
+          [subtitle]="statusListModalSubtitle()"
+          icon="ticket"
+          titleId="tech-status-list-title"
+          closeLabel="Chiudi elenco"
+          (close)="closeStatusListModal()"
+        />
+
+        <div class="modal-body pt-0">
+          <div class="d-flex flex-column flex-sm-row gap-2 mb-4">
+            <label class="visually-hidden" for="tech-status-list-search">Cerca per codice o titolo</label>
+            <div class="input-group flex-grow-1">
+              <span class="input-group-text bg-transparent" aria-hidden="true">
+                <app-sd-icon name="search" [size]="17" />
+              </span>
+              <input
+                id="tech-status-list-search"
+                type="search"
+                mdbInput
+                class="form-control"
+                placeholder="Cerca per codice o titolo…"
+                autocomplete="off"
+                [ngModel]="statusListSearchQuery()"
+                (ngModelChange)="statusListSearchQuery.set($event)"
+              />
+            </div>
+            @if (listKind === 'resolved' && hasResolvedTickets()) {
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm rounded-pill flex-shrink-0"
+                (click)="openResolvedArchiveFromListModal()"
+                mdbRipple
+              >
+                <app-sd-icon name="history" [size]="14" class="me-1" aria-hidden="true" />
+                Storico completo
+              </button>
+            }
+          </div>
+          @if (!statusListModalTickets().length) {
+            <p class="text-muted small mb-0 text-center py-4" role="status">
+              @if (statusListSearchQuery().trim()) {
+                Nessuna segnalazione corrisponde alla ricerca.
+              } @else {
+                Nessuna segnalazione in questa categoria per il filtro selezionato.
+              }
+            </p>
+          } @else {
+            <div class="d-flex flex-column gap-3">
+              @for (ticket of statusListModalTickets(); track ticket.ticketID) {
+                <ng-container *ngTemplateOutlet="assignTicketCard; context: { $implicit: ticket }" />
+              }
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" (click)="closeStatusListModal()" mdbRipple>
+            Chiudi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}
+
+@if (detailTicket(); as ticket) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'tech-assign-detail-title-' + ticket.ticketID"
+    (click)="closeTicketDetail()"
+  >
+    <div
+      class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
+      role="document"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          [title]="ticketPrimaryHeading(ticket)"
+          [subtitle]="ticketRefSubtitle(ticket) || null"
+          icon="ticket"
+          [titleId]="'tech-assign-detail-title-' + ticket.ticketID"
+          closeLabel="Chiudi dettagli"
+          (close)="closeTicketDetail()"
+        />
+
+        <div class="modal-body">
+          @if (ticketDescriptionText(ticket)) {
+            <section class="mb-4" [attr.aria-labelledby]="'tech-assign-desc-label-' + ticket.ticketID">
+              <h6 [id]="'tech-assign-desc-label-' + ticket.ticketID" class="fw-semibold mb-2">Descrizione</h6>
+              <div class="border rounded-4 p-3 bg-light" tabindex="0">
+                <p class="mb-0 text-break">{{ ticketDescriptionText(ticket) }}</p>
+              </div>
+            </section>
+          }
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <ul class="list-group list-group-flush border rounded-3">
+                <li class="list-group-item d-flex align-items-start gap-2 py-2">
+                  <app-sd-icon name="user" [size]="14" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                  <span class="small"><span class="fw-semibold">Utente:</span> {{ workerFullName(ticket) }}</span>
+                </li>
+                <li class="list-group-item d-flex align-items-start gap-2 py-2">
+                  <app-sd-icon name="envelope" [size]="14" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                  <span class="small">
+                    <span class="fw-semibold">Email:</span>
+                    @if (ticket.workerEmail) {
+                      <a [href]="'mailto:' + ticket.workerEmail" class="link-primary">{{ ticket.workerEmail }}</a>
+                    } @else {
+                      —
+                    }
+                  </span>
+                </li>
+                <li class="list-group-item d-flex align-items-start gap-2 py-2">
+                  <app-sd-icon name="building" [size]="14" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                  <span class="small"><span class="fw-semibold">Ufficio:</span> {{ spaceCaption(ticket) || '—' }}</span>
+                </li>
+                <li class="list-group-item d-flex align-items-start gap-2 py-2">
+                  <app-sd-icon name="desktop" [size]="14" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                  <span class="small"><span class="fw-semibold">Postazione:</span> {{ deskLabel(ticket) }}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-group list-group-flush border rounded-3">
+                <li class="list-group-item d-flex align-items-start gap-2 py-2">
+                  <app-sd-icon name="exclamation" [size]="14" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                  <span class="small"><span class="fw-semibold">Gravità:</span> {{ severityLabel(ticket.severity) }}</span>
+                </li>
+                <li class="list-group-item d-flex align-items-start gap-2 py-2">
+                  <app-sd-icon name="calendar" [size]="14" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                  <span class="small"><span class="fw-semibold">Data di creazione:</span> {{ formatTicketWhen(ticket.createdAt) }}</span>
+                </li>
+                <li class="list-group-item d-flex align-items-start gap-2 py-2">
+                  <app-sd-icon name="clock" [size]="14" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                  <span class="small">
+                    <span class="fw-semibold">Data di risoluzione stimata:</span>
+                    {{ formatTicketEstimatedDate(ticket.estimatedResolutionAt) }}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+              <app-ticket-status-badge [status]="ticket.status || 'OPEN'" />
+            </div>
+            <app-ticket-status-progress [status]="ticket.status || 'OPEN'" [detail]="true" />
+          </div>
+
+          @if (canEditTicket(ticket)) {
+            <div class="border rounded-4 p-3 bg-light d-flex flex-column gap-4">
+              <div>
+                <span class="d-block small fw-semibold text-muted mb-2">Gravità</span>
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                  <div class="apple-segment-control" role="radiogroup" aria-label="Seleziona gravità" aria-required="true">
+                    @for (opt of severityOptions; track opt.value) {
+                      <button
+                        type="button"
+                        class="apple-segment-btn"
+                        role="radio"
+                        [attr.aria-checked]="severityDraft() === opt.value"
+                        [class.active]="severityDraft() === opt.value"
+                        [attr.data-level]="opt.value"
+                        (click)="selectSeverity(opt.value)"
+                      >
+                        {{ opt.label }}
+                      </button>
+                    }
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm"
+                    [disabled]="savingFields() || !isSeverityDraftValid()"
+                    (click)="saveSeverity()"
+                    mdbRipple
+                  >
+                    Salva
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <span class="d-block small fw-semibold text-muted mb-2">Data risoluzione stimata</span>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                  <div style="max-width: 14rem">
+                    <mdb-form-control>
+                      <input
+                        mdbInput
+                        type="date"
+                        class="form-control form-control-sm"
+                        id="estimatedDateInput"
+                        [ngModel]="estimatedDateDraft()"
+                        (ngModelChange)="estimatedDateDraft.set($event)"
+                      />
+                      <label mdbLabel class="form-label" for="estimatedDateInput">Data risoluzione stimata</label>
+                    </mdb-form-control>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm rounded-pill"
+                    [disabled]="savingFields() || !estimatedDateDraft()"
+                    (click)="saveEstimatedResolution()"
+                    mdbRipple
+                  >
+                    Salva
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" (click)="closeTicketDetail()" mdbRipple>
+            Chiudi
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-sm rounded-pill d-inline-flex align-items-center gap-1 position-relative"
+            [class.border-danger]="hasUnreadChat(ticket)"
+            [class.text-danger]="hasUnreadChat(ticket)"
+            [attr.aria-label]="hasUnreadChat(ticket) ? 'Apri chat, ' + ticketNewIncomingCount(ticket) + ' nuovi messaggi' : 'Apri chat'"
+            (click)="openChatModal(ticket)"
+            mdbRipple
+          >
+            <app-sd-icon name="reply" [size]="14" aria-hidden="true" />
+            Apri chat
+            @if (hasUnreadChat(ticket)) {
+              <span
+                class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"
+                aria-hidden="true"
+              ></span>
+            }
+          </button>
+          @if (canEditTicket(ticket)) {
+            <button type="button" class="btn btn-success btn-sm rounded-pill" (click)="confirmMarkRepaired(ticket)" mdbRipple>
+              Segna come risolto
+            </button>
+          } @else if (isVerifyingTicket(ticket)) {
+            <span class="badge bg-info rounded-pill px-3 py-2">In attesa convalida host</span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}
+
+@if (chatTicket(); as ticket) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="tech-assign-chat-title"
+    (click)="closeChatModal()"
+  >
+    <div
+      class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
+      role="document"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+        <app-sd-modal-header
+          title="Chat ticket"
+          [subtitle]="ticketPrimaryHeading(ticket)"
+          icon="reply"
+          titleId="tech-assign-chat-title"
+          closeLabel="Chiudi chat"
+          (close)="closeChatModal()"
+        />
+        <div class="modal-body">
+          <app-ticket-chat-panel
+            [ticket]="ticket"
+            viewer="technician"
+            [canComment]="canAddComment(ticket)"
+            [sending]="isCommentSending(ticket.ticketID)"
+            [commentError]="commentError(ticket.ticketID)"
+            [commentDraft]="commentDraft(ticket.ticketID)"
+            [relaxed]="true"
+            (commentDraftChange)="setCommentDraft(ticket.ticketID, $event)"
+            (submitComment)="submitComment(ticket.ticketID)"
+            commentPlaceholder="Scrivi un aggiornamento per il lavoratore…"
+            emptyHint="Nessun messaggio ancora."
+            closedHint="Ticket chiuso: non è possibile aggiungere altri commenti."
+          />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" (click)="closeChatModal()" mdbRipple>
+            Chiudi chat
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}
+
+<ng-template #assignTicketCard let-ticket>
+  <article
+    class="card bg-white border-0 rounded-5 shadow-sm transition-all hover-shadow"
+    [class.border-start]="isVerifyingTicket(ticket) || isResolvedTicket(ticket)"
+    [class.border-warning]="isVerifyingTicket(ticket)"
+    [class.border-success]="isResolvedTicket(ticket)"
+    [class.border-3]="isVerifyingTicket(ticket) || isResolvedTicket(ticket)"
+  >
+    <div class="p-4 d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+      <div
+        class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+        style="width: 2.75rem; height: 2.75rem"
+        aria-hidden="true"
+      >
+        <app-sd-icon name="ticket" [size]="18" />
+      </div>
+
+      <div class="min-w-0 flex-grow-1">
+        <h3 class="h6 fw-bold mb-1 text-truncate" [attr.title]="ticketTitleTooltip(ticket) || null">
+          {{ ticketPrimaryHeading(ticket) }}
+        </h3>
+        @if (ticketRefSubtitle(ticket); as tref) {
+          <p class="small text-muted mb-1">{{ tref }}</p>
+        }
+        <p
+          class="small mb-0 text-truncate"
+          [class.text-muted]="!ticketDescriptionText(ticket)"
+          [attr.title]="ticketDescriptionText(ticket) || null"
+        >
+          {{ ticketDescriptionText(ticket) || 'Nessuna descrizione.' }}
+        </p>
+      </div>
+
+      <div class="d-flex flex-column align-items-lg-end gap-2 flex-shrink-0">
+        <app-ticket-status-badge [status]="ticket.status || 'OPEN'" [compact]="true" />
+        <app-ticket-status-progress
+          [status]="ticket.status || 'OPEN'"
+          [compact]="true"
+          [cardSide]="true"
+        />
+      </div>
+    </div>
+
+    <div class="bg-transparent border-0 pt-0 pb-3 px-3 d-flex flex-wrap gap-2">
+      <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" (click)="openTicketDetail(ticket)" mdbRipple>
+        Vedi dettagli
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-secondary btn-sm rounded-pill position-relative"
+        [class.border-danger]="hasUnreadChat(ticket)"
+        [class.text-danger]="hasUnreadChat(ticket)"
+        [attr.aria-label]="hasUnreadChat(ticket) ? 'Chat, ' + ticketNewIncomingCount(ticket) + ' nuovi messaggi' : 'Chat'"
+        (click)="openChatModal(ticket)"
+        mdbRipple
+      >
+        Chat
+        @if (hasUnreadChat(ticket)) {
+          <span
+            class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"
+            aria-hidden="true"
+          ></span>
+        }
+      </button>
+    </div>
+  </article>
+</ng-template>

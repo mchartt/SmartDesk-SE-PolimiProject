@@ -1,0 +1,2 @@
+export const TICKET_TITLE_MAX_LENGTH = 30;
+export const TICKET_DESCRIPTION_MAX_LENGTH = 1000;

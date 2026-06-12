@@ -1,0 +1,88 @@
+@if (assignPickSpaceModalOpen()) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="host-tech-assign-space-pick-title"
+    (click)="closeAssignSpaceModal()"
+  >
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <app-sd-modal-header
+          title="Spazio"
+          subtitle="Scegli uno spazio approvato"
+          icon="building"
+          titleId="host-tech-assign-space-pick-title"
+          (close)="closeAssignSpaceModal()"
+        />
+        <div class="modal-body">
+          <label class="form-label mb-2" for="host-tech-assign-space-search">Cerca</label>
+          <div class="input-group mb-3">
+            <span class="input-group-text bg-transparent" aria-hidden="true">
+              <app-sd-icon name="search" [size]="18" />
+            </span>
+            <input
+              id="host-tech-assign-space-search"
+              type="search"
+              mdbInput
+              class="form-control"
+              placeholder="Nome, città, codice ufficio…"
+              autocomplete="off"
+              aria-label="Cerca tra gli spazi"
+              [ngModel]="assignPickSpaceSearch()"
+              (ngModelChange)="assignPickSpaceSearch.set($event)"
+            />
+          </div>
+          <ul class="list-group list-group-flush rounded-3 border mb-0" role="listbox" aria-label="Spazi approvati">
+            @for (sp of assignSpacesAssignmentFiltered(); track sp.spaceID) {
+              <li class="list-group-item list-group-item-action p-0 border-0 border-bottom" role="presentation">
+                <button
+                  type="button"
+                  class="btn w-100 text-start d-flex align-items-start gap-3 p-3 rounded-0"
+                  [class.active]="isAssignSpacePickSelected(sp.spaceID)"
+                  role="option"
+                  [attr.aria-selected]="isAssignSpacePickSelected(sp.spaceID)"
+                  (click)="pickSpaceForAssignment(sp)"
+                  mdbRipple
+                >
+                  <span
+                    class="rounded-3 bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center flex-shrink-0"
+                    style="width: 2.25rem; height: 2.25rem"
+                    aria-hidden="true"
+                  >
+                    <app-sd-icon name="building" [size]="18" />
+                  </span>
+                  <span class="flex-grow-1 min-w-0">
+                    <span class="fw-semibold d-block">{{ sp.name }}</span>
+                    <span class="small text-muted d-block">
+                      {{ sp.officeCode || '—' }}
+                      @if (sp.city.trim()) {
+                        <span aria-hidden="true"> · </span>{{ sp.city }}
+                      }
+                    </span>
+                  </span>
+                  <app-sd-icon name="arrow-right" [size]="18" class="text-muted flex-shrink-0 mt-1" aria-hidden="true" />
+                </button>
+              </li>
+            } @empty {
+              <p class="text-muted small mb-0 px-3 py-3 text-center">
+                {{
+                  assignPickSpaceSearch().trim()
+                    ? 'Nessuno spazio corrisponde alla ricerca.'
+                    : 'Nessuno spazio approvato.'
+                }}
+              </p>
+            }
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeAssignSpaceModal()" mdbRipple>
+            Chiudi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

@@ -1,0 +1,85 @@
+<section class="mb-4" aria-labelledby="host-tech-mgmt-heading">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h3 id="host-tech-mgmt-heading" class="fw-bold h5 mb-0">Gestione tecnici</h3>
+      @if (showSeeAllTechniciansCta()) {
+        <p class="text-muted small mb-0 mt-2 lh-sm text-balance">
+          Ultimi {{ recentTechDashboardLimit }} tecnici creati<span aria-hidden="true"> · </span>{{ technicianTotalCount() }} nel team
+        </p>
+      }
+    </div>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      @if (showSeeAllTechniciansCta()) {
+        <button
+          type="button"
+          class="btn btn-outline-primary rounded-pill d-inline-flex align-items-center gap-2 position-relative"
+          (click)="openTechSearchModal()"
+          aria-haspopup="dialog"
+          [attr.aria-expanded]="isTechSearchModalOpen()"
+          mdbRipple
+        >
+          <app-sd-icon name="search" [size]="17" />
+          <span>Vedi tutti</span>
+          @if (techMgmtModalFiltersActive()) {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger p-1" aria-hidden="true">
+              <span class="visually-hidden">Filtri attivi</span>
+            </span>
+          }
+        </button>
+      }
+      @if (showDashboardInlineSearch() && allTechniciansCount()) {
+        <div class="input-group" style="min-width: 12rem">
+          <span class="input-group-text bg-transparent" aria-hidden="true">
+            <app-sd-icon name="search" [size]="18" />
+          </span>
+          <label class="visually-hidden" for="host-tech-mgmt-search">Cerca tecnici</label>
+          <input
+            id="host-tech-mgmt-search"
+            type="search"
+            mdbInput
+            class="form-control"
+            placeholder="Nome, email, codice…"
+            autocomplete="off"
+            [ngModel]="techQuickQuery()"
+            (ngModelChange)="techQuickQuery.set($event)"
+          />
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (loadingAllTechs()) {
+    <div class="d-flex align-items-center gap-2 text-muted small py-3" role="status">
+      <div class="spinner-border spinner-border-sm text-primary" aria-hidden="true"></div>
+      <span>Caricamento elenco tecnici…</span>
+    </div>
+  } @else if (!dashboardTechnicians().length) {
+    <div class="card bg-white border-0 rounded-5 shadow-sm text-center py-5 px-4">
+      <div class="text-primary mb-3" aria-hidden="true">
+        <app-sd-icon name="user-tie" [size]="36" />
+      </div>
+      <p class="fw-semibold mb-1">
+        @if (!allTechniciansCount()) {
+          Nessun tecnico nel sistema
+        } @else if (showDashboardInlineSearch() && techQuickQuery().trim()) {
+          Nessun risultato
+        } @else {
+          Nessun tecnico da mostrare
+        }
+      </p>
+      <p class="text-muted small mb-0">
+        @if (!allTechniciansCount()) {
+          Usa «Aggiungi tecnico» per creare il primo account.
+        } @else {
+          Modifica i termini di ricerca o apri «Vedi tutti».
+        }
+      </p>
+    </div>
+  } @else {
+    <div class="row g-3" role="list">
+      @for (t of dashboardTechnicians(); track t.technicianID) {
+        <app-technician-mgmt-row [technician]="t" />
+      }
+    </div>
+  }
+</section>
