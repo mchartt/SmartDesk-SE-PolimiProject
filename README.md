@@ -1,5 +1,4 @@
 # SmartDesk - Coworking Platform
-# SmartDesk
 
 ![SmartDesk Preview](preview.png)
 
